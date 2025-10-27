@@ -322,10 +322,10 @@ const Index = () => {
         {/* Hero headline */}
         <div id="mission" className="relative mt-[65px] mb-6 overflow-visible py-6 md:py-8 min-h-[480px] md:min-h-[560px]">
           <h1 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight max-w-2xl mx-auto leading-tight">
-            empowering creators through streaming visibility.  Stream any coin on any launch pad, on any platform.
+            Get instant access to every top third-party API with a single call — no API key required.
           </h1>
           <p className="mt-3 text-center text-foreground/80 max-w-xl mx-auto text-sm md:text-base leading-relaxed" style={{ transform: `translateX(${descX}px)` }}>
-            Launch a campagin for your cause instantly. Through livestream tokenization Liberated allows you to raise capital for your cause without ever having to receive a direct donation.
+            Welcome to the world's first x402-powered API marketplace, where developers can connect to leading APIs instantly, pay in crypto, and start building faster than ever.
           </p>
           {showPos && (
             <div className="mt-1 text-center text-[10px] text-muted-foreground">descX: {descX}px</div>
