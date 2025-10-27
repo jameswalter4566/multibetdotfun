@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Pure black background + light foreground */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+
+    --card: 220 12% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 220 12% 12%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 92%;
+    --primary-foreground: 220 13% 8%;
+
+    --secondary: 220 10% 16%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 6% 65%;
+
+    --accent: 220 10% 18%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 10% 22%;
+    --input: 220 10% 22%;
+    --ring: 220 10% 40%;
+
+    --radius: 1rem;
+
+    /* Sidebar matches pure black */
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 92%;
+    --sidebar-primary-foreground: 220 13% 8%;
+    --sidebar-accent: 220 10% 16%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 220 10% 22%;
+    --sidebar-ring: 220 10% 40%;
+
+    /* Nav glass: set to black */
+    --nav-background: hsl(0 0% 0% / 1);
+    --nav-backdrop: blur(20px);
+
+    /* Gradients and shadows */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 85%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 90%), hsl(0 0% 75%));
+    --gradient-accent: linear-gradient(45deg, hsl(0 0% 88%), hsl(0 0% 70%));
+    --shadow-glow: 0 0 20px hsl(0 0% 100% / 0.06);
+    --shadow-create: 0 0 30px hsl(0 0% 100% / 0.1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body { @apply bg-background text-foreground font-sans font-bold antialiased; }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-inter);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
+  }
+
+  p, span, div, li {
+    font-family: var(--font-inter);
+    font-weight: var(--font-weight-regular);
+  }
+
+  button {
+    font-family: var(--font-inter);
+    font-weight: var(--font-weight-medium);
+  }
+
+  input, textarea, select {
+    font-family: var(--font-inter);
+    font-weight: var(--font-weight-regular);
+  }
+
+  label {
+    font-family: var(--font-inter);
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* Code/monospace */
+  code, pre, .monospace {
+    font-family: var(--font-jetbrains-mono);
+  }
+}
+
+@layer components {
+  /* iOS-style surfaces */
+  .ios-card { @apply relative z-20 bg-card border border-border rounded-2xl shadow-glow; }
+  .ios-tile { @apply ios-card overflow-hidden transition-transform duration-200 hover:-translate-y-0.5; }
+
+  /* App content wrapper intentionally has no z-index so grid can sit above base bg but below cards */
+  .app-content {}
+
+  /* nav glass (clips style) */
+  .nav-glass {
+    background: var(--nav-background);
+    backdrop-filter: var(--nav-backdrop);
+    -webkit-backdrop-filter: var(--nav-backdrop);
+  }
+  .ios-nav-link { @apply text-foreground font-medium px-3 py-1.5 rounded-full hover:bg-accent/20; }
+
+  /* Inputs – dark style */
+  .ios-input { @apply w-full rounded-2xl border border-border bg-secondary px-4 py-3 shadow-sm focus-visible:ring-2 focus-visible:ring-ring outline-none; }
+  .ios-textarea { @apply w-full rounded-2xl border border-border bg-secondary p-3 shadow-sm focus-visible:ring-2 focus-visible:ring-ring outline-none; }
+
+  /* Apple-style hero typography */
+  .hero-headline {
+    font-family: var(--font-inter);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    color: hsl(var(--foreground));
+    font-size: 2.25rem; /* 36px */
+  }
+  @media (min-width: 768px) { /* md */
+    .hero-headline { font-size: 3.5rem; /* 56px */ }
+  }
+  @media (min-width: 1024px) { /* lg */
+    .hero-headline { font-size: 4rem; /* 64px */ }
+  }
+
+  .hero-subhead {
+    font-family: var(--font-inter);
+    font-weight: 700; /* bold per request */
+    letter-spacing: -0.01em;
+    line-height: 1.45;
+    text-align: center;
+    color: hsl(var(--foreground));
+    max-width: 72ch;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1rem; /* 16px */
+  }
+  @media (min-width: 768px) {
+    .hero-subhead { font-size: 1.1875rem; /* 19px */ }
+  }
+  @media (min-width: 1024px) {
+    .hero-subhead { font-size: 1.3125rem; /* 21px */ }
+  }
+  /* Emphasized phrase inside hero paragraph (2x larger) */
+  .hero-emph { font-weight: 800; color: hsl(var(--foreground)); font-size: 2em; line-height: 1.2; }
+
+  /* Extra utilities mirrored from clips */
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-secondary { background: var(--gradient-secondary); }
+  .gradient-accent { background: var(--gradient-accent); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-create { box-shadow: var(--shadow-create); }
+}

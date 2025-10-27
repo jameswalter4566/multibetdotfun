@@ -1,0 +1,32 @@
+.gridbg-root{
+  position: fixed;
+  inset: 0;
+  z-index: 5; /* above base background, below cards/content */
+  pointer-events: none;
+}
+.gridbg-base,
+.gridbg-highlight{
+  position: absolute;
+  inset: 0;
+  background-color: transparent;
+  /* Faint blue grid — 2x larger squares */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(14,165,255,0.0) 0px, rgba(14,165,255,0.0) 47px, rgba(14,165,255,0.10) 48px),
+    repeating-linear-gradient(90deg, rgba(14,165,255,0.0) 0px, rgba(14,165,255,0.0) 47px, rgba(14,165,255,0.10) 48px);
+  background-size: auto;
+}
+.gridbg-highlight{
+  /* brighter grid lines for the highlight */
+  background-image:
+    repeating-linear-gradient(0deg, rgba(14,165,255,0.0) 0px, rgba(14,165,255,0.0) 47px, rgba(56,189,248,0.35) 48px),
+    repeating-linear-gradient(90deg, rgba(14,165,255,0.0) 0px, rgba(14,165,255,0.0) 47px, rgba(56,189,248,0.35) 48px);
+  -webkit-mask-image: radial-gradient(220px 220px at var(--mx) var(--my), rgba(255,255,255,1), rgba(255,255,255,0));
+          mask-image: radial-gradient(220px 220px at var(--mx) var(--my), rgba(255,255,255,1), rgba(255,255,255,0));
+}
+.gridbg-header-mask{
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 80px; /* reduced header height while keeping grid hidden */
+  /* Match the site background exactly to avoid visible seam */
+  background: hsl(var(--background));
+}
