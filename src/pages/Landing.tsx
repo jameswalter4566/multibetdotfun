@@ -61,20 +61,20 @@ export default function Landing() {
 
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
           <div className="relative -translate-y-[20px]">
-            <h1 className="hero-headline hero-text-shadow font-extrabold tracking-tight">
+            <h1 className="hero-headline hero-text-shadow hero-slide font-extrabold tracking-tight">
               instant access to every top third party api with a single call
             </h1>
-            <h2 className="hero-text-shadow mt-4 text-center text-2xl md:text-3xl font-bold text-muted-foreground">
-              no API key required. Powered by x402
+            <h2 className="hero-text-shadow hero-slide hero-slide-delay-1 mt-4 text-center text-2xl md:text-3xl font-bold text-white">
+              <span className="hero-highlight">no API key required. Powered by x402</span>
             </h2>
 
-            <div className="hero-text-shadow mt-8 text-center text-sm md:text-base text-foreground/90">
+            <div className="hero-text-shadow hero-slide hero-slide-delay-2 mt-8 text-center text-sm md:text-base text-foreground/90">
               Make your first call for free now
             </div>
 
-            <div className="mt-3 flex justify-center">
+            <div className="hero-slide hero-slide-delay-3 mt-3 flex justify-center">
               <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
-                <Link to="/marketplace">Explore API marketplace</Link>
+                <Link to="/home">Explore API marketplace</Link>
               </Button>
             </div>
           </div>
