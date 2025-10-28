@@ -38,7 +38,7 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background decorative tiles with logos (moved outside hero, behind) */}
-        <div className="absolute inset-0 -z-10" aria-hidden>
+        <div className="absolute inset-0 z-0" aria-hidden>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
             <div className="grid grid-cols-6 gap-3 sm:gap-3">
               {heroLogos.slice(0, 18).map((logo, i) => (
