@@ -10,13 +10,9 @@ export default function SiteFooter({ className }: SiteFooterProps) {
     <footer className={cn("w-full bg-black text-white border-t border-white/10", className)}>
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left: vertical text links + CTA */}
-          <div>
-            <nav className="flex flex-col gap-2 text-sm">
-              <a href="/about" className="text-white/90 hover:text-white hover:underline">About us</a>
-              <a href="/what-we-do" className="text-white/90 hover:text-white hover:underline">What we do</a>
-              <a href="/campaigns" className="text-white/90 hover:text-white hover:underline">Start a Campaign</a>
-            </nav>
+          {/* Left: brand statement */}
+          <div className="text-sm text-white/80 leading-relaxed max-w-sm">
+            x402 marketplace connects builders to production-ready APIs with wallet-based billing and zero credential sprawl.
           </div>
 
           {/* Right: social icons in circles */}

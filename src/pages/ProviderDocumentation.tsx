@@ -26,7 +26,14 @@ export default function ProviderDocumentation() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen flex-col lg:flex-row">
-        <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-border lg:bg-secondary/30">
+        <aside className="hidden lg:flex lg:w-72 lg:flex-col lg:border-r lg:border-border lg:bg-secondary/30">
+          <Link
+            to="/"
+            className="flex items-center gap-3 px-6 pt-6 pb-4 border-b border-border/70 hover:opacity-80 transition-opacity"
+          >
+            <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-12 w-auto" />
+            <span className="text-sm font-semibold tracking-tight">x402 marketplace</span>
+          </Link>
           <div className="px-6 py-6 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Applications</div>
           <nav className="flex-1 overflow-y-auto px-2 pb-8">
             <ul className="space-y-1">
@@ -53,6 +60,13 @@ export default function ProviderDocumentation() {
         </aside>
 
         <main className="flex-1">
+          <div className="lg:hidden border-b border-border/70 px-6 py-4 flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-10 w-auto" />
+              <span className="text-sm font-semibold tracking-tight">x402 marketplace</span>
+            </Link>
+          </div>
+
           <div className="mx-auto w-full max-w-5xl px-6 py-10 md:px-12">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>

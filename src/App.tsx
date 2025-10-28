@@ -15,6 +15,7 @@ import ExploreCampaigns from "./pages/ExploreCampaigns";
 import Campaign from "./pages/Campaign";
 import NotFound from "./pages/NotFound";
 import ProviderDocumentation from "./pages/ProviderDocumentation";
+import TestSandbox from "./pages/TestSandbox";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
+          <Route path="/sandbox" element={<TestSandbox />} />
           <Route path="/stream/:channel" element={<Stream />} />
           <Route path="/profile/:channel" element={<Profile />} />
           <Route path="/signin" element={<SignIn />} />
