@@ -15,7 +15,6 @@ import ExploreCampaigns from "./pages/ExploreCampaigns";
 import Campaign from "./pages/Campaign";
 import NotFound from "./pages/NotFound";
 import ProviderDocumentation from "./pages/ProviderDocumentation";
-import TestSandbox from "./pages/TestSandbox";
 
 const queryClient = new QueryClient();
 
@@ -27,8 +26,9 @@ const App = () => (
       <div className="app-content">
         <BrowserRouter>
           <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/home" element={<Index />} />
+          <Route path="/" element={<Index initialView="marketplace" />} />
+          <Route path="/home" element={<Index initialView="marketplace" />} />
+          <Route path="/sandbox" element={<Index initialView="sandbox" />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/documentation/:slug" element={<ProviderDocumentation />} />

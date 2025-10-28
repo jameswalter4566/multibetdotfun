@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import SiteFooter from "@/components/SiteFooter";
 import { apiProviders, getProviderBySlug } from "@/data/apiProviders";
+import { cn } from "@/lib/utils";
 
 const sampleCatalog: Record<string, string[]> = {
   openai: [
@@ -72,7 +72,11 @@ const payloadTemplates: Record<string, string> = {
   ),
 };
 
-export default function TestSandbox() {
+type SandboxPanelProps = {
+  className?: string;
+};
+
+export default function SandboxPanel({ className }: SandboxPanelProps) {
   const [providerSlug, setProviderSlug] = useState(apiProviders[0]?.slug ?? "");
   const provider = useMemo(() => getProviderBySlug(providerSlug), [providerSlug]);
 
@@ -90,23 +94,13 @@ export default function TestSandbox() {
 
   const samples = sampleCatalog[providerSlug] ?? ["Sample request"];
 
-  if (!provider) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center gap-6 px-6 text-center">
-          <div className="text-3xl font-semibold">No sandbox available</div>
-          <p className="text-muted-foreground">
-            Select a different provider from the navigation or return to the marketplace to choose an integration.
-          </p>
-          <Button asChild>
-            <a href="/marketplace">Back to marketplace</a>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const handleTryIt = async () => {
+    if (!provider) {
+      setStatus("error");
+      setResponseText("Provider metadata unavailable.");
+      return;
+    }
+
     setStatus("loading");
     setResponseText("Sending request to provider…");
 
@@ -155,7 +149,6 @@ export default function TestSandbox() {
       }
 
       const res = await fetch(targetUrl, fetchOptions);
-
       const text = await res.text();
       setResponseText(text || "(empty response)");
       setStatus(res.ok ? "success" : "error");
@@ -167,130 +160,124 @@ export default function TestSandbox() {
     }
   };
 
+  if (!provider) {
+    return (
+      <div className={cn("rounded-3xl border border-border bg-secondary/30 p-6 text-sm text-muted-foreground", className)}>
+        No sandbox providers are configured yet. Add an API in `apiProviders.ts` to enable testing.
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="flex flex-col gap-2 border-b border-border bg-background/80 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
-        <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-12 w-auto" />
-          <span className="text-base font-semibold tracking-tight">x402 marketplace sandbox</span>
-        </a>
-        <div className="text-sm text-muted-foreground">
-          Choose an API, load a preset input, and run a live request with your session headers.
+    <div className={cn("flex flex-col gap-8 lg:flex-row", className)}>
+      <section className="space-y-6 lg:w-[360px]">
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+            API Provider
+          </label>
+          <select
+            value={providerSlug}
+            onChange={(event) => setProviderSlug(event.target.value)}
+            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            {apiProviders.map((item) => (
+              <option key={item.slug} value={item.slug}>
+                {item.name}
+              </option>
+            ))}
+          </select>
         </div>
-      </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-6 py-10 lg:flex-row">
-        <section className="lg:w-[360px] space-y-6">
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
-              API Provider
-            </label>
-            <select
-              value={providerSlug}
-              onChange={(event) => setProviderSlug(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              {apiProviders.map((item) => (
-                <option key={item.slug} value={item.slug}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
-              Test string
-            </label>
-            <select
-              value={sampleInput}
-              onChange={(event) => {
-                const index = Number(event.target.value) || 0;
-                setSampleInput(index);
-                if (provider.method === "GET") {
-                  setRequestText(samples[index] ?? "");
-                } else {
-                  const baseTemplate = payloadTemplates[providerSlug];
-                  if (baseTemplate) {
-                    try {
-                      const parsed = JSON.parse(baseTemplate);
-                      if (Array.isArray(parsed.messages) && parsed.messages.length > 1) {
-                        parsed.messages[1].content = samples[index] ?? parsed.messages[1].content;
-                      } else if (parsed.body) {
-                        parsed.body = samples[index];
-                      } else if (parsed.description) {
-                        parsed.description = samples[index];
-                      }
-                      setRequestText(JSON.stringify(parsed, null, 2));
-                    } catch {
-                      setRequestText(baseTemplate);
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+            Test string
+          </label>
+          <select
+            value={sampleInput}
+            onChange={(event) => {
+              const index = Number(event.target.value) || 0;
+              setSampleInput(index);
+              if (provider.method === "GET") {
+                setRequestText(samples[index] ?? "");
+              } else {
+                const baseTemplate = payloadTemplates[providerSlug];
+                if (baseTemplate) {
+                  try {
+                    const parsed = JSON.parse(baseTemplate);
+                    if (Array.isArray(parsed.messages) && parsed.messages.length > 1) {
+                      parsed.messages[1].content = samples[index] ?? parsed.messages[1].content;
+                    } else if (parsed.body) {
+                      parsed.body = samples[index];
+                    } else if (parsed.description) {
+                      parsed.description = samples[index];
                     }
+                    setRequestText(JSON.stringify(parsed, null, 2));
+                  } catch {
+                    setRequestText(baseTemplate);
                   }
                 }
-              }}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              {samples.map((label, index) => (
-                <option key={index} value={index}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
-              Request payload / query
-            </label>
-            <textarea
-              value={requestText}
-              onChange={(event) => setRequestText(event.target.value)}
-              rows={provider.method === "GET" ? 4 : 10}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              placeholder="Enter JSON payload or query string"
-            />
-            <p className="mt-2 text-xs text-muted-foreground">
-              Include your wallet-backed <code className="font-mono text-[11px]">x402-session</code> header when testing from
-              your client.
-            </p>
-          </div>
-
-          <Button
-            onClick={handleTryIt}
-            disabled={status === "loading"}
-            className="w-full rounded-xl bg-[#0ea5ff] px-4 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+              }
+            }}
+            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
-            {status === "loading" ? "Calling endpoint…" : "Try it"}
-          </Button>
-        </section>
+            {samples.map((label, index) => (
+              <option key={index} value={index}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <section className="flex-1 rounded-3xl border border-border bg-secondary/30 p-6 shadow-inner">
-          <div className="flex items-center justify-between border-b border-border/70 pb-4">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Response</div>
-              <div className="mt-1 text-sm text-muted-foreground">Method: {provider.method}</div>
-            </div>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                status === "success"
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : status === "error"
-                  ? "bg-red-500/20 text-red-400"
-                  : status === "loading"
-                  ? "bg-yellow-500/20 text-yellow-300"
-                  : "bg-border text-muted-foreground"
-              }`}
-            >
-              {status.toUpperCase()}
-            </span>
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+            Request payload / query
+          </label>
+          <textarea
+            value={requestText}
+            onChange={(event) => setRequestText(event.target.value)}
+            rows={provider.method === "GET" ? 4 : 10}
+            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            placeholder="Enter JSON payload or query string"
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Include your wallet-backed <code className="font-mono text-[11px]">x402-session</code> header when testing from
+            your client.
+          </p>
+        </div>
+
+        <Button
+          onClick={handleTryIt}
+          disabled={status === "loading"}
+          className="w-full rounded-xl bg-[#0ea5ff] px-4 py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+        >
+          {status === "loading" ? "Calling endpoint…" : "Try it"}
+        </Button>
+      </section>
+
+      <section className="flex-1 rounded-3xl border border-border bg-secondary/30 p-6 shadow-inner">
+        <div className="flex items-center justify-between border-b border-border/70 pb-4">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Response</div>
+            <div className="mt-1 text-sm text-muted-foreground">Method: {provider.method}</div>
           </div>
-          <pre className="mt-4 h-[480px] overflow-auto rounded-2xl bg-black/90 p-5 text-sm leading-relaxed text-white">
-            <code>{responseText}</code>
-          </pre>
-        </section>
-      </main>
-
-      <SiteFooter className="mt-auto" />
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              status === "success"
+                ? "bg-emerald-500/20 text-emerald-400"
+                : status === "error"
+                ? "bg-red-500/20 text-red-400"
+                : status === "loading"
+                ? "bg-yellow-500/20 text-yellow-300"
+                : "bg-border text-muted-foreground"
+            }`}
+          >
+            {status.toUpperCase()}
+          </span>
+        </div>
+        <pre className="mt-4 h-[480px] overflow-auto rounded-2xl bg-black/90 p-5 text-sm leading-relaxed text-white">
+          <code>{responseText}</code>
+        </pre>
+      </section>
     </div>
   );
 }
