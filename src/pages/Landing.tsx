@@ -37,7 +37,7 @@ export default function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
+        <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
           <h1 className="hero-headline font-extrabold tracking-tight">
             instant access to every top third party api with a single call
           </h1>
@@ -56,7 +56,7 @@ export default function Landing() {
           </div>
 
           {/* Background decorative tiles with logos (visible, 18 total) */}
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-10" aria-hidden>
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
               <div className="grid grid-cols-6 gap-3 sm:gap-3">
                 {heroLogos.slice(0, 18).map((logo, i) => (
