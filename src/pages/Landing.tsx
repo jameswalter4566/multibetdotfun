@@ -12,11 +12,32 @@ const marqueeLogosBottom = [
 ];
 
 export default function Landing() {
+  const heroLogos: { src: string; alt: string }[] = [
+    { src: "/logos/openai.jpg", alt: "OpenAI" },
+    { src: "/logos/stripe.png", alt: "Stripe" },
+    { src: "/logos/google.webp", alt: "Google" },
+    { src: "/logos/twilio.png", alt: "Twilio" },
+    { src: "/logos/youtube.png", alt: "YouTube" },
+    { src: "/logos/coingecko.jpg", alt: "CoinGecko" },
+    { src: "/logos/microsoft.png", alt: "Microsoft" },
+    { src: "/logos/paypal.png", alt: "PayPal" },
+    { src: "/logos/google-icon.png", alt: "Google" },
+    { src: "/logos/claude.jpg", alt: "Claude" },
+    // repeat to make 18
+    { src: "/logos/openai.jpg", alt: "OpenAI" },
+    { src: "/logos/stripe.png", alt: "Stripe" },
+    { src: "/logos/google.webp", alt: "Google" },
+    { src: "/logos/twilio.png", alt: "Twilio" },
+    { src: "/logos/youtube.png", alt: "YouTube" },
+    { src: "/logos/coingecko.jpg", alt: "CoinGecko" },
+    { src: "/logos/microsoft.png", alt: "Microsoft" },
+    { src: "/logos/paypal.png", alt: "PayPal" },
+  ];
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-16 md:pb-24">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
           <h1 className="hero-headline font-extrabold tracking-tight">
             instant access to every top third party api with a single call
           </h1>
@@ -34,16 +55,19 @@ export default function Landing() {
             </Button>
           </div>
 
-          {/* Background decorative blank tiles behind hero (visible) */}
-          <div className="pointer-events-none absolute inset-0 z-0">
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] max-w-[96vw]">
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                {Array.from({ length: 30 }).map((_, i) => (
+          {/* Background decorative tiles with logos (visible, 18 total) */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
+              <div className="grid grid-cols-6 gap-3 sm:gap-3">
+                {heroLogos.slice(0, 18).map((logo, i) => (
                   <div
                     key={i}
-                    className="h-28 md:h-36 rounded-2xl border border-white/15 bg-white/8"
-                    style={{ boxShadow: '0 0 22px rgba(255,255,255,0.06)' }}
-                  />
+                    className="group h-24 md:h-28 rounded-2xl border border-white/15 bg-white/5 transition-all duration-150 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)]"
+                  >
+                    <div className="h-full w-full flex items-center justify-center p-3">
+                      <img src={logo.src} alt={logo.alt} className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-85 transition-opacity duration-150 group-hover:opacity-100" />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
