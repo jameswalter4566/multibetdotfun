@@ -31,7 +31,6 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
-          <Route path="/sandbox" element={<TestSandbox />} />
           <Route path="/stream/:channel" element={<Stream />} />
           <Route path="/profile/:channel" element={<Profile />} />
           <Route path="/signin" element={<SignIn />} />
