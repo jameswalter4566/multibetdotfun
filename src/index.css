@@ -167,3 +167,26 @@ All colors MUST be HSL.
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-create { box-shadow: var(--shadow-create); }
 }
+
+/* Marquee animations for landing page */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes scroll-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@layer utilities {
+  .marquee-left {
+    display: flex;
+    width: max-content;
+    animation: scroll-left 40s linear infinite;
+  }
+  .marquee-right {
+    display: flex;
+    width: max-content;
+    animation: scroll-right 40s linear infinite;
+  }
+}
