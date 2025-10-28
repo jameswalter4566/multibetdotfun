@@ -114,12 +114,19 @@ export default function ProviderDocumentation() {
                     <div className="text-sm font-semibold text-foreground">Available proxy endpoints</div>
                     <div className="space-y-3">
                       {provider.endpoints.map((ep) => (
-                        <div key={ep.path} className="rounded-2xl border border-border/60 bg-background/70 p-4">
-                          <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+                        <div key={ep.path} className="rounded-2xl border border-border/60 bg-background/70 p-4 space-y-3">
+                          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-muted-foreground">
                             <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{ep.method}</span>
                             <span className="font-mono text-[12px] text-foreground">{ep.path}</span>
+                            <Button
+                              size="sm"
+                              className="ml-auto rounded-full bg-[#0ea5ff] text-white hover:bg-[#08b0ff]"
+                              onClick={() => window.open(ep.path, "_blank", "noopener")}
+                            >
+                              Try it
+                            </Button>
                           </div>
-                          <p className="mt-2 text-sm text-muted-foreground">{ep.description}</p>
+                          <p className="text-sm text-muted-foreground">{ep.description}</p>
                         </div>
                       ))}
                     </div>
