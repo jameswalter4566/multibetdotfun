@@ -50,7 +50,7 @@ export default function Landing() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-70 brightness-90 contrast-90 saturate-50 grayscale transition-all duration-200 group-hover:opacity-100 group-hover:brightness-100 group-hover:contrast-100 group-hover:saturate-100 group-hover:grayscale-0"
+                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-60 transition-opacity duration-200 group-hover:opacity-100"
                     />
                   </div>
                 </div>
