@@ -92,33 +92,55 @@ runChat().catch(console.error);`,
     logo: "/logos/claude.jpg",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
-      "Call Anthropic Claude via x402 to build natural language and agentic workflows without maintaining separate billing relationships.",
-    endpoint: "https://api.x402.market/anthropic/messages",
+      "Call Anthropic Claude via x402 to build natural language and agentic workflows without juggling API keys or separate billing.",
+    endpoint: "https://x402marketplace.app/claude/messages",
     method: "POST",
-    testUrl: "https://api.x402.market/anthropic/messages/test",
-    codeSampleTitle: "Python – concise completion call",
-    language: "python",
-    codeSample: `import requests
+    testUrl: "https://x402marketplace.app/claude/models",
+    codeSampleTitle: "Node (fetch) – Claude message call",
+    language: "javascript",
+    codeSample: `import fetch from "node-fetch";
 
-payload = {
-    "model": "claude-3-5-sonnet",
-    "messages": [
-        {"role": "user", "content": "Draft a product launch update for our investors."}
-    ],
-    "max_tokens": 200
+async function callClaude() {
+  const response = await fetch("https://x402marketplace.app/claude/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x402-session": "session-token-from-x402",
+    },
+    body: JSON.stringify({
+      model: "claude-3-5-sonnet",
+      messages: [
+        { role: "user", content: "Brainstorm a launch plan for a pay-per-call API marketplace." }
+      ],
+      max_tokens: 200
+    })
+  });
+
+  const data = await response.json();
+  console.log(data.content?.[0]?.text ?? data);
 }
 
-res = requests.post(
-    "https://api.x402.market/anthropic/messages",
-    headers={
-        "Content-Type": "application/json",
-        "x402-session": "wallet-session-token"
-    },
-    json=payload,
-    timeout=30
-)
-
-print(res.json()["content"][0]["text"])`,
+callClaude().catch(console.error);`,
+    endpoints: [
+      {
+        name: "Messages",
+        method: "POST",
+        path: "https://x402marketplace.app/claude/messages",
+        description: "Primary Claude endpoint for non-streaming responses."
+      },
+      {
+        name: "Streaming Messages",
+        method: "POST",
+        path: "https://x402marketplace.app/claude/messages/stream",
+        description: "Stream Claude responses event-by-event using server-sent events."
+      },
+      {
+        name: "Models",
+        method: "GET",
+        path: "https://x402marketplace.app/claude/models",
+        description: "List the Claude models exposed through x402."
+      }
+    ],
   },
   {
     name: "Stripe",
@@ -127,19 +149,19 @@ print(res.json()["content"][0]["text"])`,
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
       "Create on-demand charges and PaymentIntents through a wallet-backed Stripe proxy. Perfect for gating API calls with fiat billing.",
-    endpoint: "https://api.x402.market/stripe/charges",
+    endpoint: "https://x402marketplace.app/stripe/charges",
     method: "POST",
-    testUrl: "https://api.x402.market/stripe/charges/test",
+    testUrl: "https://x402marketplace.app/stripe/charges",
     codeSampleTitle: "Node – create a one-time charge",
     language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
 async function createCharge() {
-  const res = await fetch("https://api.x402.market/stripe/charges", {
+  const res = await fetch("https://x402marketplace.app/stripe/charges", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x402-session": "wallet-session-token"
+      "x402-session": "session-token-from-x402",
     },
     body: JSON.stringify({
       amount: 3200,
@@ -154,6 +176,26 @@ async function createCharge() {
 }
 
 createCharge().catch(console.error);`,
+    endpoints: [
+      {
+        name: "Charges",
+        method: "POST",
+        path: "https://x402marketplace.app/stripe/charges",
+        description: "Create an immediate charge using a tokenized payment method."
+      },
+      {
+        name: "PaymentIntents",
+        method: "POST",
+        path: "https://x402marketplace.app/stripe/payment_intents",
+        description: "Create PaymentIntents for multi-step confirmation flows."
+      },
+      {
+        name: "Customers",
+        method: "POST",
+        path: "https://x402marketplace.app/stripe/customers",
+        description: "Register or look up customers that will be billed through x402."
+      }
+    ],
   },
   {
     name: "Google Maps",
@@ -161,15 +203,35 @@ createCharge().catch(console.error);`,
     logo: "/logos/google-icon.png",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
-      "Drop in geocoding, reverse geocoding, and place search without managing API keys. Requests meter automatically to your x402 session.",
-    endpoint: "https://api.x402.market/google/maps/geocode",
+      "Drop in geocoding, reverse geocoding, and place search without managing credentials. Each request is linked to your x402 session.",
+    endpoint: "https://x402marketplace.app/google/maps/geocode",
     method: "GET",
-    testUrl: "https://api.x402.market/google/maps/geocode/test",
+    testUrl: "https://x402marketplace.app/google/maps/geocode?address=NYC",
     codeSampleTitle: "Curl – forward geocoding",
     language: "bash",
-    codeSample: `curl \\
-  -H "x402-session: wallet-session-token" \\
-  "https://api.x402.market/google/maps/geocode?address=1600+Amphitheatre+Parkway"`,
+    codeSample: `curl \
+  -H "x402-session: session-token-from-x402" \
+  "https://x402marketplace.app/google/maps/geocode?address=1600+Amphitheatre+Parkway"`,
+    endpoints: [
+      {
+        name: "Forward Geocode",
+        method: "GET",
+        path: "https://x402marketplace.app/google/maps/geocode",
+        description: "Convert street addresses into lat/long coordinates."
+      },
+      {
+        name: "Reverse Geocode",
+        method: "GET",
+        path: "https://x402marketplace.app/google/maps/reverse",
+        description: "Convert lat/long coordinates into human-readable addresses."
+      },
+      {
+        name: "Places Search",
+        method: "GET",
+        path: "https://x402marketplace.app/google/maps/places",
+        description: "Search for places, venues, or businesses by keyword and radius."
+      }
+    ],
   },
   {
     name: "YouTube Data",
@@ -178,17 +240,37 @@ createCharge().catch(console.error);`,
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
       "Fetch channel stats, video metadata, and search results instantly for campaign dashboards or analytics overlays.",
-    endpoint: "https://api.x402.market/google/youtube/search",
+    endpoint: "https://x402marketplace.app/google/youtube/search",
     method: "GET",
-    testUrl: "https://api.x402.market/google/youtube/search/test",
+    testUrl: "https://x402marketplace.app/google/youtube/search?q=solana",
     codeSampleTitle: "JavaScript – search by keyword",
     language: "typescript",
-    codeSample: `const res = await fetch("https://api.x402.market/google/youtube/search?q=solana+news", {
-  headers: { "x402-session": "wallet-session-token" }
+    codeSample: `const res = await fetch("https://x402marketplace.app/google/youtube/search?q=solana+news", {
+  headers: { "x402-session": "session-token-from-x402" }
 });
 
 const data = await res.json();
 console.log(data.items.map((item: any) => item.snippet.title));`,
+    endpoints: [
+      {
+        name: "Search",
+        method: "GET",
+        path: "https://x402marketplace.app/google/youtube/search",
+        description: "Search for videos, channels, or playlists by keyword."
+      },
+      {
+        name: "Videos",
+        method: "GET",
+        path: "https://x402marketplace.app/google/youtube/videos",
+        description: "Fetch metadata and statistics for specific videos."
+      },
+      {
+        name: "Channels",
+        method: "GET",
+        path: "https://x402marketplace.app/google/youtube/channels",
+        description: "Retrieve information about channels, including subscriber counts and descriptions."
+      }
+    ],
   },
   {
     name: "Twilio",
@@ -197,9 +279,9 @@ console.log(data.items.map((item: any) => item.snippet.title));`,
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
       "Send SMS updates or voice call triggers via the x402 Twilio proxy. Perfect for notifying supporters when a campaign milestone hits.",
-    endpoint: "https://api.x402.market/twilio/messages",
+    endpoint: "https://x402marketplace.app/twilio/messages",
     method: "POST",
-    testUrl: "https://api.x402.market/twilio/messages/test",
+    testUrl: "https://x402marketplace.app/twilio/messages",
     codeSampleTitle: "Python – send an SMS alert",
     language: "python",
     codeSample: `import requests
@@ -211,15 +293,35 @@ payload = {
 }
 
 res = requests.post(
-    "https://api.x402.market/twilio/messages",
+    "https://x402marketplace.app/twilio/messages",
     headers={
         "Content-Type": "application/json",
-        "x402-session": "wallet-session-token"
+        "x402-session": "session-token-from-x402"
     },
     json=payload,
 )
 
 print(res.json())`,
+    endpoints: [
+      {
+        name: "Messages",
+        method: "POST",
+        path: "https://x402marketplace.app/twilio/messages",
+        description: "Send SMS messages via the Twilio API proxy."
+      },
+      {
+        name: "Calls",
+        method: "POST",
+        path: "https://x402marketplace.app/twilio/calls",
+        description: "Initiate outbound calls using Twilio voice capabilities."
+      },
+      {
+        name: "Lookup",
+        method: "GET",
+        path: "https://x402marketplace.app/twilio/lookup",
+        description: "Verify phone numbers or fetch carrier metadata."
+      }
+    ],
   },
 ];
 
