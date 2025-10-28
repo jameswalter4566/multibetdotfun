@@ -15,6 +15,8 @@ import ExploreCampaigns from "./pages/ExploreCampaigns";
 import Campaign from "./pages/Campaign";
 import NotFound from "./pages/NotFound";
 import ProviderDocumentation from "./pages/ProviderDocumentation";
+import ListAPI from "./pages/ListAPI";
+import Signup from "./pages/Signup";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
+          <Route path="/list-api" element={<ListAPI />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/stream/:channel" element={<Stream />} />
           <Route path="/profile/:channel" element={<Profile />} />
           <Route path="/signin" element={<SignIn />} />
