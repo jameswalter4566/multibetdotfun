@@ -41,9 +41,13 @@ export default function UserBadge() {
     };
   }, []);
 
-  if (!user) return (
-    <a href="/signin" className="text-foreground/90 hover:underline text-sm md:text-base">Sign in</a>
-  );
+  if (!user) {
+    return (
+      <a href="/signin" className="text-foreground/90 hover:underline text-sm md:text-base text-right leading-snug">
+        Sign in to list your Application in the market place
+      </a>
+    );
+  }
 
   const avatar = user.profile_picture_url || (user.userdid ? `https://api.dicebear.com/7.x/identicon/svg?seed=${user.userdid}` : '/placeholder.svg');
   const handle = user.screename || user.username || `user_${String(user.id)}`;
