@@ -34,7 +34,7 @@ export default function Landing() {
     { src: "/logos/paypal.png", alt: "PayPal" },
   ];
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground pt-[50px]">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background decorative tiles with logos (moved outside hero, behind) */}
@@ -50,7 +50,7 @@ export default function Landing() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-60 transition-opacity duration-200 group-hover:opacity-100"
+                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-50 transition-opacity duration-200 group-hover:opacity-100"
                     />
                   </div>
                 </div>
