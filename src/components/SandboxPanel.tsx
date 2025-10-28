@@ -137,4 +137,3 @@ const SandboxPanel = ({ className }: { className?: string }) => {
     setStatus("success");
     setResponseText(WELCOME_PAYLOAD);
   };
-*** End Patch
