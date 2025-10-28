@@ -1,16 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Store, PlugZap, ShieldCheck, Coins, Building2, Cpu, Globe2, MapPin, Youtube, PhoneCall, Sparkles } from "lucide-react";
+import { Store, PlugZap, ShieldCheck, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const apiTiles = [
-  { name: "OpenAI API", icon: Cpu },
-  { name: "Claude API", icon: Sparkles },
-  { name: "Stripe API", icon: Coins },
-  { name: "Google Maps API", icon: MapPin },
-  { name: "YouTube Data API", icon: Youtube },
-  { name: "Twilio API", icon: PhoneCall },
-];
 
 const marqueeLogosTop = [
   "OpenAI", "Claude", "Google", "Stripe", "YouTube", "Twilio", "Pinecone", "Supabase", "Solana", "x402",
@@ -25,7 +16,7 @@ export default function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-16 md:pb-24">
+        <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-16 md:pb-24">
           <h1 className="hero-headline font-extrabold tracking-tight">
             instant access to every top third party api with a single call
           </h1>
@@ -43,14 +34,15 @@ export default function Landing() {
             </Button>
           </div>
 
-          {/* Background decorative blank tiles behind hero */}
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[95vw]">
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 opacity-25">
-                {Array.from({ length: 24 }).map((_, i) => (
+          {/* Background decorative blank tiles behind hero (visible) */}
+          <div className="pointer-events-none absolute inset-0 z-0">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] max-w-[96vw]">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                {Array.from({ length: 30 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-28 md:h-32 rounded-2xl border border-foreground/10 bg-foreground/[0.03] shadow-[0_0_24px_rgba(255,255,255,0.04)]"
+                    className="h-28 md:h-36 rounded-2xl border border-white/15 bg-white/8"
+                    style={{ boxShadow: '0 0 22px rgba(255,255,255,0.06)' }}
                   />
                 ))}
               </div>
