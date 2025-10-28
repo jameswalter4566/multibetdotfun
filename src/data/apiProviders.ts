@@ -39,6 +39,7 @@ async function runChat() {
     headers: {
       "Content-Type": "application/json",
       "x402-session": "session-token-from-x402",
+      "x402-sender-wallet": "YourSenderWalletAddress",
     },
     body: JSON.stringify({
       model: "gpt-4o-mini",
@@ -106,6 +107,7 @@ async function callClaude() {
     headers: {
       "Content-Type": "application/json",
       "x402-session": "session-token-from-x402",
+      "x402-sender-wallet": "YourSenderWalletAddress",
     },
     body: JSON.stringify({
       model: "claude-3-5-sonnet",
@@ -162,6 +164,7 @@ async function createCharge() {
     headers: {
       "Content-Type": "application/json",
       "x402-session": "session-token-from-x402",
+      "x402-sender-wallet": "YourSenderWalletAddress",
     },
     body: JSON.stringify({
       amount: 3200,
@@ -211,6 +214,7 @@ createCharge().catch(console.error);`,
     language: "bash",
     codeSample: `curl \
   -H "x402-session: session-token-from-x402" \
+  -H "x402-sender-wallet: YourSenderWalletAddress" \
   "https://x402marketplace.app/google/maps/geocode?address=1600+Amphitheatre+Parkway"`,
     endpoints: [
       {
@@ -237,7 +241,7 @@ createCharge().catch(console.error);`,
     name: "YouTube Data",
     slug: "youtube-data",
     logo: "/logos/youtube.png",
-    tagline: "Instant access. No API key required. Powered by x402.",
+    tagline: "Instant access. No API key required. Powered by x402.",	
     summary:
       "Fetch channel stats, video metadata, and search results instantly for campaign dashboards or analytics overlays.",
     endpoint: "https://x402marketplace.app/google/youtube/search",
@@ -246,7 +250,10 @@ createCharge().catch(console.error);`,
     codeSampleTitle: "JavaScript – search by keyword",
     language: "typescript",
     codeSample: `const res = await fetch("https://x402marketplace.app/google/youtube/search?q=solana+news", {
-  headers: { "x402-session": "session-token-from-x402" }
+  headers: {
+    "x402-session": "session-token-from-x402",
+    "x402-sender-wallet": "YourSenderWalletAddress"
+  }
 });
 
 const data = await res.json();
@@ -296,7 +303,8 @@ res = requests.post(
     "https://x402marketplace.app/twilio/messages",
     headers={
         "Content-Type": "application/json",
-        "x402-session": "session-token-from-x402"
+        "x402-session": "session-token-from-x402",
+        "x402-sender-wallet": "YourSenderWalletAddress"
     },
     json=payload,
 )
