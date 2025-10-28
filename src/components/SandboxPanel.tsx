@@ -3,7 +3,15 @@ import { Button } from "@/components/ui/button";
 import { apiProviders, getProviderBySlug } from "@/data/apiProviders";
 import { cn } from "@/lib/utils";
 
-const sampleCatalog: Record<string, string[]> = {
+type SandboxStatus = "idle" | "loading" | "success" | "error" | "payment_required";
+
+type SandboxPanelProps = {
+  className?: string;
+  initialProvider?: string;
+  lockedProvider?: boolean;
+};
+
+export const sandboxSamples: Record<string, string[]> = {
   openai: [
     "Summarize the latest fundraising milestones.",
     "Generate a headline for a crypto charity livestream.",
@@ -28,99 +36,88 @@ const sampleCatalog: Record<string, string[]> = {
   twilio: ["SMS: Stream going live", "SMS: Goal reached announcement", "SMS: Share campaign update"],
 };
 
-const payloadTemplates: Record<string, string> = {
-  openai: JSON.stringify(
-    {
-      model: "gpt-4.1-mini",
-      messages: [
-        { role: "system", content: "You are a helpful assistant for fundraising campaigns." },
-        { role: "user", content: "Summarize the latest fundraising milestones." },
-      ],
-    },
-    null,
-    2
-  ),
-  claude: JSON.stringify(
-    {
-      model: "claude-3-5-sonnet",
-      messages: [{ role: "user", content: "Outline a launch plan for a Solana-based product." }],
-      max_tokens: 200,
-    },
-    null,
-    2
-  ),
-  stripe: JSON.stringify(
-    {
-      amount: 3200,
-      currency: "usd",
-      description: "Usage-based API call",
-      source: "tok_visa",
-    },
-    null,
-    2
-  ),
-  "google-maps": "address=1600 Amphitheatre Parkway, Mountain View, CA",
-  "youtube-data": "q=solana news",
-  twilio: JSON.stringify(
-    {
-      to: "+15551234567",
-      from: "+18885550123",
-      body: "Milestone unlocked! Join the live stream now.",
-    },
-    null,
-    2
-  ),
+export const sandboxDefaultPayloads: Record<string, any> = {
+  openai: {
+    model: "gpt-4.1-mini",
+    messages: [
+      { role: "system", content: "You are a helpful assistant for fundraising campaigns." },
+      { role: "user", content: "Summarize the latest fundraising milestones." },
+    ],
+  },
+  claude: {
+    model: "claude-3-5-sonnet",
+    messages: [{ role: "user", content: "Outline a launch plan for a Solana-based product." }],
+    max_tokens: 200,
+  },
+  stripe: {
+    amount: 3200,
+    currency: "usd",
+    description: "Usage-based API call",
+    source: "tok_visa",
+  },
+  twilio: {
+    to: "+15551234567",
+    from: "+18885550123",
+    body: "Milestone unlocked! Join the live stream now.",
+  },
 };
 
-const SandboxPanel = ({ className }: { className?: string }) => {
-  const [providerSlug, setProviderSlug] = useState(apiProviders[0]?.slug ?? "");
+const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: SandboxPanelProps) => {
+  const [providerSlug, setProviderSlug] = useState(initialProvider ?? apiProviders[0]?.slug ?? "");
   const provider = useMemo(() => getProviderBySlug(providerSlug), [providerSlug]);
 
-  const [sampleInput, setSampleInput] = useState(0);
-  const [requestText, setRequestText] = useState(payloadTemplates[providerSlug] ?? "");
-  const [responseText, setResponseText] = useState<string>("Awaiting request…");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [sampleIndex, setSampleIndex] = useState(0);
+  const [requestText, setRequestText] = useState<string>("");
+  const [responseText, setResponseText] = useState<string>("Ready to test the endpoint.");
+  const [status, setStatus] = useState<SandboxStatus>("idle");
 
   useEffect(() => {
-    setSampleInput(0);
-    setRequestText(payloadTemplates[providerSlug] ?? "");
+    if (initialProvider) {
+      setProviderSlug(initialProvider);
+    }
+  }, [initialProvider]);
+
+  useEffect(() => {
+    const template = sandboxDefaultPayloads[providerSlug];
+    if (template) {
+      setRequestText(JSON.stringify(template, null, 2));
+    } else if (provider?.method?.toUpperCase() === "GET") {
+      setRequestText(sandboxSamples[providerSlug]?.[0] ?? "");
+    } else {
+      setRequestText("{}");
+    }
+    setSampleIndex(0);
     setResponseText("Ready to test the endpoint.");
     setStatus("idle");
-  }, [providerSlug]);
+  }, [providerSlug, provider?.method]);
 
-  const samples = sampleCatalog[providerSlug] ?? ["Sample request"];
+  const samples = sandboxSamples[providerSlug] ?? ["Sample request"];
 
-  const WELCOME_PAYLOAD = useMemo(
-    () =>
-      JSON.stringify(
-        {
-          message: "👋 Welcome to the x402 Marketplace API Gateway.",
-          description: "Instant pay-per-use access to top APIs using the x402 protocol — starting with OpenAI.",
-          status: "online",
-          version: "1.0.0",
-          payment_instructions: {
-            how_to_pay: "Before using any endpoint, you must pay via x402 protocol to unlock access.",
-            step_1: "Send your payment to the x402 Gateway wallet address:",
-            wallet_address: "9rKmtdWDHGmi3xqyvTM23Bps5wUwg2oB7Y9HAseRrxqv",
-            step_2: "Include your request hash or session ID in the memo field for verification.",
-            step_3: "Once payment is confirmed on-chain, retry your API call — the gateway will verify it automatically.",
-            accepted_currencies: ["USDC", "SOL", "$402MARKET"],
-            note: "Each call or session requires a valid on-chain payment. Unpaid requests will receive an HTTP 402 Payment Required response."
-          },
-          available_endpoints: {
-            openai_completions: "/openai/completions",
-            openai_chat_completions: "/openai/chat/completions",
-            openai_images: "/openai/images/generations",
-            openai_models: "/openai/models"
-          },
-          disclaimer:
-            "x402 Marketplace acts as a payment-gated proxy layer for third-party APIs. Payments are verified on-chain and non-refundable."
-        },
-        null,
-        2
-      ),
-    []
-  );
+  const handleSampleChange = (value: string, index: number) => {
+    setSampleIndex(index);
+    if (!provider) return;
+
+    if (provider.method.toUpperCase() === "GET") {
+      setRequestText(value);
+      return;
+    }
+
+    const base = sandboxDefaultPayloads[providerSlug];
+    if (!base) return;
+
+    const clone = JSON.parse(JSON.stringify(base));
+    if (Array.isArray(clone.messages) && clone.messages.length > 0) {
+      clone.messages[clone.messages.length - 1] = {
+        ...clone.messages[clone.messages.length - 1],
+        content: value,
+      };
+    } else if (typeof clone.prompt === "string") {
+      clone.prompt = value;
+    } else if (clone.body) {
+      clone.body = value;
+    }
+    setRequestText(JSON.stringify(clone, null, 2));
+  };
 
   const handleTryIt = async () => {
     if (!provider) {
@@ -132,8 +129,146 @@ const SandboxPanel = ({ className }: { className?: string }) => {
     setStatus("loading");
     setResponseText("Calling x402 gateway…");
 
-    await new Promise((resolve) => setTimeout(resolve, 900));
+    try {
+      const shouldSendPayment = status === "payment_required";
+      const headers: Record<string, string> = {
+        "x402-sender-wallet": "DemoSenderWallet11111111111111111111111",
+      };
 
-    setStatus("success");
-    setResponseText(WELCOME_PAYLOAD);
+      let url = provider.endpoint;
+      let body: string | undefined;
+
+      if (provider.method.toUpperCase() === "GET") {
+        const query = requestText.trim();
+        if (query.length > 0) {
+          url = `${provider.endpoint}${query.startsWith("?") ? query : `?${query}`}`;
+        }
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = requestText ?? "{}";
+      }
+
+      if (shouldSendPayment) {
+        headers["x-payment"] = "eyJ4NDAyVmVyc2lvbiI6MSwicGF5bWVudCI6Im1vY2stcGF5bWVudCJ9";
+      }
+
+      const response = await fetch(url, {
+        method: provider.method,
+        headers,
+        body: provider.method.toUpperCase() === "GET" ? undefined : body,
+      });
+
+      const rawText = await response.text();
+      let formatted = rawText;
+      try {
+        formatted = JSON.stringify(JSON.parse(rawText), null, 2);
+      } catch {
+        // plain text response
+      }
+
+      setResponseText(formatted);
+
+      if (response.status === 402) {
+        setStatus("payment_required");
+      } else if (response.ok) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+      }
+    } catch (error) {
+      setStatus("error");
+      setResponseText((error instanceof Error ? error.message : String(error)) ?? "Request failed");
+    }
   };
+
+  const statusBadge = () => {
+    switch (status) {
+      case "loading":
+        return "Loading";
+      case "success":
+        return "Success";
+      case "error":
+        return "Error";
+      case "payment_required":
+        return "402 Payment Required";
+      default:
+        return "Idle";
+    }
+  };
+
+  return (
+    <div className={cn("rounded-3xl border border-border bg-secondary/40 p-6 shadow-glow space-y-6", className)}>
+      {!lockedProvider && (
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+            API Provider
+          </label>
+          <select
+            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            value={providerSlug}
+            onChange={(event) => setProviderSlug(event.target.value)}
+          >
+            {apiProviders.map((item) => (
+              <option key={item.slug} value={item.slug}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Test string</label>
+          <select
+            className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            value={sampleIndex}
+            onChange={(event) => handleSampleChange(samples[Number(event.target.value)] ?? "", Number(event.target.value))}
+          >
+            {samples.map((sample, index) => (
+              <option key={`${sample}-${index}`} value={index}>
+                {sample}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+            Request payload / query
+          </label>
+          <textarea
+            className="mt-2 h-36 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            value={requestText}
+            onChange={(event) => setRequestText(event.target.value)}
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Include your wallet-backed <code className="font-mono text-[11px]">x402-session</code>,
+            <code className="font-mono text-[11px]"> x402-sender-wallet</code>, and retry with
+            <code className="font-mono text-[11px]"> X-PAYMENT</code> when prompted with 402.
+          </p>
+        </div>
+
+        <Button
+          onClick={handleTryIt}
+          disabled={status === "loading"}
+          className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+        >
+          {status === "payment_required" ? "Retry with mock X-PAYMENT" : "Try it"}
+        </Button>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-background/70">
+        <div className="flex items-center justify-between border-b border-border/70 px-4 py-2">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Response</div>
+          <span className="rounded-full bg-secondary px-3 py-1 text-[11px] font-semibold text-foreground/80">
+            {statusBadge()}
+          </span>
+        </div>
+        <pre className="max-h-72 overflow-auto px-4 py-5 text-[13px] leading-relaxed text-foreground/90">{responseText}</pre>
+      </div>
+    </div>
+  );
+};
+
+export default SandboxPanel;

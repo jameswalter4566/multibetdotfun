@@ -1,7 +1,12 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { apiProviders, getProviderBySlug } from "@/data/apiProviders";
 import SiteFooter from "@/components/SiteFooter";
+import { apiProviders, getProviderBySlug } from "@/data/apiProviders";
+import type { ApiProvider } from "@/data/apiProviders";
+import { sandboxDefaultPayloads, sandboxSamples } from "@/components/SandboxPanel";
+
+type SandboxStatus = "idle" | "loading" | "success" | "error" | "payment_required";
 
 export default function ProviderDocumentation() {
   const { slug } = useParams<{ slug: string }>();
@@ -22,6 +27,161 @@ export default function ProviderDocumentation() {
       </div>
     );
   }
+
+  const endpoints = useMemo(() => {
+    if (provider.endpoints && provider.endpoints.length > 0) {
+      return provider.endpoints;
+    }
+    return [
+      {
+        name: provider.name,
+        method: provider.method,
+        path: provider.endpoint,
+        description: provider.summary
+      }
+    ];
+  }, [provider]);
+
+  const providerSamples = useMemo(() => sandboxSamples[provider.slug] ?? ["Sample request"], [provider.slug]);
+
+  const [sandboxEndpointIndex, setSandboxEndpointIndex] = useState(0);
+  const [sandboxSampleIndex, setSandboxSampleIndex] = useState(0);
+  const [sandboxRequest, setSandboxRequest] = useState<string>("");
+  const [sandboxStatus, setSandboxStatus] = useState<SandboxStatus>("idle");
+  const [sandboxResponse, setSandboxResponse] = useState<string>("Ready to test the endpoint.");
+
+  const activeEndpoint = endpoints[sandboxEndpointIndex];
+
+  const applySampleToPayload = (payload: any, sampleValue: string) => {
+    if (Array.isArray(payload.messages) && payload.messages.length > 0) {
+      payload.messages[payload.messages.length - 1] = {
+        ...payload.messages[payload.messages.length - 1],
+        content: sampleValue,
+      };
+    } else if (typeof payload.prompt === "string") {
+      payload.prompt = sampleValue;
+    } else if (payload.body) {
+      payload.body = sampleValue;
+    }
+  };
+
+  const buildDefaultRequest = (endpoint: typeof endpoints[number], sampleValue?: string) => {
+    if (endpoint.method.toUpperCase() === "GET") {
+      if (sampleValue) return sampleValue;
+      return providerSamples[0] ?? "";
+    }
+    const base = sandboxDefaultPayloads[provider.slug];
+    if (!base) return "{}";
+    const clone = JSON.parse(JSON.stringify(base));
+    applySampleToPayload(clone, sampleValue ?? providerSamples[0] ?? "");
+    return JSON.stringify(clone, null, 2);
+  };
+
+  useEffect(() => {
+    if (!activeEndpoint) return;
+    const defaultRequest = buildDefaultRequest(activeEndpoint);
+    setSandboxRequest(defaultRequest);
+    setSandboxSampleIndex(0);
+    setSandboxStatus("idle");
+    setSandboxResponse("Ready to test the endpoint.");
+  }, [provider.slug, sandboxEndpointIndex, activeEndpoint?.method]);
+
+  const handleSandboxSampleChange = (index: number) => {
+    setSandboxSampleIndex(index);
+    if (!activeEndpoint) return;
+    const newRequest = buildDefaultRequest(activeEndpoint, providerSamples[index]);
+    setSandboxRequest(newRequest);
+    setSandboxStatus("idle");
+    setSandboxResponse("Ready to test the endpoint.");
+  };
+
+  const executeSandboxRequest = async (
+    withPayment = false,
+    endpointOverride?: typeof endpoints[number],
+    requestOverride?: string
+  ) => {
+    const endpoint = endpointOverride ?? activeEndpoint;
+    if (!endpoint) return;
+
+    const requestPayload = requestOverride ?? sandboxRequest;
+
+    setSandboxStatus("loading");
+    setSandboxResponse("Calling x402 gateway…");
+
+    try {
+      const headers: Record<string, string> = {
+        "x402-sender-wallet": "DemoSenderWallet11111111111111111111111",
+      };
+
+      let url = endpoint.path;
+      let body: string | undefined = requestPayload ?? "{}";
+
+      if (endpoint.method.toUpperCase() === "GET") {
+        const query = requestPayload.trim();
+        if (query.length > 0) {
+          url = `${endpoint.path}${query.startsWith("?") ? query : `?${query}`}`;
+        }
+        body = undefined;
+      } else {
+        headers["Content-Type"] = "application/json";
+      }
+
+      if (withPayment || sandboxStatus === "payment_required") {
+        headers["x-payment"] = "eyJ4NDAyVmVyc2lvbiI6MSwicGF5bWVudCI6Im1vY2stcGF5bWVudCJ9";
+      }
+
+      const response = await fetch(url, {
+        method: endpoint.method,
+        headers,
+        body,
+      });
+
+      const rawText = await response.text();
+      let formatted = rawText;
+      try {
+        formatted = JSON.stringify(JSON.parse(rawText), null, 2);
+      } catch {
+        // keep plain text
+      }
+
+      setSandboxResponse(formatted);
+
+      if (response.status === 402) {
+        setSandboxStatus("payment_required");
+      } else if (response.ok) {
+        setSandboxStatus("success");
+      } else {
+        setSandboxStatus("error");
+      }
+    } catch (error) {
+      setSandboxStatus("error");
+      setSandboxResponse((error instanceof Error ? error.message : String(error)) ?? "Request failed");
+    }
+  };
+
+  const handleEndpointTry = (index: number) => {
+    const endpoint = endpoints[index];
+    const defaultRequest = buildDefaultRequest(endpoint);
+    setSandboxEndpointIndex(index);
+    setSandboxSampleIndex(0);
+    setSandboxRequest(defaultRequest);
+    executeSandboxRequest(false, endpoint, defaultRequest);
+  };
+
+  const statusBadge = (state: SandboxStatus) => {
+    switch (state) {
+      case "loading":
+        return "Loading";
+      case "success":
+        return "Success";
+      case "error":
+        return "Error";
+      case "payment_required":
+        return "402 Payment Required";
+      default:
+        return "Idle";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -113,7 +273,7 @@ export default function ProviderDocumentation() {
                   <div className="space-y-4">
                     <div className="text-sm font-semibold text-foreground">Available proxy endpoints</div>
                     <div className="space-y-3">
-                      {provider.endpoints.map((ep) => (
+                      {endpoints.map((ep, index) => (
                         <div key={ep.path} className="rounded-2xl border border-border/60 bg-background/70 p-4 space-y-3">
                           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-muted-foreground">
                             <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{ep.method}</span>
@@ -121,7 +281,7 @@ export default function ProviderDocumentation() {
                             <Button
                               size="sm"
                               className="ml-auto rounded-full bg-[#0ea5ff] text-white hover:bg-[#08b0ff]"
-                              onClick={() => window.open(ep.path, "_blank", "noopener")}
+                              onClick={() => handleEndpointTry(index)}
                             >
                               Try it
                             </Button>
@@ -157,13 +317,72 @@ export default function ProviderDocumentation() {
 
               <div className="space-y-4 rounded-3xl border border-border bg-secondary/30 p-5">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Quickstart</div>
-                  <ul className="mt-3 space-y-3 text-sm text-foreground/80">
-                    <li>1. Start a session from the home page.</li>
-                    <li>2. Call the endpoint with your wallet-backed `x402-session` header.</li>
-                    <li>3. Monitor response headers for metering + credits.</li>
-                  </ul>
+                  <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Sandbox</div>
+                  <p className="mt-2 text-sm text-foreground/80">
+                    Send a live request to the x402 gateway. The first call returns a <code className="font-mono text-[11px]">402 Payment Required</code>
+                    response with pricing details. Retry with a mock <code className="font-mono text-[11px]">X-PAYMENT</code> header to see the happy path.
+                  </p>
                 </div>
+
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Endpoint</div>
+                  <div className="mt-2 rounded-xl border border-border bg-background px-3 py-3 text-xs font-mono text-foreground/80">
+                    <span className="font-semibold text-primary mr-2">{activeEndpoint.method}</span>
+                    {activeEndpoint.path}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Test string</label>
+                  <select
+                    className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    value={sandboxSampleIndex}
+                    onChange={(event) => handleSandboxSampleChange(Number(event.target.value))}
+                  >
+                    {providerSamples.map((sample, index) => (
+                      <option key={`${sample}-${index}`} value={index}>
+                        {sample}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                    Request payload / query
+                  </label>
+                  <textarea
+                    className="mt-2 h-32 w-full rounded-xl border border-border bg-background px-3 py-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    value={sandboxRequest}
+                    onChange={(event) => {
+                      setSandboxRequest(event.target.value);
+                      setSandboxStatus("idle");
+                    }}
+                  />
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Include <code className="font-mono text-[11px]">x402-session</code>, <code className="font-mono text-[11px]">x402-sender-wallet</code>, and retry with
+                    <code className="font-mono text-[11px]"> X-PAYMENT</code> when the gateway returns 402.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => executeSandboxRequest(sandboxStatus === "payment_required")}
+                  disabled={sandboxStatus === "loading"}
+                  className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+                >
+                  {sandboxStatus === "payment_required" ? "Retry with mock X-PAYMENT" : "Call gateway"}
+                </Button>
+
+                <div className="rounded-2xl border border-border bg-background/70">
+                  <div className="flex items-center justify-between border-b border-border/70 px-4 py-2">
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Response</div>
+                    <span className="rounded-full bg-secondary px-3 py-1 text-[11px] font-semibold text-foreground/80">
+                      {statusBadge(sandboxStatus)}
+                    </span>
+                  </div>
+                  <pre className="max-h-60 overflow-auto px-4 py-5 text-[13px] leading-relaxed text-foreground/90">{sandboxResponse}</pre>
+                </div>
+
                 <div className="rounded-2xl border border-border/70 bg-background/70 p-4 text-xs text-muted-foreground">
                   Need help? Join the community in Discord or book time with the integrations team.
                 </div>
