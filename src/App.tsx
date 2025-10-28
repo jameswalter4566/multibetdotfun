@@ -14,6 +14,7 @@ import Campaigns from "./pages/Campaigns";
 import ExploreCampaigns from "./pages/ExploreCampaigns";
 import Campaign from "./pages/Campaign";
 import NotFound from "./pages/NotFound";
+import ProviderDocumentation from "./pages/ProviderDocumentation";
 
 const queryClient = new QueryClient();
 
@@ -25,9 +26,11 @@ const App = () => (
       <div className="app-content">
         <BrowserRouter>
           <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Index />} />
           <Route path="/home" element={<Index />} />
+          <Route path="/landing" element={<Landing />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
           <Route path="/stream/:channel" element={<Stream />} />
           <Route path="/profile/:channel" element={<Profile />} />
           <Route path="/signin" element={<SignIn />} />

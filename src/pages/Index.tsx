@@ -1,6 +1,5 @@
 import SiteFooter from "@/components/SiteFooter";
 import UserBadge from "@/components/UserBadge";
-import OrganizersRealtimeGrid from "@/components/OrganizersRealtimeGrid";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,13 +21,7 @@ type CampaignLite = {
 
 type ContainersMap = Record<string, HTMLDivElement | null>;
 
-const sideLinks = [
-  { label: "Mission", href: "#mission" },
-  { label: "Discover Campaigns", href: "#discover" },
-  { label: "Explore Organizers", href: "#workers" },
-  { label: "Explore Campaigns", href: "/explore" },
-  { label: "Start a Campaign", href: "/campaigns" },
-];
+const sideLinks = [{ label: "Explore API market place", href: "/marketplace" }];
 
 export default function Index() {
   const [recentCamps, setRecentCamps] = useState<CampaignLite[]>([]);
@@ -340,41 +333,6 @@ export default function Index() {
             </div>
           </section>
 
-          <section id="mission" className="mt-16">
-            <div className="mx-auto max-w-4xl rounded-3xl border border-border bg-secondary/40 p-8 shadow-glow">
-              <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">Mission</h2>
-              <p className="mt-4 text-sm text-muted-foreground sm:text-base">
-                We help developers launch ideas faster by bundling discovery, live fundraising, and instant API access in the same
-                marketplace. Every campaign is stream-enabled and powered by x402 payments so contributors fund work in real time.
-              </p>
-              <ul className="mt-6 grid gap-4 text-sm text-foreground/90 sm:grid-cols-2">
-                <li className="rounded-2xl border border-border/80 bg-background/60 p-4">
-                  Ship integrations with zero credential sprawl using the unified endpoint.
-                </li>
-                <li className="rounded-2xl border border-border/80 bg-background/60 p-4">
-                  Grow reach through live streams that simulcast to pump.fun and the marketplace.
-                </li>
-                <li className="rounded-2xl border border-border/80 bg-background/60 p-4">
-                  Accept SOL, USDC, and x402-native tokens instantly with on-chain receipts.
-                </li>
-                <li className="rounded-2xl border border-border/80 bg-background/60 p-4">
-                  Turn supporters into collaborators with transparent metrics for every call.
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          <section id="workers" className="mt-16 max-w-7xl mx-auto">
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-              <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">Explore Organizers</h2>
-              <p className="text-sm text-muted-foreground sm:text-base">
-                Live profiles update in real time so you can see who&apos;s building right now.
-              </p>
-            </div>
-            <div className="mt-6">
-              <OrganizersRealtimeGrid />
-            </div>
-          </section>
         </main>
 
         <SiteFooter />

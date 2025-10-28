@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Twitter, Instagram, Linkedin } from "lucide-react";
+import { Instagram, Linkedin } from "lucide-react";
 
 interface SiteFooterProps {
   className?: string;
@@ -17,14 +17,6 @@ export default function SiteFooter({ className }: SiteFooterProps) {
               <a href="/what-we-do" className="text-white/90 hover:text-white hover:underline">What we do</a>
               <a href="/campaigns" className="text-white/90 hover:text-white hover:underline">Start a Campaign</a>
             </nav>
-            <div className="mt-4">
-              <a
-                href="#buy-liberated"
-                className="inline-block px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium border border-white/20 hover:bg-white/15"
-              >
-                Buy $LIBERATED now
-              </a>
-            </div>
           </div>
 
           {/* Right: social icons in circles */}
@@ -36,7 +28,7 @@ export default function SiteFooter({ className }: SiteFooterProps) {
               className="h-9 w-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/15"
               aria-label="Follow us on X"
             >
-              <Twitter className="h-4 w-4 text-white" />
+              <span className="text-white text-lg font-semibold leading-none">X</span>
             </a>
             <a
               href="#instagram"
@@ -57,7 +49,7 @@ export default function SiteFooter({ className }: SiteFooterProps) {
 
         {/* Bottom row */}
         <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-white/70">
-          <div>© 2025 Liberated — all rights reserved</div>
+          <div>x402 marketplace - all rights reserved</div>
           <div className="hidden md:block" />
         </div>
       </div>
