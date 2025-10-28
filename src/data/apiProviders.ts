@@ -10,6 +10,12 @@ export type ApiProvider = {
   codeSampleTitle: string;
   codeSample: string;
   language: string;
+  endpoints?: Array<{
+    name: string;
+    method: string;
+    path: string;
+    description: string;
+  }>;
 };
 
 export const apiProviders: ApiProvider[] = [
@@ -19,37 +25,66 @@ export const apiProviders: ApiProvider[] = [
     logo: "/logos/openai.jpg",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
-      "Leverage the OpenAI Chat Completions API through the x402 marketplace without provisioning keys. Send a prompt, receive structured responses, and bill usage per call.",
-    endpoint: "https://api.x402.market/openai/chat",
+      "Use x402 Marketplace to call OpenAI's APIs without sharing or storing your own keys. Pay with x402 protocol, send your request to our gateway, and we forward it securely using our managed OpenAI account.",
+    endpoint: "https://x402marketplace.app/openai/chat/completions",
     method: "POST",
-    testUrl: "https://api.x402.market/openai/chat/test",
-    codeSampleTitle: "JavaScript – streaming chat request",
-    language: "typescript",
+    testUrl: "https://x402marketplace.app/openai/models",
+    codeSampleTitle: "Node (fetch) – chat completions via x402 gateway",
+    language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
 async function runChat() {
-  const response = await fetch("https://api.x402.market/openai/chat", {
+  const response = await fetch("https://x402marketplace.app/openai/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x402-session": "wallet-session-token"
+      "x402-session": "session-token-from-x402",
     },
     body: JSON.stringify({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: "Summarize the latest platform updates." }
+        { role: "system", content: "You are an assistant for x402 marketplace users." },
+        { role: "user", content: "Draft a welcome message for new API partners." }
       ],
-      stream: true
+      temperature: 0.7
     })
   });
 
-  for await (const chunk of response.body as any) {
-    process.stdout.write(chunk);
+  if (!response.ok) {
+    throw new Error(await response.text());
   }
+
+  const data = await response.json();
+  console.log(data.choices?.[0]?.message?.content ?? data);
 }
 
 runChat().catch(console.error);`,
+    endpoints: [
+      {
+        name: "Chat Completions",
+        method: "POST",
+        path: "https://x402marketplace.app/openai/chat/completions",
+        description: "Proxy for OpenAI's Chat Completions. Send messages array and chat parameters, receive assistant replies."
+      },
+      {
+        name: "Completions",
+        method: "POST",
+        path: "https://x402marketplace.app/openai/completions",
+        description: "Text completion endpoint for legacy or non-chat models like `text-davinci-003`."
+      },
+      {
+        name: "Image Generations",
+        method: "POST",
+        path: "https://x402marketplace.app/openai/images/generations",
+        description: "Generate images using DALL·E style prompts. Returns base64 data or URLs depending on payload options."
+      },
+      {
+        name: "Models",
+        method: "GET",
+        path: "https://x402marketplace.app/openai/models",
+        description: "List the OpenAI models currently available through the gateway."
+      }
+    ],
   },
   {
     name: "Claude",

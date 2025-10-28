@@ -102,14 +102,31 @@ export default function ProviderDocumentation() {
             </div>
 
             <section className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="rounded-3xl border border-border bg-secondary/40 p-6 shadow-glow">
+              <div className="rounded-3xl border border-border bg-secondary/40 p-6 shadow-glow space-y-6">
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Endpoint</div>
                 <div className="mt-3 inline-flex items-center gap-3 rounded-full bg-background/80 px-4 py-2 text-xs font-semibold text-foreground shadow-inner ring-1 ring-border">
                   <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{provider.method}</span>
                   <span className="font-mono text-[13px]">{provider.endpoint}</span>
                 </div>
 
-                <div className="mt-6">
+                {provider.endpoints && provider.endpoints.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="text-sm font-semibold text-foreground">Available proxy endpoints</div>
+                    <div className="space-y-3">
+                      {provider.endpoints.map((ep) => (
+                        <div key={ep.path} className="rounded-2xl border border-border/60 bg-background/70 p-4">
+                          <div className="flex items-center gap-3 text-xs font-semibold text-muted-foreground">
+                            <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{ep.method}</span>
+                            <span className="font-mono text-[12px] text-foreground">{ep.path}</span>
+                          </div>
+                          <p className="mt-2 text-sm text-muted-foreground">{ep.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                <div>
                   <div className="text-sm font-semibold text-foreground">{provider.codeSampleTitle}</div>
                   <div className="mt-3 overflow-hidden rounded-2xl border border-border/60 bg-black/90">
                     <div className="flex items-center justify-between border-b border-white/10 px-4 py-2 text-xs text-white/60">
