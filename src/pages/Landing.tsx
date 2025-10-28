@@ -44,13 +44,13 @@ export default function Landing() {
               {heroLogos.slice(0, 18).map((logo, i) => (
                 <div
                   key={i}
-                  className="group h-24 md:h-28 rounded-2xl border border-white/10 bg-white/5 transition-all duration-200 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:ring-2 hover:ring-cyan-400/70"
+                  className="group h-28 md:h-32 rounded-2xl border border-white/20 bg-white/10 transition-all duration-200 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:ring-2 hover:ring-cyan-400/70"
                 >
-                  <div className="h-full w-full flex items-center justify-center p-3">
+                  <div className="h-full w-full flex items-center justify-center p-4">
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-40 transition-opacity duration-200 group-hover:opacity-100"
+                      className="max-h-12 md:max-h-14 max-w-[85%] object-contain opacity-60 transition-opacity duration-200 group-hover:opacity-100"
                     />
                   </div>
                 </div>
