@@ -72,11 +72,11 @@ const payloadTemplates: Record<string, string> = {
   ),
 };
 
-type SandboxPanelProps = {
+type TestSandboxProps = {
   className?: string;
 };
 
-export default function SandboxPanel({ className }: SandboxPanelProps) {
+export default function TestSandbox({ className }: TestSandboxProps) {
   const [providerSlug, setProviderSlug] = useState(apiProviders[0]?.slug ?? "");
   const provider = useMemo(() => getProviderBySlug(providerSlug), [providerSlug]);
 

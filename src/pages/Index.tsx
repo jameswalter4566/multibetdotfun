@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import UserBadge from "@/components/UserBadge";
 import { Button } from "@/components/ui/button";
 import { apiProviders } from "@/data/apiProviders";
-import SandboxPanel from "./TestSandbox";
+import TestSandbox from "./TestSandbox";
 
 type View = "marketplace" | "sandbox";
 
@@ -179,7 +179,7 @@ export default function Index({ initialView = "marketplace" }: IndexProps) {
                 </div>
               </div>
               <div className="mt-6">
-                <SandboxPanel />
+                <TestSandbox />
               </div>
             </section>
           )}
