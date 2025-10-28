@@ -43,19 +43,15 @@ export default function Landing() {
             </Button>
           </div>
 
-          {/* Background API Tiles behind hero */}
+          {/* Background decorative blank tiles behind hero */}
           <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[520px] blur-0">
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-4 opacity-25">
-                {apiTiles.map((t, i) => (
-                  <div key={i} className="">
-                    <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 h-24 flex items-center justify-center">
-                      <div className="flex items-center gap-2 text-cyan-200">
-                        <t.icon className="w-5 h-5" />
-                        <span className="text-xs font-medium whitespace-nowrap">{t.name}</span>
-                      </div>
-                    </div>
-                  </div>
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[95vw]">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 opacity-25">
+                {Array.from({ length: 24 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-28 md:h-32 rounded-2xl border border-foreground/10 bg-foreground/[0.03] shadow-[0_0_24px_rgba(255,255,255,0.04)]"
+                  />
                 ))}
               </div>
             </div>
@@ -168,7 +164,24 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* API Marketplace (bottom section) */}
+      <section className="py-12 md:py-20 border-t border-border">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-center">API Marketplace</h2>
+          <p className="mt-3 text-center text-muted-foreground text-base md:text-lg">
+            Browse and call top third‑party APIs via a single unified endpoint.
+          </p>
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {["OpenAI", "Claude", "Stripe", "Google Maps", "YouTube Data", "Twilio"].map((name) => (
+              <div key={name} className="ios-card p-5">
+                <div className="text-lg font-semibold">{name}</div>
+                <div className="text-sm text-muted-foreground mt-1">Instant access. No API key required. Powered by x402.</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
-
