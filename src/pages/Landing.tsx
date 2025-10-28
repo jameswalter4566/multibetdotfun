@@ -36,7 +36,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section className="hero-section relative overflow-hidden">
         {/* Background decorative tiles with logos (moved outside hero, behind) */}
         <div className="absolute inset-0 z-0" aria-hidden>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
@@ -61,22 +61,22 @@ export default function Landing() {
 
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
           <div className="relative -translate-y-[20px]">
-          <h1 className="hero-headline font-extrabold tracking-tight">
-            instant access to every top third party api with a single call
-          </h1>
-          <h2 className="mt-4 text-center text-2xl md:text-3xl font-bold text-muted-foreground">
-            no API key required. Powered by x402
-          </h2>
+            <h1 className="hero-headline hero-text-shadow font-extrabold tracking-tight">
+              instant access to every top third party api with a single call
+            </h1>
+            <h2 className="hero-text-shadow mt-4 text-center text-2xl md:text-3xl font-bold text-muted-foreground">
+              no API key required. Powered by x402
+            </h2>
 
-          <div className="mt-8 text-center text-sm md:text-base text-foreground/90">
-            Make your first call for free now
-          </div>
+            <div className="hero-text-shadow mt-8 text-center text-sm md:text-base text-foreground/90">
+              Make your first call for free now
+            </div>
 
-          <div className="mt-3 flex justify-center">
-            <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
-              <Link to="/marketplace">Explore API marketplace</Link>
-            </Button>
-          </div>
+            <div className="mt-3 flex justify-center">
+              <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
+                <Link to="/marketplace">Explore API marketplace</Link>
+              </Button>
+            </div>
           </div>
 
         </div>
