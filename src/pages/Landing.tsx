@@ -34,13 +34,13 @@ export default function Landing() {
     { src: "/logos/paypal.png", alt: "PayPal" },
   ];
   return (
-    <div className="min-h-screen bg-background text-foreground pt-[50px]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background decorative tiles with logos (moved outside hero, behind) */}
         <div className="absolute inset-0 z-0" aria-hidden>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
-            <div className="grid grid-cols-6 gap-3 sm:gap-3">
+            <div className="mt-[30px] grid grid-cols-6 gap-3 sm:gap-3">
               {heroLogos.slice(0, 18).map((logo, i) => (
                 <div
                   key={i}
@@ -50,7 +50,7 @@ export default function Landing() {
                     <img
                       src={logo.src}
                       alt={logo.alt}
-                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-50 transition-opacity duration-200 group-hover:opacity-100"
+                      className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-40 transition-opacity duration-200 group-hover:opacity-100"
                     />
                   </div>
                 </div>
@@ -60,6 +60,7 @@ export default function Landing() {
         </div>
 
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
+          <div className="relative -translate-y-[20px]">
           <h1 className="hero-headline font-extrabold tracking-tight">
             instant access to every top third party api with a single call
           </h1>
@@ -75,6 +76,7 @@ export default function Landing() {
             <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
               <Link to="/marketplace">Explore API marketplace</Link>
             </Button>
+          </div>
           </div>
 
         </div>
