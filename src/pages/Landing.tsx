@@ -37,6 +37,24 @@ export default function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
+        {/* Background decorative tiles with logos (moved outside hero, behind) */}
+        <div className="absolute inset-0 -z-10" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
+            <div className="grid grid-cols-6 gap-3 sm:gap-3">
+              {heroLogos.slice(0, 18).map((logo, i) => (
+                <div
+                  key={i}
+                  className="group h-24 md:h-28 rounded-2xl border border-white/15 bg-white/5 transition-all duration-150 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:ring-2 hover:ring-cyan-400/70"
+                >
+                  <div className="h-full w-full flex items-center justify-center p-3">
+                    <img src={logo.src} alt={logo.alt} className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-85 transition-opacity duration-150 group-hover:opacity-100" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
           <h1 className="hero-headline font-extrabold tracking-tight">
             instant access to every top third party api with a single call
@@ -55,23 +73,6 @@ export default function Landing() {
             </Button>
           </div>
 
-          {/* Background decorative tiles with logos (visible, 18 total) */}
-          <div className="absolute inset-0 z-10" aria-hidden>
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] max-w-[96vw]">
-              <div className="grid grid-cols-6 gap-3 sm:gap-3">
-                {heroLogos.slice(0, 18).map((logo, i) => (
-                  <div
-                    key={i}
-                    className="group h-24 md:h-28 rounded-2xl border border-white/15 bg-white/5 transition-all duration-150 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:ring-2 hover:ring-cyan-400/70"
-                  >
-                    <div className="h-full w-full flex items-center justify-center p-3">
-                      <img src={logo.src} alt={logo.alt} className="max-h-10 md:max-h-12 max-w-[85%] object-contain opacity-85 transition-opacity duration-150 group-hover:opacity-100" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Soft glow background */}
