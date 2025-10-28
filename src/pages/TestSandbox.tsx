@@ -76,7 +76,7 @@ type TestSandboxProps = {
   className?: string;
 };
 
-export default function TestSandbox({ className }: TestSandboxProps) {
+const TestSandbox = ({ className }: TestSandboxProps) => {
   const [providerSlug, setProviderSlug] = useState(apiProviders[0]?.slug ?? "");
   const provider = useMemo(() => getProviderBySlug(providerSlug), [providerSlug]);
 
@@ -280,4 +280,6 @@ export default function TestSandbox({ className }: TestSandboxProps) {
       </section>
     </div>
   );
-}
+};
+
+export default TestSandbox;
