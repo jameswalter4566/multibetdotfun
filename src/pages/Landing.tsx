@@ -3,36 +3,103 @@ import { Card } from "@/components/ui/card";
 import { Store, PlugZap, ShieldCheck, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const brandLogos: Record<string, string> = {
+  OpenAI: "/logos/openai.svg",
+  Claude: "/logos/claude.svg",
+  Google: "/logos/google.svg",
+  "Google Maps": "/logos/google.svg",
+  Stripe: "/logos/stripe.svg",
+  YouTube: "/logos/youtube.svg",
+  "YouTube Data": "/logos/youtube.svg",
+  Twilio: "/logos/twilio.svg",
+  Pinecone: "/logos/pinecone.svg",
+  Supabase: "/logos/supabase.svg",
+  Solana: "/logos/solana.svg",
+  x402: "/logos/x402.svg",
+  Anthropic: "/logos/anthropic.svg",
+  Cohere: "/logos/cohere.svg",
+  AWS: "/logos/aws.svg",
+  Azure: "/logos/azure.svg",
+  GCP: "/logos/gcp.svg",
+  Mapbox: "/logos/mapbox.svg",
+  Plaid: "/logos/plaid.svg",
+  SendGrid: "/logos/sendgrid.svg",
+  Segment: "/logos/segment.svg",
+  Datadog: "/logos/datadog.svg",
+};
+
 const marqueeLogosTop = [
-  "OpenAI", "Claude", "Google", "Stripe", "YouTube", "Twilio", "Pinecone", "Supabase", "Solana", "x402",
+  "OpenAI",
+  "Claude",
+  "Google",
+  "Stripe",
+  "YouTube",
+  "Twilio",
+  "Pinecone",
+  "Supabase",
+  "Solana",
+  "x402",
 ];
 
 const marqueeLogosBottom = [
-  "Anthropic", "Cohere", "AWS", "Azure", "GCP", "Mapbox", "Plaid", "SendGrid", "Segment", "Datadog",
+  "Anthropic",
+  "Cohere",
+  "AWS",
+  "Azure",
+  "GCP",
+  "Mapbox",
+  "Plaid",
+  "SendGrid",
+  "Segment",
+  "Datadog",
 ];
 
 export default function Landing() {
-  const heroLogos: { src: string; alt: string }[] = [
-    { src: "/logos/openai-updated.jpg", alt: "OpenAI" },
-    { src: "/logos/stripe.png", alt: "Stripe" },
-    { src: "/logos/google.webp", alt: "Google" },
-    { src: "/logos/twilio.png", alt: "Twilio" },
-    { src: "/logos/youtube.png", alt: "YouTube" },
-    { src: "/logos/coingecko.jpg", alt: "CoinGecko" },
-    { src: "/logos/microsoft.png", alt: "Microsoft" },
-    { src: "/logos/paypal.png", alt: "PayPal" },
-    { src: "/logos/google-icon.png", alt: "Google" },
-    { src: "/logos/claude.jpg", alt: "Claude" },
-    // repeat to make 18
-    { src: "/logos/openai-updated.jpg", alt: "OpenAI" },
-    { src: "/logos/stripe.png", alt: "Stripe" },
-    { src: "/logos/google.webp", alt: "Google" },
-    { src: "/logos/twilio.png", alt: "Twilio" },
-    { src: "/logos/youtube.png", alt: "YouTube" },
-    { src: "/logos/coingecko.jpg", alt: "CoinGecko" },
-    { src: "/logos/microsoft.png", alt: "Microsoft" },
-    { src: "/logos/paypal.png", alt: "PayPal" },
+  const heroBrands = [
+    "OpenAI",
+    "Claude",
+    "Google",
+    "Stripe",
+    "YouTube",
+    "Twilio",
+    "Pinecone",
+    "Supabase",
+    "Solana",
+    "x402",
+    "Anthropic",
+    "Cohere",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Mapbox",
+    "Plaid",
+    "SendGrid",
   ];
+  const heroLogos = heroBrands.map((name) => ({
+    name,
+    src: brandLogos[name],
+  }));
+  const renderBrandBadge = (name: string, key: string) => {
+    const logoSrc = brandLogos[name];
+    return (
+      <Card
+        key={key}
+        className="mr-4 rounded-2xl px-5 py-3 bg-card/80 border border-border/80"
+      >
+        <div className="flex items-center gap-2 text-sm md:text-base font-medium text-foreground/90">
+          {logoSrc && (
+            <img
+              src={logoSrc}
+              alt={name}
+              className="h-6 w-6 object-contain"
+            />
+          )}
+          <span>{name}</span>
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
@@ -47,11 +114,17 @@ export default function Landing() {
                   className="group h-28 md:h-32 rounded-2xl border border-white/20 bg-white/10 transition-all duration-200 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:ring-2 hover:ring-cyan-400/70"
                 >
                   <div className="h-full w-full flex items-center justify-center p-4">
-                    <img
-                      src={logo.src}
-                      alt={logo.alt}
-                      className="max-h-12 md:max-h-14 max-w-[85%] object-contain opacity-60 transition-opacity duration-200 group-hover:opacity-100"
-                    />
+                    {logo.src ? (
+                      <img
+                        src={logo.src}
+                        alt={logo.name}
+                        className="max-h-12 md:max-h-14 max-w-[85%] object-contain opacity-70 transition-opacity duration-200 group-hover:opacity-100"
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-white/70 group-hover:text-white">
+                        {logo.name}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -91,22 +164,18 @@ export default function Landing() {
           {/* Top row left moving */}
           <div className="overflow-hidden">
             <div className="marquee-left">
-              {[...marqueeLogosTop, ...marqueeLogosTop].map((name, i) => (
-                <Card key={`top-${i}`} className="mr-4 rounded-2xl px-5 py-3 bg-card/80 border border-border/80">
-                  <div className="text-sm md:text-base font-medium text-foreground/90">{name}</div>
-                </Card>
-              ))}
+              {[...marqueeLogosTop, ...marqueeLogosTop].map((name, i) =>
+                renderBrandBadge(name, `top-${i}`)
+              )}
             </div>
           </div>
 
           {/* Bottom row right moving */}
           <div className="overflow-hidden mt-4">
             <div className="marquee-right">
-              {[...marqueeLogosBottom, ...marqueeLogosBottom].map((name, i) => (
-                <Card key={`bot-${i}`} className="mr-4 rounded-2xl px-5 py-3 bg-card/80 border border-border/80">
-                  <div className="text-sm md:text-base font-medium text-foreground/90">{name}</div>
-                </Card>
-              ))}
+              {[...marqueeLogosBottom, ...marqueeLogosBottom].map((name, i) =>
+                renderBrandBadge(name, `bot-${i}`)
+              )}
             </div>
           </div>
         </div>
@@ -196,12 +265,26 @@ export default function Landing() {
             Browse and call top third‑party APIs via a single unified endpoint.
           </p>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {["OpenAI", "Claude", "Stripe", "Google Maps", "YouTube Data", "Twilio"].map((name) => (
-              <div key={name} className="ios-card p-5">
-                <div className="text-lg font-semibold">{name}</div>
-                <div className="text-sm text-muted-foreground mt-1">Instant access. No API key required. Powered by x402.</div>
-              </div>
-            ))}
+            {["OpenAI", "Claude", "Stripe", "Google Maps", "YouTube Data", "Twilio"].map((name) => {
+              const logoSrc = brandLogos[name];
+              return (
+                <div key={name} className="ios-card p-5 space-y-3">
+                  <div className="flex items-center gap-3">
+                    {logoSrc && (
+                      <img
+                        src={logoSrc}
+                        alt={name}
+                        className="h-9 w-9 object-contain"
+                      />
+                    )}
+                    <div className="text-lg font-semibold">{name}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Instant access. No API key required. Powered by x402.
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
