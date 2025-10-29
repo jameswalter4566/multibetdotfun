@@ -222,24 +222,29 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 gap-10 items-start mt-12">
             <div className="flex flex-col items-start gap-4">
               <img
-                src="/logos/hero-console.png"
-                alt="Platform screenshot"
-                className="max-w-[260px] w-full rounded-2xl shadow-[0_0_32px_rgba(14,165,255,0.25)]"
+                src="/logos/infra-stack.png"
+                alt="Infrastructure illustration"
+                className="max-w-[260px] w-full rounded-xl shadow-[0_0_24px_rgba(14,165,255,0.2)]"
               />
-              <h3 className="text-xl md:text-2xl font-bold">Payment Layer – Powered by x402 Protocol</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>Handles all transactions via x402 Payment Required standard</li>
-                <li>Accepts SOL, USDC, $402MARKET, and other Solana tokens</li>
-                <li>Instant confirmations, no chargebacks</li>
-                <li>Replaces outdated payment processors</li>
-              </ul>
-            </div>
-            <div>
               <h3 className="text-xl md:text-2xl font-bold">Infrastructure Layer – Developer-First Platform</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
                 <li>Session-based billing (no per-call delays)</li>
                 <li>Automatic on-chain verification</li>
                 <li>Multi-chain support coming soon</li>
+              </ul>
+            </div>
+            <div className="flex flex-col items-start gap-4 md:items-end text-left md:text-right">
+              <img
+                src="/logos/hero-console.png"
+                alt="Platform screenshot"
+                className="max-w-[260px] w-full rounded-2xl shadow-[0_0_32px_rgba(14,165,255,0.25)]"
+              />
+              <h3 className="text-xl md:text-2xl font-bold md:text-right w-full">Payment Layer – Powered by x402 Protocol</h3>
+              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc md:text-right md:pl-8 w-full md:list-none md:[&>li]:before:content-['•'] md:[&>li]:before:mr-2">
+                <li>Handles all transactions via x402 Payment Required standard</li>
+                <li>Accepts SOL, USDC, $402MARKET, and other Solana tokens</li>
+                <li>Instant confirmations, no chargebacks</li>
+                <li>Replaces outdated payment processors</li>
               </ul>
             </div>
           </div>
