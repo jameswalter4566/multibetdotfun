@@ -68,6 +68,52 @@ const tileLogos: Record<string, string> = {
   Twilio: brandLogos.Twilio,
 };
 
+const featureTiles = [
+  {
+    title: "Access Layer – Instant API Access",
+    image: "/logos/agent-automation.png",
+    alt: "Access automation",
+    points: [
+      "One unified endpoint for every major API (OpenAI, Claude, Google, Stripe, etc.)",
+      "No API keys or signup forms required",
+      "Pay per call using x402 protocol",
+      "Designed for developers, agents, and automations",
+    ],
+  },
+  {
+    title: "Infrastructure Layer – Developer-First Platform",
+    image: "/logos/infra-stack.png",
+    alt: "Infrastructure illustration",
+    points: [
+      "Session-based billing (no per-call delays)",
+      "Automatic on-chain verification",
+      "Multi-chain support coming soon",
+    ],
+  },
+  {
+    title: "Marketplace Layer – List & Monetize Your API",
+    image: "/logos/payment-card.png",
+    alt: "Marketplace illustration",
+    points: [
+      "List your API in minutes",
+      "Set per-call pricing and supported tokens",
+      "Receive instant payments per request",
+      "Analytics dashboard for usage and earnings",
+    ],
+  },
+  {
+    title: "Payment Layer – Powered by x402 Protocol",
+    image: "/logos/hero-console.png",
+    alt: "Platform payment console",
+    points: [
+      "Handles all transactions via x402 Payment Required standard",
+      "Accepts SOL, USDC, $402MARKET, and other Solana tokens",
+      "Instant confirmations, no chargebacks",
+      "Replaces outdated payment processors",
+    ],
+  },
+];
+
 export default function Landing() {
   const heroLogos = [...heroLogoSet, ...heroLogoSet].slice(0, 18);
 
@@ -167,86 +213,26 @@ export default function Landing() {
 
       {/* Explainer Tiles */}
       <section className="py-10 md:py-16">
-        <div className="max-w-6xl mx-auto px-6 space-y-12">
-          <div className="grid md:grid-cols-2 gap-10">
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold">Access Layer – Instant API Access</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>One unified endpoint for every major API (OpenAI, Claude, Google, Stripe, etc.)</li>
-                <li>No API keys or signup forms required</li>
-                <li>Pay per call using x402 protocol</li>
-                <li>Designed for developers, agents, and automations</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold">Infrastructure Layer – Developer-First Platform</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>Session-based billing (no per-call delays)</li>
-                <li>Automatic on-chain verification</li>
-                <li>Multi-chain support coming soon</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-10 items-start">
-            <div className="flex flex-col items-start gap-4">
-              <img
-                src="/logos/agent-automation.png"
-                alt="Access automation"
-                className="max-w-[260px] w-full rounded-xl shadow-[0_0_24px_rgba(14,165,255,0.2)]"
-              />
-              <h3 className="text-xl md:text-2xl font-bold">Access Layer – Instant API Access</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>One unified endpoint for every major API (OpenAI, Claude, Google, Stripe, etc.)</li>
-                <li>No API keys or signup forms required</li>
-                <li>Pay per call using x402 protocol</li>
-                <li>Designed for developers, agents, and automations</li>
-              </ul>
-            </div>
-            <div className="flex flex-col items-start gap-4 md:items-end">
-              <img
-                src="/logos/payment-card.png"
-                alt="Marketplace illustration"
-                className="max-w-[260px] w-full rounded-xl shadow-[0_0_24px_rgba(14,165,255,0.2)]"
-              />
-              <h3 className="text-xl md:text-2xl font-bold md:text-right w-full">Marketplace Layer – List & Monetize Your API</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc md:text-right md:pl-8 w-full md:list-none md:[&>li]:before:content-['•'] md:[&>li]:before:mr-2">
-                <li>List your API in minutes</li>
-                <li>Set per-call pricing and supported tokens</li>
-                <li>Receive instant payments per request</li>
-                <li>Analytics dashboard for usage and earnings</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-10 items-start mt-12">
-            <div className="flex flex-col items-start gap-4">
-              <img
-                src="/logos/infra-stack.png"
-                alt="Infrastructure illustration"
-                className="max-w-[260px] w-full rounded-xl shadow-[0_0_24px_rgba(14,165,255,0.2)]"
-              />
-              <h3 className="text-xl md:text-2xl font-bold">Infrastructure Layer – Developer-First Platform</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>Session-based billing (no per-call delays)</li>
-                <li>Automatic on-chain verification</li>
-                <li>Multi-chain support coming soon</li>
-              </ul>
-            </div>
-            <div className="flex flex-col items-start gap-4 md:items-end text-left md:text-right">
-              <img
-                src="/logos/hero-console.png"
-                alt="Platform screenshot"
-                className="max-w-[260px] w-full rounded-2xl shadow-[0_0_32px_rgba(14,165,255,0.25)]"
-              />
-              <h3 className="text-xl md:text-2xl font-bold md:text-right w-full">Payment Layer – Powered by x402 Protocol</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc md:text-right md:pl-8 w-full md:list-none md:[&>li]:before:content-['•'] md:[&>li]:before:mr-2">
-                <li>Handles all transactions via x402 Payment Required standard</li>
-                <li>Accepts SOL, USDC, $402MARKET, and other Solana tokens</li>
-                <li>Instant confirmations, no chargebacks</li>
-                <li>Replaces outdated payment processors</li>
-              </ul>
-            </div>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid gap-8 md:grid-cols-2">
+            {featureTiles.map((tile) => (
+              <div
+                key={tile.title}
+                className="rounded-3xl border border-border bg-card/80 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.25)] backdrop-blur flex flex-col items-center text-center"
+              >
+                <img
+                  src={tile.image}
+                  alt={tile.alt}
+                  className="w-[220px] max-w-full object-contain drop-shadow-[0_0_24px_rgba(14,165,255,0.2)] mb-4"
+                />
+                <h3 className="text-xl md:text-2xl font-bold">{tile.title}</h3>
+                <ul className="mt-4 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-6 text-left w-full">
+                  {tile.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </section>
