@@ -22,7 +22,7 @@ export const apiProviders: ApiProvider[] = [
   {
     name: "OpenAI",
     slug: "openai",
-    logo: "/logos/openai-updated.jpg",
+    logo: "/logos/openai.png",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
       "Use x402 Marketplace to call OpenAI's APIs without sharing or storing your own keys. Pay with x402 protocol, send your request to our gateway, and we forward it securely using our managed OpenAI account.",
@@ -90,7 +90,7 @@ runChat().catch(console.error);`,
   {
     name: "Claude",
     slug: "claude",
-    logo: "/logos/claude.jpg",
+    logo: "/logos/claude.png",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
       "Call Anthropic Claude via x402 to build natural language and agentic workflows without juggling API keys or separate billing.",
@@ -203,7 +203,7 @@ createCharge().catch(console.error);`,
   {
     name: "Google Maps",
     slug: "google-maps",
-    logo: "/logos/google-icon.png",
+    logo: "/logos/google-maps.png",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
       "Drop in geocoding, reverse geocoding, and place search without managing credentials. Each request is linked to your x402 session.",

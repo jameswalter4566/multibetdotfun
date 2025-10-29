@@ -11,28 +11,30 @@ const marqueeLogosBottom = [
   "Anthropic", "Cohere", "AWS", "Azure", "GCP", "Mapbox", "Plaid", "SendGrid", "Segment", "Datadog",
 ];
 
+const heroLogoSet: { src: string; alt: string }[] = [
+  { src: "/logos/openai.png", alt: "OpenAI" },
+  { src: "/logos/stripe.png", alt: "Stripe" },
+  { src: "/logos/google.webp", alt: "Google" },
+  { src: "/logos/twilio.png", alt: "Twilio" },
+  { src: "/logos/youtube.png", alt: "YouTube" },
+  { src: "/logos/coingecko.png", alt: "CoinGecko" },
+  { src: "/logos/helius.png", alt: "Helius" },
+  { src: "/logos/paypal.png", alt: "PayPal" },
+  { src: "/logos/google-maps.png", alt: "Google Maps" },
+  { src: "/logos/claude.png", alt: "Claude" },
+];
+
+const tileLogos: Record<string, string> = {
+  OpenAI: "/logos/openai.png",
+  Claude: "/logos/claude.png",
+  Stripe: "/logos/stripe.png",
+  "Google Maps": "/logos/google-maps.png",
+  "YouTube Data": "/logos/youtube.png",
+  Twilio: "/logos/twilio.png",
+};
+
 export default function Landing() {
-  const heroLogos: { src: string; alt: string }[] = [
-    { src: "/logos/openai-updated.jpg", alt: "OpenAI" },
-    { src: "/logos/stripe.png", alt: "Stripe" },
-    { src: "/logos/google.webp", alt: "Google" },
-    { src: "/logos/twilio.png", alt: "Twilio" },
-    { src: "/logos/youtube.png", alt: "YouTube" },
-    { src: "/logos/coingecko.jpg", alt: "CoinGecko" },
-    { src: "/logos/microsoft.png", alt: "Microsoft" },
-    { src: "/logos/paypal.png", alt: "PayPal" },
-    { src: "/logos/google-icon.png", alt: "Google" },
-    { src: "/logos/claude.jpg", alt: "Claude" },
-    // repeat to make 18
-    { src: "/logos/openai-updated.jpg", alt: "OpenAI" },
-    { src: "/logos/stripe.png", alt: "Stripe" },
-    { src: "/logos/google.webp", alt: "Google" },
-    { src: "/logos/twilio.png", alt: "Twilio" },
-    { src: "/logos/youtube.png", alt: "YouTube" },
-    { src: "/logos/coingecko.jpg", alt: "CoinGecko" },
-    { src: "/logos/microsoft.png", alt: "Microsoft" },
-    { src: "/logos/paypal.png", alt: "PayPal" },
-  ];
+  const heroLogos = [...heroLogoSet, ...heroLogoSet].slice(0, 18);
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
@@ -196,12 +198,26 @@ export default function Landing() {
             Browse and call top third‑party APIs via a single unified endpoint.
           </p>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {["OpenAI", "Claude", "Stripe", "Google Maps", "YouTube Data", "Twilio"].map((name) => (
-              <div key={name} className="ios-card p-5">
-                <div className="text-lg font-semibold">{name}</div>
-                <div className="text-sm text-muted-foreground mt-1">Instant access. No API key required. Powered by x402.</div>
-              </div>
-            ))}
+            {["OpenAI", "Claude", "Stripe", "Google Maps", "YouTube Data", "Twilio"].map((name) => {
+              const logoSrc = tileLogos[name];
+              return (
+                <div key={name} className="ios-card p-5 space-y-3">
+                  <div className="flex items-center gap-3">
+                    {logoSrc && (
+                      <img
+                        src={logoSrc}
+                        alt={name}
+                        className="h-8 w-8 object-contain"
+                      />
+                    )}
+                    <div className="text-lg font-semibold">{name}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Instant access. No API key required. Powered by x402.
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
