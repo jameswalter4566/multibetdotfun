@@ -4,11 +4,32 @@ import { Store, PlugZap, ShieldCheck, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const marqueeLogosTop = [
-  "OpenAI", "Claude", "Google", "Stripe", "YouTube", "Twilio", "Pinecone", "Supabase", "Solana", "x402",
+  "OpenAI",
+  "Claude",
+  "Google",
+  "Stripe",
+  "YouTube",
+  "Twilio",
+  "CoinGecko",
+  "Helius",
+  "PayPal",
+  "Pinecone",
+  "Supabase",
+  "Solana",
+  "x402",
 ];
 
 const marqueeLogosBottom = [
-  "Anthropic", "Cohere", "AWS", "Azure", "GCP", "Mapbox", "Plaid", "SendGrid", "Segment", "Datadog",
+  "Anthropic",
+  "Cohere",
+  "AWS",
+  "Azure",
+  "GCP",
+  "Mapbox",
+  "Plaid",
+  "SendGrid",
+  "Segment",
+  "Datadog",
 ];
 
 const heroLogoSet: { src: string; alt: string }[] = [
@@ -24,17 +45,52 @@ const heroLogoSet: { src: string; alt: string }[] = [
   { src: "/logos/claude.png", alt: "Claude" },
 ];
 
-const tileLogos: Record<string, string> = {
+const brandLogos: Record<string, string> = {
   OpenAI: "/logos/openai.png",
   Claude: "/logos/claude.png",
+  Google: "/logos/google.webp",
   Stripe: "/logos/stripe.png",
+  YouTube: "/logos/youtube.png",
+  Twilio: "/logos/twilio.png",
+  CoinGecko: "/logos/coingecko.png",
+  Helius: "/logos/helius.png",
+  PayPal: "/logos/paypal.png",
   "Google Maps": "/logos/google-maps.png",
   "YouTube Data": "/logos/youtube.png",
-  Twilio: "/logos/twilio.png",
+};
+
+const tileLogos: Record<string, string> = {
+  OpenAI: brandLogos.OpenAI,
+  Claude: brandLogos.Claude,
+  Stripe: brandLogos.Stripe,
+  "Google Maps": brandLogos["Google Maps"],
+  "YouTube Data": brandLogos["YouTube Data"],
+  Twilio: brandLogos.Twilio,
 };
 
 export default function Landing() {
   const heroLogos = [...heroLogoSet, ...heroLogoSet].slice(0, 18);
+
+  const renderMarqueeBadge = (name: string, key: string) => {
+    const logoSrc = brandLogos[name];
+    return (
+      <Card
+        key={key}
+        className="text-card-foreground shadow-sm mr-4 rounded-2xl px-5 py-3 bg-card/80 border border-border/80"
+      >
+        <div className="flex items-center gap-2 text-sm md:text-base font-medium text-foreground/90">
+          {logoSrc && (
+            <img
+              src={logoSrc}
+              alt={name}
+              className="h-6 w-6 object-contain"
+            />
+          )}
+          <span>{name}</span>
+        </div>
+      </Card>
+    );
+  };
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
@@ -93,22 +149,18 @@ export default function Landing() {
           {/* Top row left moving */}
           <div className="overflow-hidden">
             <div className="marquee-left">
-              {[...marqueeLogosTop, ...marqueeLogosTop].map((name, i) => (
-                <Card key={`top-${i}`} className="mr-4 rounded-2xl px-5 py-3 bg-card/80 border border-border/80">
-                  <div className="text-sm md:text-base font-medium text-foreground/90">{name}</div>
-                </Card>
-              ))}
+              {[...marqueeLogosTop, ...marqueeLogosTop].map((name, i) =>
+                renderMarqueeBadge(name, `top-${i}`)
+              )}
             </div>
           </div>
 
           {/* Bottom row right moving */}
           <div className="overflow-hidden mt-4">
             <div className="marquee-right">
-              {[...marqueeLogosBottom, ...marqueeLogosBottom].map((name, i) => (
-                <Card key={`bot-${i}`} className="mr-4 rounded-2xl px-5 py-3 bg-card/80 border border-border/80">
-                  <div className="text-sm md:text-base font-medium text-foreground/90">{name}</div>
-                </Card>
-              ))}
+              {[...marqueeLogosBottom, ...marqueeLogosBottom].map((name, i) =>
+                renderMarqueeBadge(name, `bot-${i}`)
+              )}
             </div>
           </div>
         </div>
