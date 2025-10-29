@@ -118,27 +118,24 @@ export default function Landing() {
         </div>
 
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
-          <div className="relative -translate-y-[20px] flex flex-col gap-6 max-w-3xl">
-            <div className="text-left">
-              <h1 className="hero-headline hero-text-shadow hero-slide font-extrabold tracking-tight text-left">
-                instant access to every top third party api with a single call
-              </h1>
-              <h2 className="hero-text-shadow hero-slide hero-slide-delay-1 mt-4 text-2xl md:text-3xl font-bold text-white text-left">
-                <span className="hero-highlight">no API key required. Powered by x402</span>
-              </h2>
+          <div className="relative -translate-y-[20px] text-center max-w-3xl mx-auto">
+            <h1 className="hero-headline hero-text-shadow hero-slide font-extrabold tracking-tight">
+              instant access to every top third party api with a single call
+            </h1>
+            <h2 className="hero-text-shadow hero-slide hero-slide-delay-1 mt-4 text-2xl md:text-3xl font-bold text-white">
+              <span className="hero-highlight">no API key required. Powered by x402</span>
+            </h2>
 
-              <div className="hero-text-shadow hero-slide hero-slide-delay-2 mt-4 text-sm md:text-base text-foreground/90 text-left max-w-lg">
-                Make your first call for free now. Built for developers, agents, and automations.
-              </div>
+            <div className="hero-text-shadow hero-slide hero-slide-delay-2 mt-8 text-sm md:text-base text-foreground/90">
+              Make your first call for free now. Built for developers, agents, and automations.
+            </div>
 
-              <div className="hero-slide hero-slide-delay-3 mt-4 flex justify-start">
-                <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
-                  <Link to="/home">Explore API marketplace</Link>
-                </Button>
-              </div>
+            <div className="hero-slide hero-slide-delay-3 mt-3 flex justify-center">
+              <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
+                <Link to="/home">Explore API marketplace</Link>
+              </Button>
             </div>
           </div>
-
         </div>
 
         {/* Soft glow background */}
@@ -170,8 +167,8 @@ export default function Landing() {
 
       {/* Explainer Tiles */}
       <section className="py-10 md:py-16">
-        <div className="max-w-6xl mx-auto px-6 grid gap-10 md:grid-cols-2 items-start">
-          <div className="space-y-8">
+        <div className="max-w-6xl mx-auto px-6 space-y-12">
+          <div className="grid md:grid-cols-2 gap-10">
             <div>
               <h3 className="text-xl md:text-2xl font-bold">Access Layer – Instant API Access</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
@@ -181,27 +178,6 @@ export default function Landing() {
                 <li>Designed for developers, agents, and automations</li>
               </ul>
             </div>
-
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold">Payment Layer – Powered by x402 Protocol</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>Handles all transactions via x402 Payment Required standard</li>
-                <li>Accepts SOL, USDC, $402MARKET, and other Solana tokens</li>
-                <li>Instant confirmations, no chargebacks</li>
-                <li>Replaces outdated payment processors</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold">Marketplace Layer – List & Monetize Your API</h3>
-              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
-                <li>List your API in minutes</li>
-                <li>Set per-call pricing and supported tokens</li>
-                <li>Receive instant payments per request</li>
-                <li>Analytics dashboard for usage and earnings</li>
-              </ul>
-            </div>
-
             <div>
               <h3 className="text-xl md:text-2xl font-bold">Infrastructure Layer – Developer-First Platform</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
@@ -212,12 +188,35 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="flex justify-center md:justify-end">
-            <img
-              src="/logos/hero-console.png"
-              alt="Platform screenshot"
-              className="max-w-[420px] w-full rounded-2xl shadow-[0_0_32px_rgba(14,165,255,0.25)]"
-            />
+          <div className="grid md:grid-cols-2 gap-10 items-start">
+            <div className="flex flex-col items-start gap-4">
+              <img
+                src="/logos/payment-card.png"
+                alt="Marketplace illustration"
+                className="max-w-[240px] w-full rounded-xl shadow-[0_0_24px_rgba(14,165,255,0.2)]"
+              />
+              <h3 className="text-xl md:text-2xl font-bold">Marketplace Layer – List & Monetize Your API</h3>
+              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
+                <li>List your API in minutes</li>
+                <li>Set per-call pricing and supported tokens</li>
+                <li>Receive instant payments per request</li>
+                <li>Analytics dashboard for usage and earnings</li>
+              </ul>
+            </div>
+            <div className="flex flex-col items-start gap-4 md:items-end text-left md:text-right">
+              <img
+                src="/logos/hero-console.png"
+                alt="Platform screenshot"
+                className="max-w-[294px] w-full rounded-2xl shadow-[0_0_32px_rgba(14,165,255,0.25)]"
+              />
+              <h3 className="text-xl md:text-2xl font-bold md:text-right w-full">Payment Layer – Powered by x402 Protocol</h3>
+              <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc md:pl-8 w-full md:text-right md:list-none md:[&>li]:before:content-['•'] md:[&>li]:before:mr-2">
+                <li>Handles all transactions via x402 Payment Required standard</li>
+                <li>Accepts SOL, USDC, $402MARKET, and other Solana tokens</li>
+                <li>Instant confirmations, no chargebacks</li>
+                <li>Replaces outdated payment processors</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
