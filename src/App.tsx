@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import ProviderDocumentation from "./pages/ProviderDocumentation";
 import ListAPI from "./pages/ListAPI";
 import Signup from "./pages/Signup";
+import AdminWorkbench from "./pages/AdminWorkbench";
 
 const queryClient = new QueryClient();
 
@@ -28,21 +29,22 @@ const App = () => (
       <div className="app-content">
         <BrowserRouter>
           <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/home" element={<Index />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
-          <Route path="/list-api" element={<ListAPI />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/stream/:channel" element={<Stream />} />
-          <Route path="/profile/:channel" element={<Profile />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/campaigns" element={<Campaigns />} />
-          <Route path="/campaign/:id" element={<Campaign />} />
-          <Route path="/explore" element={<ExploreCampaigns />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/home" element={<Index />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
+            <Route path="/list-api" element={<ListAPI />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/mein/arbeit" element={<AdminWorkbench />} />
+            <Route path="/stream/:channel" element={<Stream />} />
+            <Route path="/profile/:channel" element={<Profile />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/campaigns" element={<Campaigns />} />
+            <Route path="/campaign/:id" element={<Campaign />} />
+            <Route path="/explore" element={<ExploreCampaigns />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </div>
