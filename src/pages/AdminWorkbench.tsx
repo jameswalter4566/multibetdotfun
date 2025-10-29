@@ -9,6 +9,7 @@ const fallbackGatewayUrl = import.meta.env.DEV
 const gatewayUrl =
   (import.meta.env.VITE_GATEWAY_URL as string | undefined)?.trim() || fallbackGatewayUrl;
 const adminEndpoint = `${gatewayUrl}/admin/test-openai`;
+const testWallet = "7FHxcYUCcyFmh35froTpsHa9YwA5euALXFaH7ykVATYh";
 
 type RequestState = "idle" | "loading" | "success" | "error";
 
@@ -79,7 +80,8 @@ const AdminWorkbench = () => {
           <h1 className="text-3xl font-bold tracking-tight">Gateway Sanity Check</h1>
           <p className="text-sm text-muted-foreground">
             Trigger a full Solana payment flow against the OpenAI models endpoint using the
-            facilitator and the test payer configured on Railway. No auth token required.
+            facilitator and the test payer configured on Railway. The request signs on behalf of
+            <span className="ml-1 font-mono text-[11px]">{testWallet}</span>.
           </p>
         </header>
 
