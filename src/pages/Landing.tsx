@@ -13,7 +13,7 @@ const marqueeLogosBottom = [
 
 export default function Landing() {
   const heroLogos: { src: string; alt: string }[] = [
-    { src: "/logos/openai.jpg", alt: "OpenAI" },
+    { src: "/logos/openai-updated.jpg", alt: "OpenAI" },
     { src: "/logos/stripe.png", alt: "Stripe" },
     { src: "/logos/google.webp", alt: "Google" },
     { src: "/logos/twilio.png", alt: "Twilio" },
@@ -24,7 +24,7 @@ export default function Landing() {
     { src: "/logos/google-icon.png", alt: "Google" },
     { src: "/logos/claude.jpg", alt: "Claude" },
     // repeat to make 18
-    { src: "/logos/openai.jpg", alt: "OpenAI" },
+    { src: "/logos/openai-updated.jpg", alt: "OpenAI" },
     { src: "/logos/stripe.png", alt: "Stripe" },
     { src: "/logos/google.webp", alt: "Google" },
     { src: "/logos/twilio.png", alt: "Twilio" },
