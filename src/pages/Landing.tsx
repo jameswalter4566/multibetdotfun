@@ -118,22 +118,31 @@ export default function Landing() {
         </div>
 
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
-          <div className="relative -translate-y-[20px]">
-            <h1 className="hero-headline hero-text-shadow hero-slide font-extrabold tracking-tight">
-              instant access to every top third party api with a single call
-            </h1>
-            <h2 className="hero-text-shadow hero-slide hero-slide-delay-1 mt-4 text-center text-2xl md:text-3xl font-bold text-white">
-              <span className="hero-highlight">no API key required. Powered by x402</span>
-            </h2>
+          <div className="relative -translate-y-[20px] grid md:grid-cols-[minmax(0,1fr)_320px] gap-10 items-center">
+            <div className="text-left">
+              <h1 className="hero-headline hero-text-shadow hero-slide font-extrabold tracking-tight text-left">
+                instant access to every top third party api with a single call
+              </h1>
+              <h2 className="hero-text-shadow hero-slide hero-slide-delay-1 mt-4 text-2xl md:text-3xl font-bold text-white text-left">
+                <span className="hero-highlight">no API key required. Powered by x402</span>
+              </h2>
 
-            <div className="hero-text-shadow hero-slide hero-slide-delay-2 mt-8 text-center text-sm md:text-base text-foreground/90">
-              Make your first call for free now
+              <div className="hero-text-shadow hero-slide hero-slide-delay-2 mt-4 text-sm md:text-base text-foreground/90 text-left max-w-lg">
+                Make your first call for free now. Built for developers, agents, and automations.
+              </div>
+
+              <div className="hero-slide hero-slide-delay-3 mt-4 flex justify-start">
+                <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
+                  <Link to="/home">Explore API marketplace</Link>
+                </Button>
+              </div>
             </div>
-
-            <div className="hero-slide hero-slide-delay-3 mt-3 flex justify-center">
-              <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
-                <Link to="/home">Explore API marketplace</Link>
-              </Button>
+            <div className="hidden md:flex justify-center">
+              <img
+                src="/logos/hero-console.png"
+                alt="x402 Console"
+                className="max-h-72 w-full object-contain drop-shadow-[0_0_24px_rgba(14,165,255,0.35)]"
+              />
             </div>
           </div>
 
@@ -168,16 +177,10 @@ export default function Landing() {
 
       {/* Explainer Tiles */}
       <section className="py-10 md:py-16">
-        <div className="max-w-6xl mx-auto px-6 grid gap-6">
-          {/* Tile 1: Access Layer */}
-          <div className="ios-card p-6 md:p-8 grid md:grid-cols-[120px_1fr] gap-4 items-center">
-            <div className="flex md:justify-center">
-              <div className="w-20 h-20 rounded-2xl bg-cyan-500/15 border border-cyan-400/30 flex items-center justify-center shadow-[0_0_24px_rgba(14,165,255,0.3)]">
-                <PlugZap className="w-9 h-9 text-cyan-300" />
-              </div>
-            </div>
+        <div className="max-w-6xl mx-auto px-6 grid gap-10 md:grid-cols-2 items-start">
+          <div className="space-y-8">
             <div>
-              <div className="text-xl md:text-2xl font-bold">Access Layer – Instant API Access</div>
+              <h3 className="text-xl md:text-2xl font-bold">Access Layer – Instant API Access</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
                 <li>One unified endpoint for every major API (OpenAI, Claude, Google, Stripe, etc.)</li>
                 <li>No API keys or signup forms required</li>
@@ -185,12 +188,9 @@ export default function Landing() {
                 <li>Designed for developers, agents, and automations</li>
               </ul>
             </div>
-          </div>
 
-          {/* Tile 2: Payment Layer */}
-          <div className="ios-card p-6 md:p-8 grid md:grid-cols-[1fr_120px] gap-4 items-center">
             <div>
-              <div className="text-xl md:text-2xl font-bold">Payment Layer – Powered by x402 Protocol</div>
+              <h3 className="text-xl md:text-2xl font-bold">Payment Layer – Powered by x402 Protocol</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
                 <li>Handles all transactions via x402 Payment Required standard</li>
                 <li>Accepts SOL, USDC, $402MARKET, and other Solana tokens</li>
@@ -198,22 +198,9 @@ export default function Landing() {
                 <li>Replaces outdated payment processors</li>
               </ul>
             </div>
-            <div className="flex md:justify-center order-first md:order-last">
-              <div className="w-20 h-20 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center shadow-[0_0_24px_rgba(16,185,129,0.25)]">
-                <ShieldCheck className="w-9 h-9 text-emerald-300" />
-              </div>
-            </div>
-          </div>
 
-          {/* Tile 3: Marketplace Layer */}
-          <div className="ios-card p-6 md:p-8 grid md:grid-cols-[120px_1fr] gap-4 items-center">
-            <div className="flex md:justify-center">
-              <div className="w-20 h-20 rounded-2xl bg-indigo-500/15 border border-indigo-400/30 flex items-center justify-center shadow-[0_0_24px_rgba(99,102,241,0.25)]">
-                <Store className="w-9 h-9 text-indigo-300" />
-              </div>
-            </div>
             <div>
-              <div className="text-xl md:text-2xl font-bold">Marketplace Layer – List & Monetize Your API</div>
+              <h3 className="text-xl md:text-2xl font-bold">Marketplace Layer – List & Monetize Your API</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
                 <li>List your API in minutes</li>
                 <li>Set per-call pricing and supported tokens</li>
@@ -221,23 +208,23 @@ export default function Landing() {
                 <li>Analytics dashboard for usage and earnings</li>
               </ul>
             </div>
-          </div>
 
-          {/* Tile 4: Infrastructure Layer */}
-          <div className="ios-card p-6 md:p-8 grid md:grid-cols-[1fr_120px] gap-4 items-center">
             <div>
-              <div className="text-xl md:text-2xl font-bold">Infrastructure Layer – Developer-First Platform</div>
+              <h3 className="text-xl md:text-2xl font-bold">Infrastructure Layer – Developer-First Platform</h3>
               <ul className="mt-2 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-5">
                 <li>Session-based billing (no per-call delays)</li>
                 <li>Automatic on-chain verification</li>
                 <li>Multi-chain support coming soon</li>
               </ul>
             </div>
-            <div className="flex md:justify-center order-first md:order-last">
-              <div className="w-20 h-20 rounded-2xl bg-fuchsia-500/15 border border-fuchsia-400/30 flex items-center justify-center shadow-[0_0_24px_rgba(217,70,239,0.25)]">
-                <Building2 className="w-9 h-9 text-fuchsia-300" />
-              </div>
-            </div>
+          </div>
+
+          <div className="flex justify-center md:justify-end">
+            <img
+              src="/logos/hero-console.png"
+              alt="Platform screenshot"
+              className="max-w-[420px] w-full rounded-2xl shadow-[0_0_32px_rgba(14,165,255,0.25)]"
+            />
           </div>
         </div>
       </section>
