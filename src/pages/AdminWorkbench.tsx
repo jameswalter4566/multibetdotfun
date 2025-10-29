@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +13,6 @@ const adminEndpoint = `${gatewayUrl}/admin/test-openai`;
 type RequestState = "idle" | "loading" | "success" | "error";
 
 const AdminWorkbench = () => {
-  const [adminToken, setAdminToken] = useState<string>("");
   const [status, setStatus] = useState<RequestState>("idle");
   const [resultText, setResultText] = useState<string>("");
   const [errorText, setErrorText] = useState<string>("");
@@ -29,9 +27,6 @@ const AdminWorkbench = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(adminToken.trim().length > 0
-            ? { Authorization: `Bearer ${adminToken.trim()}` }
-            : {}),
         },
         body: JSON.stringify({}),
       });
@@ -84,28 +79,11 @@ const AdminWorkbench = () => {
           <h1 className="text-3xl font-bold tracking-tight">Gateway Sanity Check</h1>
           <p className="text-sm text-muted-foreground">
             Trigger a full Solana payment flow against the OpenAI models endpoint using the
-            facilitator and test payer configured on Railway. Provide the admin bearer token from
-            `ADMIN_API_KEY` to authorise this call.
+            facilitator and the test payer configured on Railway. No auth token required.
           </p>
         </header>
 
         <section className="space-y-5 rounded-3xl border border-border bg-secondary/30 p-6 shadow-glow">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
-              Admin bearer token
-            </label>
-            <Input
-              type="password"
-              value={adminToken}
-              onChange={event => setAdminToken(event.target.value)}
-              placeholder="Paste your ADMIN_API_KEY token"
-            />
-            <p className="text-xs text-muted-foreground">
-              The token is never stored; it is attached to a single POST request to
-              <span className="ml-1 font-mono text-[11px] text-foreground/80">/admin/test-openai</span>.
-            </p>
-          </div>
-
           <Button
             onClick={runGatewayTest}
             disabled={status === "loading"}
