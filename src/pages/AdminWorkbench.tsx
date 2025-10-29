@@ -23,11 +23,12 @@ const AdminWorkbench = () => {
     setErrorText("");
     setResultText("Pinging gateway...");
 
-    try {
+  try {
       const response = await fetch(adminEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x402-sender-wallet": testWallet,
         },
         body: JSON.stringify({}),
       });
