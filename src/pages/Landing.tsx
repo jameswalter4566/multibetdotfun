@@ -118,7 +118,7 @@ export default function Landing() {
         </div>
 
         <div className="relative z-50 max-w-6xl mx-auto px-6 pt-20 md:pt-28 pb-20 md:pb-28">
-          <div className="relative -translate-y-[20px] grid md:grid-cols-[minmax(0,1fr)_320px] gap-10 items-center">
+          <div className="relative -translate-y-[20px] flex flex-col gap-6 max-w-3xl">
             <div className="text-left">
               <h1 className="hero-headline hero-text-shadow hero-slide font-extrabold tracking-tight text-left">
                 instant access to every top third party api with a single call
@@ -136,13 +136,6 @@ export default function Landing() {
                   <Link to="/home">Explore API marketplace</Link>
                 </Button>
               </div>
-            </div>
-            <div className="hidden md:flex justify-center">
-              <img
-                src="/logos/hero-console.png"
-                alt="x402 Console"
-                className="max-h-72 w-full object-contain drop-shadow-[0_0_24px_rgba(14,165,255,0.35)]"
-              />
             </div>
           </div>
 
