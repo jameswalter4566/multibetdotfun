@@ -260,7 +260,12 @@ export default function CampaignPage() {
     <div className="min-h-screen bg-background">
       {/* Top-left logo */}
       <Link to="/" className="fixed top-2 left-12 md:left-16 z-30 block">
-        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
+        <img
+          src="/marketx-logo.png"
+          alt="x402 marketplace"
+          className="w-auto align-middle"
+          style={{ maxHeight: "4rem", height: "auto", width: "auto" }}
+        />
       </Link>
       {/* Top-right nav (match Index nav) */}
       <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">

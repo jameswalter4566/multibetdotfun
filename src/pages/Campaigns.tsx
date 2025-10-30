@@ -54,7 +54,12 @@ export default function CampaignsPage() {
   return (
     <div className="min-h-screen bg-background">
       <a href="/" className="fixed top-2 left-12 md:left-16 z-20 block">
-        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
+        <img
+          src="/marketx-logo.png"
+          alt="x402 marketplace"
+          className="w-auto align-middle"
+          style={{ maxHeight: "4rem", height: "auto", width: "auto" }}
+        />
       </a>
       <main className="container mx-auto px-4 pt-24 pb-10 max-w-5xl">
         <div className="bg-card border border-border rounded-lg p-6">
