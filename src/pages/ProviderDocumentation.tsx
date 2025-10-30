@@ -326,7 +326,7 @@ export default function ProviderDocumentation() {
 
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Endpoint</div>
-                  <div className="mt-2 rounded-xl border border-border bg-background px-3 py-3 text-xs font-mono text-foreground/80">
+                  <div className="mt-2 rounded-xl border border-border bg-background px-3 py-3 text-xs font-mono text-foreground/80 break-all">
                     <span className="font-semibold text-primary mr-2">{activeEndpoint.method}</span>
                     {activeEndpoint.path}
                   </div>
