@@ -43,8 +43,11 @@ export default function UserBadge() {
 
   if (!user) {
     return (
-      <a href="/signin" className="text-foreground/90 hover:underline text-sm md:text-base text-right leading-snug">
-        Sign in to list your Application in the market place
+      <a
+        href="/list-api"
+        className="inline-flex items-center rounded-full bg-[#0ea5ff] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.4)] hover:bg-[#08b0ff]"
+      >
+        List your App
       </a>
     );
   }
