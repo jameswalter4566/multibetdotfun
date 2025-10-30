@@ -130,11 +130,13 @@ const AutomationNode = ({
   isActive,
   onStartDrag,
   onSelect,
+  provideRef,
 }: {
   node: AutomationNode;
   isActive: boolean;
   onStartDrag: (info: DragInfo) => void;
   onSelect: (id: string) => void;
+  provideRef: (id: string, el: HTMLDivElement | null) => void;
 }) => {
   const nodeRef = useRef<HTMLDivElement | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -164,6 +166,10 @@ const AutomationNode = ({
     };
     document.addEventListener("mouseup", handleMouseUp);
     return () => document.removeEventListener("mouseup", handleMouseUp);
+  }, []);
+
+  useEffect(() => {
+    provideRef(node.id, nodeRef.current);
   }, []);
 
   return (
@@ -229,10 +235,14 @@ export const AutomationSandbox = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const nodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const dragInfoRef = useRef<DragInfo | null>(null);
   const rafRef = useRef<number | null>(null);
   const pendingPositionRef = useRef<{ id: string; x: number; y: number } | null>(null);
   const { toast } = useToast();
+  const [connectorAnchors, setConnectorAnchors] = useState<
+    Array<{ id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean }>
+  >([]);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -290,6 +300,45 @@ export const AutomationSandbox = () => {
     toast({ title: "Layout reset", description: "Nodes returned to their default positions." });
   };
 
+  const updateAnchors = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const anchors = CONNECTORS.map((edge) => {
+      const fromEl = nodeRefs.current[edge.from];
+      const toEl = nodeRefs.current[edge.to];
+      if (!fromEl || !toEl) return null;
+      const fromRect = fromEl.getBoundingClientRect();
+      const toRect = toEl.getBoundingClientRect();
+      return {
+        id: `${edge.from}-${edge.to}`,
+        animated: edge.animated,
+        startX: fromRect.right - containerRect.left,
+        startY: fromRect.top + fromRect.height / 2 - containerRect.top,
+        endX: toRect.left - containerRect.left,
+        endY: toRect.top + toRect.height / 2 - containerRect.top,
+      };
+    }).filter(Boolean) as Array<{ id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean }>;
+    setConnectorAnchors(anchors);
+  }, []);
+
+  useEffect(() => {
+    updateAnchors();
+  }, [nodes, updateAnchors]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const resizeObserver = new ResizeObserver(() => updateAnchors());
+    resizeObserver.observe(containerRef.current);
+    window.addEventListener("resize", updateAnchors);
+    const timer = setTimeout(updateAnchors, 0);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateAnchors);
+      clearTimeout(timer);
+    };
+  }, [updateAnchors]);
+
   const simulateAutomation = () => {
     setIsRunning(true);
     const timestamp = new Date().toISOString();
@@ -328,22 +377,6 @@ export const AutomationSandbox = () => {
   };
 
   const activeConfig = configs[activeNodeId] ?? {};
-
-  const connectors = useMemo(() => {
-    return CONNECTORS.map((edge) => {
-      const from = nodes.find((node) => node.id === edge.from);
-      const to = nodes.find((node) => node.id === edge.to);
-      if (!from || !to) return null;
-      return {
-        id: `${edge.from}-${edge.to}`,
-        animated: edge.animated,
-        startX: from.position.x + NODE_WIDTH,
-        startY: from.position.y + NODE_HEIGHT / 2,
-        endX: to.position.x,
-        endY: to.position.y + NODE_HEIGHT / 2,
-      };
-    }).filter(Boolean) as Array<{ id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean }>;
-  }, [nodes]);
 
   return (
     <div className="space-y-8">
@@ -389,7 +422,7 @@ export const AutomationSandbox = () => {
           }}
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0ea5ff24] to-transparent" />
-          {connectors.map((edge) => (
+          {connectorAnchors.map((edge) => (
             <Connector key={edge.id} {...edge} />
           ))}
           {nodes.map((node) => (
@@ -399,6 +432,10 @@ export const AutomationSandbox = () => {
               isActive={node.id === activeNodeId}
               onStartDrag={handleStartDrag}
               onSelect={setActiveNodeId}
+              provideRef={(id, el) => {
+                nodeRefs.current[id] = el;
+                updateAnchors();
+              }}
             />
           ))}
         </div>
