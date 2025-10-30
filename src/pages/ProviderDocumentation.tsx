@@ -359,15 +359,11 @@ export default function ProviderDocumentation() {
                     <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
                       Step 1 — Initial request
                     </div>
-                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">
-{initialCurlCommand}
-                    </pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">{initialCurlCommand}</pre>
                     {!docIsGet && docBodyExample && (
                       <div className="mt-2 space-y-2">
                         <p className="text-xs text-muted-foreground">Sample JSON payload</p>
-                        <pre className="overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
-{docBodyExample}
-                        </pre>
+                        <pre className="overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">{docBodyExample}</pre>
                       </div>
                     )}
                     {docIsGet && docQueryExample && (
@@ -384,9 +380,7 @@ export default function ProviderDocumentation() {
                     <p className="mt-2 text-xs text-muted-foreground">
                       Your first call returns a 402 response containing <code className="font-mono text-[11px]">PaymentRequirements</code>. Save the payload exactly.
                     </p>
-                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
-{challengeExample}
-                    </pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">{challengeExample}</pre>
                   </div>
 
                   <div>
@@ -396,32 +390,25 @@ export default function ProviderDocumentation() {
                     <p className="mt-2 text-xs text-muted-foreground">
                       Combine the signed payment data with the original requirements, then base64-encode the JSON to create the <code className="font-mono text-[11px]">X-PAYMENT</code> header value.
                     </p>
-                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
-{paymentEnvelopeExample}
-                    </pre>
-                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">
-{base64Snippet}
-                    </pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">{paymentEnvelopeExample}</pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">{base64Snippet}</pre>
                   </div>
 
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
                       Step 4 — Retry with X-PAYMENT
                     </div>
-                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">
-{retryCurlCommand}
-                    </pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">{retryCurlCommand}</pre>
                     <p className="mt-2 text-xs text-muted-foreground">
                       Example Node implementation using the official x402 SDK:
                     </p>
-                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
-{nodeRetrySnippet}
-                    </pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">{nodeRetrySnippet}</pre>
                   </div>
 
                   <div className="rounded-xl bg-secondary/40 px-3 py-3 text-xs text-muted-foreground">
-                    Keep the payload, memo, and headers identical between attempts. The gateway rejects payments when the signer wallet does not match the
-                    <code className="mx-1 font-mono text-[11px]">x402-sender-wallet</code> header or when the requirements are mutated.
+                    Keep the payload, memo, and headers identical between attempts. The gateway rejects payments when the signer wallet does not match the{" "}
+                    <code className="mx-1 font-mono text-[11px]">x402-sender-wallet</code>{" "}
+                    header or when the requirements are mutated.
                   </div>
                 </div>
 
