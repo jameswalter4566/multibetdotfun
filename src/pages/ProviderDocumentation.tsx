@@ -191,12 +191,7 @@ export default function ProviderDocumentation() {
             to="/"
             className="flex items-center gap-3 px-6 pt-6 pb-4 border-b border-border/70 hover:opacity-80 transition-opacity"
           >
-            <img
-              src="/marketx-logo.png"
-              alt="x402 marketplace"
-              className="w-auto"
-              style={{ maxHeight: "4rem", height: "auto", width: "auto" }}
-            />
+            <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto" />
             <span className="text-sm font-semibold tracking-tight">x402 marketplace</span>
           </Link>
           <div className="px-6 py-6 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Applications</div>
@@ -227,12 +222,7 @@ export default function ProviderDocumentation() {
         <main className="flex-1">
           <div className="lg:hidden border-b border-border/70 px-6 py-4 flex items-center gap-3">
             <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img
-                src="/marketx-logo.png"
-                alt="x402 marketplace"
-                className="w-auto"
-                style={{ maxHeight: "3rem", height: "auto", width: "auto" }}
-              />
+              <img src="/marketx-logo.png" alt="x402 marketplace" className="h-10 w-auto" />
               <span className="text-sm font-semibold tracking-tight">x402 marketplace</span>
             </Link>
           </div>
