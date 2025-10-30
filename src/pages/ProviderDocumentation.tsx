@@ -77,6 +77,75 @@ export default function ProviderDocumentation() {
     return JSON.stringify(clone, null, 2);
   };
 
+  const docEndpoint = endpoints[0];
+  const docUrl = docEndpoint?.path ?? provider.endpoint;
+  const docMethod = (docEndpoint?.method ?? provider.method).toUpperCase();
+  const docIsGet = docMethod === "GET";
+  const docBodyExample =
+    !docIsGet && docEndpoint ? buildDefaultRequest(docEndpoint, providerSamples[0]) : undefined;
+  const docQueryExample = docIsGet ? providerSamples[0] ?? "" : undefined;
+  const docUrlWithQuery =
+    docIsGet && docQueryExample
+      ? `${docUrl}${docQueryExample.startsWith("?") ? docQueryExample : `?${docQueryExample}`}`
+      : docUrl;
+  const initialCurlCommand = docIsGet
+    ? `curl -i "${docUrlWithQuery}" \\
+  -H 'x402-sender-wallet: <YOUR_SOLANA_ADDRESS>'`
+    : `curl -i "${docUrl}" \\
+  -H 'Content-Type: application/json' \\
+  -H 'x402-sender-wallet: <YOUR_SOLANA_ADDRESS>' \\
+  -H 'x402-session: optional-session-id' \\
+  -d '<JSON_PAYLOAD>'`;
+  const retryCurlCommand = docIsGet
+    ? `curl -i "${docUrlWithQuery}" \\
+  -H 'x402-sender-wallet: <YOUR_SOLANA_ADDRESS>' \\
+  -H 'X-PAYMENT: <BASE64_ENCODED_ENVELOPE>'`
+    : `curl -i "${docUrl}" \\
+  -H 'Content-Type: application/json' \\
+  -H 'x402-sender-wallet: <YOUR_SOLANA_ADDRESS>' \\
+  -H 'x402-session: optional-session-id' \\
+  -H 'X-PAYMENT: <BASE64_ENCODED_ENVELOPE>' \\
+  -d '<JSON_PAYLOAD>'`;
+  const challengeExample = `{
+  "x402Version": 1,
+  "error": "X-PAYMENT header is required",
+  "accepts": [
+    {
+      "network": "solana",
+      "scheme": "exact",
+      "payTo": "<GATEWAY_WALLET>",
+      "amountUsd": "0.05",
+      "memo": "session:YOUR-MEMO"
+    }
+  ]
+}`;
+  const paymentEnvelopeExample = `{
+  "x402Version": 1,
+  "paymentPayload": "<signed transaction or receipt payload>",
+  "paymentRequirements": "<paste the accepts[0] object from the 402 response>"
+}`;
+  const base64Snippet =
+    'const paymentHeader = Buffer.from(JSON.stringify(envelope)).toString("base64");';
+  const nodeRetryLines = [
+    'import { createSigner } from "x402/types";',
+    'import { createPaymentHeader } from "x402/client";',
+    '',
+    ...(docIsGet ? [] : ['const payload = /* same body as the initial call */ YOUR_PAYLOAD;', '']),
+    'const requirements = accepts[0]; // copy from the 402 response body',
+    'const signer = await createSigner("solana", process.env.SVM_PRIVATE_KEY!);',
+    'const header = await createPaymentHeader(signer, 1, requirements);',
+    `const response = await fetch("${docUrlWithQuery}", {`,
+    `  method: "${docMethod}",`,
+    "  headers: {",
+    ...(docIsGet ? [] : ['    "content-type": "application/json",']),
+    '    "x402-sender-wallet": signer.address,',
+    '    "X-PAYMENT": header,',
+    "  },",
+    ...(docIsGet ? [] : ['  body: JSON.stringify(payload),']),
+    "});",
+  ];
+  const nodeRetrySnippet = nodeRetryLines.join("\n");
+
   useEffect(() => {
     if (!activeEndpoint) return;
     const defaultRequest = buildDefaultRequest(activeEndpoint);
@@ -267,6 +336,93 @@ export default function ProviderDocumentation() {
                 <div className="mt-3 inline-flex items-center gap-3 rounded-full bg-background/80 px-4 py-2 text-xs font-semibold text-foreground shadow-inner ring-1 ring-border">
                   <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{provider.method}</span>
                   <span className="font-mono text-[13px]">{provider.endpoint}</span>
+                </div>
+
+                <div className="rounded-2xl border border-border/60 bg-background/70 p-4 space-y-4">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                      Payment flow
+                    </div>
+                    <p className="mt-2 text-sm text-foreground/80">
+                      Every request hits the gateway twice: first to collect a 402 challenge, then to retry with an{" "}
+                      <code className="mx-1 font-mono text-[11px]">X-PAYMENT</code> header that proves settlement on Solana.
+                    </p>
+                  </div>
+
+                  <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                    <li>Call the endpoint without an <code className="font-mono text-[11px]">X-PAYMENT</code> header to fetch pricing requirements.</li>
+                    <li>Read the <code className="font-mono text-[11px]">accepts[0]</code> object from the 402 response and sign a payment using your wallet or facilitator.</li>
+                    <li>Retry the identical request with <code className="font-mono text-[11px]">X-PAYMENT</code> and the same sender wallet.</li>
+                  </ol>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                      Step 1 — Initial request
+                    </div>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">
+{initialCurlCommand}
+                    </pre>
+                    {!docIsGet && docBodyExample && (
+                      <div className="mt-2 space-y-2">
+                        <p className="text-xs text-muted-foreground">Sample JSON payload</p>
+                        <pre className="overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
+{docBodyExample}
+                        </pre>
+                      </div>
+                    )}
+                    {docIsGet && docQueryExample && (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Example query string: <code className="font-mono text-[11px]">{docQueryExample}</code>
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                      Step 2 — Gateway challenge
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Your first call returns a 402 response containing <code className="font-mono text-[11px]">PaymentRequirements</code>. Save the payload exactly.
+                    </p>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
+{challengeExample}
+                    </pre>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                      Step 3 — Build the payment envelope
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Combine the signed payment data with the original requirements, then base64-encode the JSON to create the <code className="font-mono text-[11px]">X-PAYMENT</code> header value.
+                    </p>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
+{paymentEnvelopeExample}
+                    </pre>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">
+{base64Snippet}
+                    </pre>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">
+                      Step 4 — Retry with X-PAYMENT
+                    </div>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre-wrap">
+{retryCurlCommand}
+                    </pre>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Example Node implementation using the official x402 SDK:
+                    </p>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-border bg-background px-4 py-3 text-xs font-mono text-foreground/80 whitespace-pre">
+{nodeRetrySnippet}
+                    </pre>
+                  </div>
+
+                  <div className="rounded-xl bg-secondary/40 px-3 py-3 text-xs text-muted-foreground">
+                    Keep the payload, memo, and headers identical between attempts. The gateway rejects payments when the signer wallet does not match the
+                    <code className="mx-1 font-mono text-[11px]">x402-sender-wallet</code> header or when the requirements are mutated.
+                  </div>
                 </div>
 
                 {provider.endpoints && provider.endpoints.length > 0 ? (
