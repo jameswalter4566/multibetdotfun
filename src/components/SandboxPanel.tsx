@@ -70,6 +70,7 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
   const [requestText, setRequestText] = useState<string>("");
   const [responseText, setResponseText] = useState<string>("Ready to test the endpoint.");
   const [status, setStatus] = useState<SandboxStatus>("idle");
+  const [hasCalledGateway, setHasCalledGateway] = useState(false);
 
   useEffect(() => {
     if (initialProvider) {
@@ -120,6 +121,7 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
   };
 
   const handleTryIt = async () => {
+    if (hasCalledGateway) return;
     if (!provider) {
       setStatus("error");
       setResponseText("Provider metadata unavailable.");
@@ -128,9 +130,9 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
 
     setStatus("loading");
     setResponseText("Calling x402 gateway…");
+    setHasCalledGateway(true);
 
     try {
-      const shouldSendPayment = status === "payment_required";
       const headers: Record<string, string> = {
         "x402-sender-wallet": "DemoSenderWallet11111111111111111111111",
       };
@@ -146,10 +148,6 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
       } else {
         headers["Content-Type"] = "application/json";
         body = requestText ?? "{}";
-      }
-
-      if (shouldSendPayment) {
-        headers["x-payment"] = "eyJ4NDAyVmVyc2lvbiI6MSwicGF5bWVudCI6Im1vY2stcGF5bWVudCJ9";
       }
 
       const response = await fetch(url, {
@@ -243,18 +241,17 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
             onChange={(event) => setRequestText(event.target.value)}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Include your wallet-backed <code className="font-mono text-[11px]">x402-session</code>,
-            <code className="font-mono text-[11px]"> x402-sender-wallet</code>, and retry with
-            <code className="font-mono text-[11px]"> X-PAYMENT</code> when prompted with 402.
+            Include your wallet-backed <code className="font-mono text-[11px]">x402-session</code> and
+            <code className="font-mono text-[11px]"> x402-sender-wallet</code> headers for authenticated calls.
           </p>
         </div>
 
         <Button
           onClick={handleTryIt}
-          disabled={status === "loading"}
-          className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+          disabled={status === "loading" || hasCalledGateway}
+          className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff] disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {status === "payment_required" ? "Retry with mock X-PAYMENT" : "Try it"}
+          Call gateway
         </Button>
       </div>
 

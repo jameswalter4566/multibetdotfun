@@ -287,7 +287,7 @@ export default function Landing() {
               return (
                 <div
                   key={tile.title}
-                  className="rounded-3xl border border-border bg-card/80 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.25)] backdrop-blur flex flex-col items-center text-center"
+                  className="rounded-3xl border border-transparent bg-transparent p-6 flex flex-col items-center text-center"
                   style={tileStyle}
                 >
                   <img
