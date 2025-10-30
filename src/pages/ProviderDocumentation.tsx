@@ -320,7 +320,7 @@ export default function ProviderDocumentation() {
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Sandbox</div>
                   <p className="mt-2 text-sm text-foreground/80">
                     Send a live request to the x402 gateway. The first call returns a <code className="font-mono text-[11px]">402 Payment Required</code>
-                    response with pricing details. Retry with a mock <code className="font-mono text-[11px]">X-PAYMENT</code> header to see the happy path.
+                    response with pricing details. Retry with an <code className="font-mono text-[11px]">X-PAYMENT</code> header to see the live path.
                   </p>
                 </div>
 
