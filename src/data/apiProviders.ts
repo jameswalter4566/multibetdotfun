@@ -93,11 +93,11 @@ runChat().catch(console.error);`,
     logo: "/logos/claude.png",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
-      "Call Anthropic Claude via x402 to build natural language and agentic workflows without juggling API keys or separate billing.",
+      "Call Anthropic Claude through the x402 gateway for high-quality reasoning and agentic workflows. Your wallet funds the usage, we forward the request with our managed Anthropic key.",
     endpoint: "https://x402market.app/claude/messages",
     method: "POST",
-    testUrl: "https://x402market.app/claude/models",
-    codeSampleTitle: "Node (fetch) – Claude message call",
+    testUrl: "https://x402market.app/claude/messages",
+    codeSampleTitle: "Node (fetch) – Claude messages via x402",
     language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
@@ -111,15 +111,19 @@ async function callClaude() {
     },
     body: JSON.stringify({
       model: "claude-3-5-sonnet",
+      max_tokens: 300,
       messages: [
-        { role: "user", content: "Brainstorm a launch plan for a pay-per-call API marketplace." }
-      ],
-      max_tokens: 200
+        { role: "user", content: [{ type: "text", text: "Draft a launch checklist for our marketplace." }] }
+      ]
     })
   });
 
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
   const data = await response.json();
-  console.log(data.content?.[0]?.text ?? data);
+  console.log(data);
 }
 
 callClaude().catch(console.error);`,
@@ -128,21 +132,10 @@ callClaude().catch(console.error);`,
         name: "Messages",
         method: "POST",
         path: "https://x402market.app/claude/messages",
-        description: "Primary Claude endpoint for non-streaming responses."
-      },
-      {
-        name: "Streaming Messages",
-        method: "POST",
-        path: "https://x402market.app/claude/messages/stream",
-        description: "Stream Claude responses event-by-event using server-sent events."
-      },
-      {
-        name: "Models",
-        method: "GET",
-        path: "https://x402market.app/claude/models",
-        description: "List the Claude models exposed through x402."
+        description: "Send Anthropic Claude chat messages and receive assistant replies via x402."
       }
     ],
+  },
   },
   {
     name: "Stripe",
@@ -201,39 +194,60 @@ createCharge().catch(console.error);`,
     ],
   },
   {
-    name: "Google Maps",
-    slug: "google-maps",
-    logo: "/logos/google-maps.png",
+    name: "Google Sheets",
+    slug: "google-sheets",
+    logo: "/logos/google-sheets.png",
     tagline: "Instant access. No API key required. Powered by x402.",
     summary:
-      "Drop in geocoding, reverse geocoding, and place search without managing credentials. Each request is linked to your x402 session.",
-    endpoint: "https://x402market.app/google/maps/geocode",
-    method: "GET",
-    testUrl: "https://x402market.app/google/maps/geocode?address=NYC",
-    codeSampleTitle: "Curl – forward geocoding",
-    language: "bash",
-    codeSample: `curl \
-  -H "x402-session: session-token-from-x402" \
-  -H "x402-sender-wallet: YourSenderWalletAddress" \
-  "https://x402market.app/google/maps/geocode?address=1600+Amphitheatre+Parkway"`,
+      "Read and write Sheets data without juggling service accounts. Each request is signed by x402 and billed through your wallet session.",
+    endpoint: "https://x402market.app/google-sheets/values/get",
+    method: "POST",
+    testUrl: "https://x402market.app/google-sheets/values/get",
+    codeSampleTitle: "Node (fetch) – read a range",
+    language: "javascript",
+    codeSample: `import fetch from "node-fetch";
+
+async function readSheet() {
+  const response = await fetch("https://x402market.app/google-sheets/values/get", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x402-session": "session-token-from-x402",
+      "x402-sender-wallet": "YourSenderWalletAddress",
+    },
+    body: JSON.stringify({
+      spreadsheetId: "1AbCdEfGhIjKlMnOpQrStUvWxYz",
+      range: "Sheet1!A1:C5"
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const data = await response.json();
+  console.log(data.values);
+}
+
+readSheet().catch(console.error);`,
     endpoints: [
       {
-        name: "Forward Geocode",
-        method: "GET",
-        path: "https://x402market.app/google/maps/geocode",
-        description: "Convert street addresses into lat/long coordinates."
+        name: "Get values",
+        method: "POST",
+        path: "https://x402market.app/google-sheets/values/get",
+        description: "Fetch a range of cells from a spreadsheet. Provide `spreadsheetId` and `range` in the body."
       },
       {
-        name: "Reverse Geocode",
-        method: "GET",
-        path: "https://x402market.app/google/maps/reverse",
-        description: "Convert lat/long coordinates into human-readable addresses."
+        name: "Update values",
+        method: "POST",
+        path: "https://x402market.app/google-sheets/values/update",
+        description: "Overwrite a target range. Send `values` and optional `valueInputOption`."
       },
       {
-        name: "Places Search",
-        method: "GET",
-        path: "https://x402market.app/google/maps/places",
-        description: "Search for places, venues, or businesses by keyword and radius."
+        name: "Append values",
+        method: "POST",
+        path: "https://x402market.app/google-sheets/values/append",
+        description: "Append rows to the end of a sheet. Supply the value rows and optional insert mode."
       }
     ],
   },

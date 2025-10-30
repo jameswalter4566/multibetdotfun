@@ -42,7 +42,7 @@ const heroLogoSet: { src: string; alt: string }[] = [
   { src: "/logos/coingecko.png", alt: "CoinGecko" },
   { src: "/logos/helius.png", alt: "Helius" },
   { src: "/logos/paypal.png", alt: "PayPal" },
-  { src: "/logos/google-maps.png", alt: "Google Maps" },
+  { src: "/logos/google-sheets.png", alt: "Google Sheets" },
   { src: "/logos/claude.png", alt: "Claude" },
 ];
 
@@ -56,7 +56,7 @@ const brandLogos: Record<string, string> = {
   CoinGecko: "/logos/coingecko.png",
   Helius: "/logos/helius.png",
   PayPal: "/logos/paypal.png",
-  "Google Maps": "/logos/google-maps.png",
+  "Google Sheets": "/logos/google-sheets.png",
   "YouTube Data": "/logos/youtube.png",
 };
 
@@ -64,7 +64,7 @@ const tileLogos: Record<string, string> = {
   OpenAI: brandLogos.OpenAI,
   Claude: brandLogos.Claude,
   Stripe: brandLogos.Stripe,
-  "Google Maps": brandLogos["Google Maps"],
+  "Google Sheets": brandLogos["Google Sheets"],
   "YouTube Data": brandLogos["YouTube Data"],
   Twilio: brandLogos.Twilio,
 };
@@ -356,7 +356,7 @@ export default function Landing() {
             Browse and call top third‑party APIs via a single unified endpoint.
           </p>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {["OpenAI", "Claude", "Stripe", "Google Maps", "YouTube Data", "Twilio"].map((name) => {
+            {["OpenAI", "Claude", "Stripe", "Google Sheets", "YouTube Data", "Twilio"].map((name) => {
               const logoSrc = tileLogos[name];
               return (
                 <div key={name} className="ios-card p-5 space-y-3">

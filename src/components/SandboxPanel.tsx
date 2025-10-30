@@ -23,11 +23,7 @@ export const sandboxSamples: Record<string, string[]> = {
     "Write a privacy policy intro paragraph.",
   ],
   stripe: ["Create a $32 usage charge", "Authorise a $99 hold", "Refund a $12 transaction"],
-  "google-maps": [
-    "address=476 5th Ave, New York, NY 10018",
-    "address=Champ de Mars, 5 Avenue Anatole, 75007 Paris",
-    "latlng=37.422,-122.084",
-  ],
+  "google-sheets": ["Read range"],
   "youtube-data": [
     "q=x402 marketplace launch",
     "channelId=UC_x5XG1OV2P6uZZ5FSM9Ttw",
@@ -59,6 +55,10 @@ export const sandboxDefaultPayloads: Record<string, any> = {
     to: "+15551234567",
     from: "+18885550123",
     body: "Milestone unlocked! Claim your perk in the dashboard.",
+  },
+  "google-sheets": {
+    spreadsheetId: "1AbCdEfGhIjKlMnOpQrStUvWxYz",
+    range: "Sheet1!A1:C5",
   },
 };
 
@@ -97,6 +97,18 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
   const handleSampleChange = (value: string, index: number) => {
     setSampleIndex(index);
     if (!provider) return;
+
+    if (provider.slug === "google-sheets") {
+      const base = JSON.parse(JSON.stringify(sandboxDefaultPayloads["google-sheets"] ?? {}));
+      if (base) {
+        base.spreadsheetId = base.spreadsheetId ?? "1AbCdEfGhIjKlMnOpQrStUvWxYz";
+        base.range = "Sheet1!A1:C5";
+      }
+      setRequestText(JSON.stringify(base, null, 2));
+      setStatus("idle");
+      setResponseText("Ready to test the endpoint.");
+      return;
+    }
 
     if (provider.method.toUpperCase() === "GET") {
       setRequestText(value);
