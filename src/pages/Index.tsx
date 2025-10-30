@@ -22,6 +22,7 @@ export default function Index() {
     () => [
       { label: "Explore API market place", href: "#marketplace" },
       { label: "Documentation", href: docHome },
+      { label: "Create AI Automation", href: "/list-api?mode=automation", cta: true },
       { label: "Test sandbox", href: "#sandbox" },
       { label: "Add your API", href: "/list-api" },
     ],
@@ -38,7 +39,15 @@ export default function Index() {
           <ul className="flex flex-col gap-3 text-sm font-medium text-foreground/90">
             {sideLinks.map((item) => (
               <li key={item.label}>
-                {item.href.startsWith("#") ? (
+                {item.cta ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-center rounded-xl bg-[#0ea5ff] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.3)] transition-colors hover:bg-[#08b0ff]"
+                    onClick={() => navigate(item.href)}
+                  >
+                    {item.label}
+                  </button>
+                ) : item.href.startsWith("#") ? (
                   <a
                     href={item.href}
                     className="flex items-center justify-between rounded-xl border border-transparent px-4 py-2 transition-colors hover:border-border/70 hover:bg-accent/10"

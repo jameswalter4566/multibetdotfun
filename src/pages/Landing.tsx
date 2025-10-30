@@ -262,7 +262,8 @@ export default function Landing() {
                   href="https://x.com/marketx402"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground/90 hover:bg-secondary/60"
+                  aria-label="Follow us on X"
+                  className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 hover:bg-secondary/60"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -275,7 +276,6 @@ export default function Landing() {
                       d="M3.5 0H9l4.5 6.5L18 0h6l-7.5 9.2L24 24h-5.5l-4.7-6.9L9 24H3.5l7.7-9.5L3.5 0Z"
                     />
                   </svg>
-                  Twitter
                 </a>
               </div>
             </div>
