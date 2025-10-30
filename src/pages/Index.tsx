@@ -42,10 +42,11 @@ export default function Index() {
                 {item.cta ? (
                   <button
                     type="button"
-                    className="flex w-full items-center justify-center rounded-xl bg-[#0ea5ff] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.3)] transition-colors hover:bg-[#08b0ff]"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0ea5ff] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.3)] transition-colors hover:bg-[#08b0ff]"
                     onClick={() => navigate(item.href)}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <span className="rounded-full bg-white/25 px-2 py-0.5 text-[10px] tracking-wide">BETA</span>
                   </button>
                 ) : item.href.startsWith("#") ? (
                   <a

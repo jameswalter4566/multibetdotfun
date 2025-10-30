@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState, useLayoutEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Keypair } from "@solana/web3.js";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -8,203 +9,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { PlayCircle, Repeat } from "lucide-react";
 
-const NODE_WIDTH = 240;
-const NODE_HEIGHT = 130;
-const CANVAS_PADDING = 32;
+const CANVAS_BACKGROUND = "radial-gradient(circle at 20px 20px, rgba(14,165,255,0.12) 0, rgba(14,165,255,0.12) 1px, transparent 1px)";
 
-type AutomationNode = {
+interface ChatMessage {
   id: string;
-  title: string;
-  description: string;
-  color: string;
-  borderColor: string;
-  position: { x: number; y: number };
-};
+  role: "assistant" | "user";
+  content: string;
+  createdAt: number;
+}
 
-type ConnectorEdge = {
-  from: string;
-  to: string;
-  animated?: boolean;
-};
-
-type DragInfo = {
-  id: string;
-  offsetX: number;
-  offsetY: number;
-};
-
-const INITIAL_NODES: AutomationNode[] = [
+const INITIAL_MESSAGES: ChatMessage[] = [
   {
-    id: "node-0",
-    title: "Listen for Mentions",
-    description: "Monitor X (Twitter) mentions for a handle.",
-    color: "rgba(14,165,255,0.16)",
-    borderColor: "rgba(14,165,255,0.45)",
-    position: { x: 40, y: 80 },
-  },
-  {
-    id: "node-1",
-    title: "Filter Timeline",
-    description: "Choose which events continue downstream.",
-    color: "rgba(16,185,129,0.16)",
-    borderColor: "rgba(16,185,129,0.45)",
-    position: { x: 360, y: 20 },
-  },
-  {
-    id: "node-2",
-    title: "Draft Response",
-    description: "Generate on-brand replies with AI prompts.",
-    color: "rgba(249,115,22,0.18)",
-    borderColor: "rgba(249,115,22,0.55)",
-    position: { x: 660, y: 140 },
-  },
-  {
-    id: "node-3",
-    title: "Ship Reply",
-    description: "Queue or ship the reply automatically.",
-    color: "rgba(168,85,247,0.18)",
-    borderColor: "rgba(168,85,247,0.55)",
-    position: { x: 960, y: 80 },
+    id: "assistant-intro",
+    role: "assistant",
+    content:
+      "Hey there! I'm your automation co-pilot. Describe the workflow you want to orchestrate and I'll assemble the right third-party APIs from our marketplace to make it happen.",
+    createdAt: Date.now(),
   },
 ];
-
-const INITIAL_CONFIGS: Record<string, any> = {
-  "node-0": { twitterHandle: "marketx402", pollFrequency: 5, maxMentions: 25 },
-  "node-1": { filterQuestions: true, filterHashtags: false, filterShortPosts: false },
-  "node-2": {
-    responseMode: "conversational",
-    prompt:
-      "You are an on-brand automation that replies with concise, helpful tone. Reference original tweets when it helps the reader.",
-  },
-  "node-3": { autoPublish: false, moderationEnabled: true },
-};
-
-const CONNECTORS: ConnectorEdge[] = [
-  { from: "node-0", to: "node-1", animated: true },
-  { from: "node-1", to: "node-2", animated: true },
-  { from: "node-2", to: "node-3", animated: true },
-];
-
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
-
-const Connector = ({ startX, startY, endX, endY, animated }: { startX: number; startY: number; endX: number; endY: number; animated?: boolean }) => {
-  const path = useMemo(() => {
-    const deltaX = endX - startX;
-    const deltaY = endY - startY;
-    const influence = Math.min(Math.abs(deltaX) * 0.45, 180);
-    const vertical = Math.min(Math.abs(deltaY) * 0.45, 120);
-
-    let cp1x = startX + influence;
-    let cp1y = startY;
-    let cp2x = endX - influence;
-    let cp2y = endY;
-
-    if (Math.abs(deltaY) > Math.abs(deltaX)) {
-      cp1x = startX;
-      cp1y = startY + vertical;
-      cp2x = endX;
-      cp2y = endY - vertical;
-    }
-
-    return `M${startX},${startY} C${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
-  }, [startX, startY, endX, endY]);
-
-  return (
-    <svg className="absolute inset-0 h-full w-full overflow-visible pointer-events-none">
-      <path d={path} stroke="rgba(255,255,255,0.25)" strokeWidth={2} fill="none" strokeLinecap="round" />
-      <path
-        d={path}
-        stroke="rgba(255,255,255,0.8)"
-        strokeWidth={2}
-        fill="none"
-        strokeLinecap="round"
-        strokeDasharray="6 8"
-        style={{ animation: animated ? "automation-dash 2200ms linear infinite" : "none" }}
-      />
-    </svg>
-  );
-};
-
-const AutomationNode = ({
-  node,
-  isActive,
-  onStartDrag,
-  onSelect,
-  provideRef,
-}: {
-  node: AutomationNode;
-  isActive: boolean;
-  onStartDrag: (info: DragInfo) => void;
-  onSelect: (id: string) => void;
-  provideRef: (id: string, el: HTMLDivElement | null) => void;
-}) => {
-  const nodeRef = useRef<HTMLDivElement | null>(null);
-  const dragOffset = useRef({ x: 0, y: 0 });
-  const dragging = useRef(false);
-
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    const rect = nodeRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    dragging.current = true;
-    dragOffset.current = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
-    onStartDrag({ id: node.id, offsetX: dragOffset.current.x, offsetY: dragOffset.current.y });
-  };
-
-  const handleClick = () => {
-    if (!dragging.current) {
-      onSelect(node.id);
-    }
-    dragging.current = false;
-  };
-
-  useEffect(() => {
-    const handleMouseUp = () => {
-      dragging.current = false;
-    };
-    document.addEventListener("mouseup", handleMouseUp);
-    return () => document.removeEventListener("mouseup", handleMouseUp);
-  }, []);
-
-  useEffect(() => {
-    provideRef(node.id, nodeRef.current);
-  }, []);
-
-  return (
-    <div
-      ref={nodeRef}
-      role="button"
-      tabIndex={0}
-      onMouseDown={handleMouseDown}
-      onClick={handleClick}
-      className={`select-none rounded-2xl border p-4 shadow-lg transition-transform duration-150 ${
-        isActive ? "ring-2 ring-offset-2 ring-white" : "hover:-translate-y-[3px]"
-      }`}
-      style={{
-        transform: `translate3d(${node.position.x}px, ${node.position.y}px, 0)`,
-        width: NODE_WIDTH,
-        height: NODE_HEIGHT,
-        backgroundColor: node.color,
-        borderColor: node.borderColor,
-        cursor: "grab",
-      }}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-base font-semibold text-white">{node.title}</h3>
-          <p className="mt-1 text-sm text-white/70">{node.description}</p>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="h-2 w-2 rounded-full bg-white/60" />
-          <div className="h-2 w-2 rounded-full bg-white/40" />
-        </div>
-      </div>
-      <div className="pointer-events-none absolute inset-0 rounded-2xl border border-white/10" />
-    </div>
-  );
-};
 
 const TerminalLog = ({ logs }: { logs: string[] }) => (
   <Card className="border border-border/60 bg-background/80 backdrop-blur">
@@ -229,343 +51,308 @@ const TerminalLog = ({ logs }: { logs: string[] }) => (
 );
 
 export const AutomationSandbox = () => {
-  const [nodes, setNodes] = useState<AutomationNode[]>(INITIAL_NODES);
-  const [configs, setConfigs] = useState<Record<string, any>>(INITIAL_CONFIGS);
-  const [activeNodeId, setActiveNodeId] = useState<string>(INITIAL_NODES[0].id);
-  const [isRunning, setIsRunning] = useState(false);
+  const [automationName, setAutomationName] = useState("");
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [promptInput, setPromptInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const nodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const dragInfoRef = useRef<DragInfo | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const pendingPositionRef = useRef<{ id: string; x: number; y: number } | null>(null);
+  const [isAutoPublish, setIsAutoPublish] = useState(false);
+  const [isModerationEnabled, setIsModerationEnabled] = useState(true);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
   const { toast } = useToast();
-  const [connectorAnchors, setConnectorAnchors] = useState<
-    Array<{ id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean }>
-  >([]);
+
+  const assistantEndpoint = import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined;
+  const openAiKey = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!dragInfoRef.current || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const { id, offsetX, offsetY } = dragInfoRef.current;
-      const rawX = event.clientX - rect.left - offsetX;
-      const rawY = event.clientY - rect.top - offsetY;
-      const x = clamp(rawX, CANVAS_PADDING, rect.width - NODE_WIDTH - CANVAS_PADDING);
-      const y = clamp(rawY, CANVAS_PADDING, rect.height - NODE_HEIGHT - CANVAS_PADDING);
-      pendingPositionRef.current = { id, x, y };
-
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        const pending = pendingPositionRef.current;
-        if (!pending) return;
-        setNodes((current) =>
-          current.map((node) => (node.id === pending.id ? { ...node, position: { x: pending.x, y: pending.y } } : node))
-        );
-        requestAnimationFrame(updateAnchors);
-        rafRef.current = null;
-      });
-    };
-
-    const handleMouseUp = () => {
-      dragInfoRef.current = null;
-      pendingPositionRef.current = null;
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
+    const keypair = Keypair.generate();
+    setWalletAddress(keypair.publicKey.toBase58());
   }, []);
 
-  const handleStartDrag = (info: DragInfo) => {
-    dragInfoRef.current = info;
+
+  const resetLayout = () => {
+    toast({ title: "Workspace reset", description: "Node canvas cleared." });
   };
-
-  const handleConfigChange = (id: string, patch: Record<string, any>) => {
-    setConfigs((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
-  };
-
-  const handleResetLayout = () => {
-    setNodes(INITIAL_NODES);
-    setConfigs(INITIAL_CONFIGS);
-    setActiveNodeId(INITIAL_NODES[0].id);
-    toast({ title: "Layout reset", description: "Nodes returned to their default positions." });
-  };
-
-  const updateAnchors = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const containerRect = container.getBoundingClientRect();
-    const anchors = CONNECTORS.map((edge) => {
-      const fromEl = nodeRefs.current[edge.from];
-      const toEl = nodeRefs.current[edge.to];
-      if (!fromEl || !toEl) return null;
-      const fromRect = fromEl.getBoundingClientRect();
-      const toRect = toEl.getBoundingClientRect();
-      return {
-        id: `${edge.from}-${edge.to}`,
-        animated: edge.animated,
-        startX: fromRect.right - containerRect.left,
-        startY: fromRect.top + fromRect.height / 2 - containerRect.top,
-        endX: toRect.left - containerRect.left,
-        endY: toRect.top + toRect.height / 2 - containerRect.top,
-      };
-    }).filter((edge): edge is { id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean } => Boolean(edge));
-    setConnectorAnchors(anchors);
-  }, []);
-
-  useLayoutEffect(() => {
-    updateAnchors();
-  }, [nodes, updateAnchors]);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const resizeObserver = new ResizeObserver(() => updateAnchors());
-    resizeObserver.observe(containerRef.current);
-    window.addEventListener("resize", updateAnchors);
-    const timer = setTimeout(updateAnchors, 0);
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("resize", updateAnchors);
-      clearTimeout(timer);
-    };
-  }, [updateAnchors]);
 
   const simulateAutomation = () => {
-    setIsRunning(true);
-    const timestamp = new Date().toISOString();
-    const syntheticResponses = [
-      JSON.stringify({
-        timestamp,
-        stage: "listen",
-        handle: configs["node-0"].twitterHandle,
-        mentions: Math.floor(Math.random() * configs["node-0"].maxMentions),
-      }, null, 2),
-      JSON.stringify({
-        timestamp,
-        stage: "filter",
-        accepted: Math.floor(Math.random() * 12),
-        filters: configs["node-1"],
-      }, null, 2),
-      JSON.stringify({
-        timestamp,
-        stage: "draft",
-        mode: configs["node-2"].responseMode,
-        sampleResponse: "Appreciate the shoutout! Launching AI automations with x402 is faster than ever.",
-      }, null, 2),
-      JSON.stringify({
-        timestamp,
-        stage: "ship",
-        autoPublish: configs["node-3"].autoPublish,
-        moderationQueue: configs["node-3"].moderationEnabled,
-      }, null, 2),
+    const now = new Date().toISOString();
+    const synthetic = [
+      JSON.stringify({ timestamp: now, stage: "fetch_sources", wallet: walletAddress, filters: { autoPublish: isAutoPublish, moderation: isModerationEnabled } }, null, 2),
+      JSON.stringify({ timestamp: now, stage: "draft_automation", name: automationName || "untitled" }, null, 2),
     ];
 
-    setTimeout(() => {
-      setIsRunning(false);
-      setTerminalLogs((prev) => [...syntheticResponses.reverse(), ...prev].slice(0, 40));
-      toast({ title: "Automation simulated", description: "Responses streamed to the terminal panel." });
-    }, 900);
+    setTerminalLogs((prev) => [...synthetic, ...prev].slice(0, 40));
+    toast({ title: "Automation simulated", description: "Streaming raw events to the terminal." });
   };
 
-  const activeConfig = configs[activeNodeId] ?? {};
+  const handleSaveAutomation = () => {
+    const trimmed = automationName.trim();
+    if (!trimmed) {
+      toast({ title: "Name required", description: "Give your automation a memorable name before saving.", variant: "destructive" });
+      return;
+    }
+
+    try {
+      localStorage.setItem("automation-name", trimmed);
+      localStorage.setItem("automation-chat", JSON.stringify(chatMessages));
+      toast({ title: "Automation saved", description: "We stored the name and current chat locally." });
+    } catch (error) {
+      toast({ title: "Save failed", description: "Unable to persist automation locally.", variant: "destructive" });
+    }
+  };
+
+  const appendAssistantMessage = useCallback((content: string) => {
+    setChatMessages((prev) => [
+      ...prev,
+      {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content,
+        createdAt: Date.now(),
+      },
+    ]);
+  }, []);
+
+  const callAssistant = useCallback(
+    async (payload: { prompt: string; history: ChatMessage[] }) => {
+      if (assistantEndpoint) {
+        const response = await fetch(assistantEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            automationName: automationName || "untitled",
+            walletAddress,
+            prompt: payload.prompt,
+            history: payload.history,
+            autoPublish: isAutoPublish,
+            moderation: isModerationEnabled,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Assistant endpoint responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+        const text = data.reply ?? data.message ?? "Assistant processed your request.";
+        setTerminalLogs((prev) => [JSON.stringify(data, null, 2), ...prev].slice(0, 40));
+        return text as string;
+      }
+
+      if (openAiKey) {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${openAiKey}`,
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are an automation architect. When given a task, you describe which APIs (OpenAI, Claude, Google Sheets, Discord, etc.) should be chained together. Respond with a step-by-step plan and mention which nodes you will create.",
+              },
+              ...payload.history.map((message) => ({ role: message.role, content: message.content })),
+              { role: "user", content: payload.prompt },
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`OpenAI request failed with ${response.status}`);
+        }
+
+        const data = await response.json();
+        const text = data.choices?.[0]?.message?.content ?? "Assistant created a draft automation.";
+        setTerminalLogs((prev) => [JSON.stringify(data, null, 2), ...prev].slice(0, 40));
+        return text as string;
+      }
+
+      return "Preview mode: configure VITE_AUTOMATION_ASSISTANT_ENDPOINT (server proxy) or VITE_OPENAI_API_KEY to enable live responses.";
+    },
+    [assistantEndpoint, automationName, openAiKey, walletAddress, isAutoPublish, isModerationEnabled]
+  );
+
+  const handlePromptSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = promptInput.trim();
+    if (!trimmed.length) return;
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: trimmed,
+      createdAt: Date.now(),
+    };
+
+    setChatMessages((prev) => [...prev, userMessage]);
+    setPromptInput("");
+    setIsSending(true);
+
+    try {
+      const reply = await callAssistant({ prompt: trimmed, history: [...chatMessages, userMessage] });
+      appendAssistantMessage(reply);
+    } catch (error) {
+      console.error(error);
+      appendAssistantMessage("I hit an issue reaching the assistant endpoint. Double-check your configuration and try again.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const copyWalletToClipboard = () => {
+    if (!walletAddress) return;
+    navigator.clipboard
+      .writeText(walletAddress)
+      .then(() => toast({ title: "Wallet copied", description: "Address copied to clipboard." }))
+      .catch(() => toast({ title: "Copy failed", description: "Unable to copy address.", variant: "destructive" }));
+  };
 
   return (
-    <div className="space-y-8">
+    <div id="marketplace" className="space-y-8">
       <style>{`
         @keyframes automation-dash { to { stroke-dashoffset: -180; } }
       `}</style>
+
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Automation playground</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Drag nodes to rewire the workflow. Configure each step and preview how data flows from listening to shipping
-            responses. This editor is fully client-side—no sign in required.
+            Drag and wire nodes to choreograph end-to-end workflows. Generate ideas with the assistant and simulate them locally
+            before deploying to production.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="secondary"
-            className="rounded-full border-border/70 bg-background px-5 py-2 text-sm"
-            onClick={handleResetLayout}
-          >
+          <Button variant="secondary" className="rounded-full border-border/70 bg-background px-5 py-2 text-sm" onClick={resetLayout}>
             <Repeat className="mr-2 h-4 w-4" />
             Reset layout
           </Button>
           <Button
             className="rounded-full bg-[#0ea5ff] px-5 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.5)] hover:bg-[#08b0ff]"
             onClick={simulateAutomation}
-            disabled={isRunning}
           >
             <PlayCircle className="mr-2 h-4 w-4" />
-            {isRunning ? "Simulating…" : "Run automation"}
+            Run automation
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div
-          ref={containerRef}
-          className="relative min-h-[640px] overflow-hidden rounded-3xl border border-border/60 bg-[#050b1f] p-6 shadow-[0_0_60px_rgba(8,47,73,0.35)]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20px 20px, rgba(14,165,255,0.12) 0, rgba(14,165,255,0.12) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
+          ref={canvasRef}
+          className="relative min-h-[560px] overflow-hidden rounded-3xl border border-border/60 bg-[#050b1f] p-6 shadow-[0_0_60px_rgba(8,47,73,0.35)]"
+          style={{ backgroundImage: CANVAS_BACKGROUND, backgroundSize: "40px 40px" }}
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0ea5ff24] to-transparent" />
-          {connectorAnchors.map((edge) => (
-            <Connector key={edge.id} {...edge} />
-          ))}
-          {nodes.map((node) => (
-            <AutomationNode
-              key={node.id}
-              node={node}
-              isActive={node.id === activeNodeId}
-              onStartDrag={handleStartDrag}
-              onSelect={setActiveNodeId}
-              provideRef={(id, el) => {
-                nodeRefs.current[id] = el;
-                requestAnimationFrame(updateAnchors);
-              }}
-            />
-          ))}
+          <div className="flex h-full items-center justify-center text-center">
+            <div className="max-w-sm space-y-3 text-sm text-white/70">
+              <p className="text-base font-semibold text-white">Your canvas is empty</p>
+              <p>Start by prompting the AI assistant. Suggested nodes will appear here when the automation is ready.</p>
+            </div>
+          </div>
         </div>
 
         <Card className="border border-border/60 bg-background/70 backdrop-blur shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-foreground">Step configuration</CardTitle>
-            <CardDescription>
-              Tweak how <span className="font-medium text-foreground">{nodes.find((node) => node.id === activeNodeId)?.title}</span> behaves inside
-              the flow. Changes update live.
+          <CardHeader className="space-y-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div className="flex-1">
+                <Label htmlFor="automation-name" className="text-sm font-medium text-muted-foreground">
+                  Name automation
+                </Label>
+                <Input
+                  id="automation-name"
+                  value={automationName}
+                  onChange={(event) => setAutomationName(event.target.value)}
+                  placeholder="Ex: Crypto supporter onboarding"
+                  className="mt-1"
+                />
+              </div>
+              <Button onClick={handleSaveAutomation} className="rounded-xl bg-[#0ea5ff] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.35)] hover:bg-[#08b0ff]">
+                Save automation
+              </Button>
+            </div>
+
+            <div className="rounded-xl border border-border/70 bg-background/80 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Fund your AI agent&#39;s wallet</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                This wallet pays for on-chain verification and per-call usage (SOL or USDC). Fund it before running live automations.
+              </p>
+              <div className="mt-3 flex items-center gap-2 rounded-lg border border-border/60 bg-background px-3 py-2 font-mono text-xs text-foreground">
+                <span className="truncate flex-1">{walletAddress || "Generating wallet..."}</span>
+                <Button variant="ghost" size="sm" onClick={copyWalletToClipboard}>
+                  Copy
+                </Button>
+              </div>
+            </div>
+
+            <CardTitle className="text-lg font-semibold text-foreground">AI Automation assistant</CardTitle>
+            <CardDescription className="text-sm leading-relaxed text-muted-foreground">
+              Tell us what you want to automate and the assistant will stitch together the right third-party APIs (OpenAI, Claude,
+              Google Sheets, Discord, on-chain actions, and more). You stay in the cockpit while it drafts the workflow.
             </CardDescription>
+            <div className="rounded-lg border border-border/70 bg-background/80 p-3 text-sm text-muted-foreground">
+              <p className="font-medium text-foreground">How it works</p>
+              <p className="mt-2">
+                Simply type in a task or a service that you would like to automate and our AI assistant will pick the most relevant
+                third-party APIs to orchestrate the workflow. It will describe the nodes it plans to deploy and request funding when
+                on-chain actions are required.
+              </p>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {activeNodeId === "node-0" && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="twitter-handle">X handle (without @)</Label>
-                  <Input
-                    id="twitter-handle"
-                    value={activeConfig.twitterHandle}
-                    onChange={(event) => handleConfigChange("node-0", { twitterHandle: event.target.value })}
-                    placeholder="marketx402"
-                    className="border-border/50"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="poll-frequency">Poll every (minutes)</Label>
-                    <Input
-                      id="poll-frequency"
-                      type="number"
-                      min={1}
-                      value={activeConfig.pollFrequency}
-                      onChange={(event) => handleConfigChange("node-0", { pollFrequency: Number(event.target.value) || 1 })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="max-mentions">Max mentions per cycle</Label>
-                    <Input
-                      id="max-mentions"
-                      type="number"
-                      min={1}
-                      value={activeConfig.maxMentions}
-                      onChange={(event) => handleConfigChange("node-0", { maxMentions: Number(event.target.value) || 1 })}
-                    />
+          <CardContent className="space-y-4">
+            <div className="max-h-72 space-y-3 overflow-y-auto rounded-lg border border-border/60 bg-background/70 p-4">
+              {chatMessages.map((message) => (
+                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm ${
+                      message.role === "user" ? "bg-[#0ea5ff] text-white" : "bg-accent/30 text-foreground"
+                    }`}
+                  >
+                    {message.content}
                   </div>
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
 
-            {activeNodeId === "node-1" && (
-              <div className="space-y-4">
-                {[
-                  { id: "filter-questions", label: "Prioritize questions", key: "filterQuestions" },
-                  { id: "filter-hashtags", label: "Skip hashtag-only posts", key: "filterHashtags" },
-                  { id: "filter-short", label: "Ignore very short posts", key: "filterShortPosts" },
-                ].map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg border border-border/70 px-3 py-2">
-                    <Label htmlFor={item.id} className="text-sm font-medium">
-                      {item.label}
-                    </Label>
-                    <Switch
-                      id={item.id}
-                      checked={Boolean(activeConfig[item.key])}
-                      onCheckedChange={(value) => handleConfigChange("node-1", { [item.key]: value })}
-                    />
+            <form className="space-y-3" onSubmit={handlePromptSubmit}>
+              <Textarea
+                value={promptInput}
+                onChange={(event) => setPromptInput(event.target.value)}
+                placeholder="Type your automation here"
+                rows={4}
+                className="border-border/70"
+              />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Switch checked={isAutoPublish} onCheckedChange={setIsAutoPublish} id="auto-publish-toggle" />
+                    <label htmlFor="auto-publish-toggle" className="cursor-pointer">
+                      Auto publish replies
+                    </label>
                   </div>
-                ))}
+                  <div className="flex items-center gap-2">
+                    <Switch checked={isModerationEnabled} onCheckedChange={setIsModerationEnabled} id="moderation-toggle" />
+                    <label htmlFor="moderation-toggle" className="cursor-pointer">
+                      Require review
+                    </label>
+                  </div>
+                </div>
+                <Button type="submit" className="rounded-xl" disabled={isSending}>
+                  {isSending ? "Thinking..." : "Submit"}
+                </Button>
               </div>
-            )}
-
-            {activeNodeId === "node-2" && (
-              <div className="space-y-3">
-                <div>
-                  <Label htmlFor="response-mode">Response style</Label>
-                  <Input
-                    id="response-mode"
-                    value={activeConfig.responseMode}
-                    onChange={(event) => handleConfigChange("node-2", { responseMode: event.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="prompt">Prompt instructions</Label>
-                  <Textarea
-                    id="prompt"
-                    rows={6}
-                    value={activeConfig.prompt}
-                    onChange={(event) => handleConfigChange("node-2", { prompt: event.target.value })}
-                    className="border-border/60"
-                  />
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Explain how the automation should sound. The prompt is injected before every response call.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {activeNodeId === "node-3" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg border border-border/70 px-3 py-2">
-                  <Label htmlFor="auto-publish" className="text-sm font-medium">
-                    Auto publish replies
-                  </Label>
-                  <Switch
-                    id="auto-publish"
-                    checked={Boolean(activeConfig.autoPublish)}
-                    onCheckedChange={(value) => handleConfigChange("node-3", { autoPublish: value })}
-                  />
-                </div>
-                <div className="flex items-center justify-between rounded-lg border border-border/70 px-3 py-2">
-                  <Label htmlFor="moderation-enabled" className="text-sm font-medium">
-                    Require human review
-                  </Label>
-                  <Switch
-                    id="moderation-enabled"
-                    checked={Boolean(activeConfig.moderationEnabled)}
-                    onCheckedChange={(value) => handleConfigChange("node-3", { moderationEnabled: value })}
-                  />
-                </div>
-              </div>
-            )}
+            </form>
           </CardContent>
           <CardFooter className="border-t border-border/60 bg-background/60 px-6 py-4 text-xs text-muted-foreground">
-            Position nodes anywhere inside the canvas. Copy this blueprint into your own backend to run production flows.
+            Keep this tab open while the assistant works. Saving exports the latest plan to local storage for quick restoration.
           </CardFooter>
         </Card>
       </div>
 
-      <TerminalLog logs={terminalLogs} />
+      <div id="sandbox"><TerminalLog logs={terminalLogs} /></div>
     </div>
   );
 };
