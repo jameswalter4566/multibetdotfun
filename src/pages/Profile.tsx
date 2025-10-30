@@ -147,29 +147,29 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 )}
-                <div className="mt-3 text-xs text-muted-foreground">Total raised: <span className="text-foreground font-medium">{totalRaised.toFixed(2)} SOL</span></div>
+                <div className="mt-3 text-xs text-muted-foreground">Total processed: <span className="text-foreground font-medium">{totalRaised.toFixed(2)} SOL</span></div>
               </div>
 
               {/* Actions */}
               {isOwner && (
                 <div className="mt-4">
-                  <Button onClick={()=>setCreateOpen(true)} className="px-3 py-1.5">Launch a Campaign</Button>
+                  <Button onClick={()=>setCreateOpen(true)} className="px-3 py-1.5">Launch a project</Button>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Campaigns */}
+        {/* Launches */}
         <div id="campaigns" className="mt-6 bg-card border border-border rounded-lg">
           <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Campaigns</h2>
+            <h2 className="text-lg font-semibold">Launches</h2>
           </div>
           <div className="p-6">
             {loading ? (
               <div className="text-sm text-muted-foreground">Loading…</div>
             ) : campaigns.length === 0 ? (
-              <div className="text-sm text-muted-foreground">User has not created any campaigns yet.</div>
+              <div className="text-sm text-muted-foreground">User has not published any launches yet.</div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {campaigns.map(c => (
@@ -193,11 +193,11 @@ export default function ProfilePage() {
                         {c.website_url && <a className="underline" href={c.website_url} target="_blank" rel="noreferrer">Website</a>}
                         {c.x_url && <a className="underline" href={c.x_url} target="_blank" rel="noreferrer">X</a>}
                       </div>
-                      {/* Campaign progress bar */}
+                      {/* Launch progress bar */}
                       <div className="mt-3">
                         <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
-                          <span>Campaign progress</span>
-                          <span>Campaign goal</span>
+                          <span>Launch progress</span>
+                          <span>Launch target</span>
                         </div>
                         {(() => {
                           const raised = Number(c.raised_sol || 0);
@@ -213,7 +213,7 @@ export default function ProfilePage() {
                           );
                         })()}
                         <div className="mt-1 text-[11px] text-muted-foreground">
-                          {Number(c.raised_sol || 0).toFixed(2)} SOL raised out of {Number(c.goal_sol || 0).toFixed(2)} SOL goal
+                          {Number(c.raised_sol || 0).toFixed(2)} SOL processed toward {Number(c.goal_sol || 0).toFixed(2)} SOL target
                         </div>
                         {c.mint_address && (
                           <div className="mt-1 text-[11px] text-muted-foreground">

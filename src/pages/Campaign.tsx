@@ -104,9 +104,9 @@ export default function CampaignPage() {
     return () => { try { sub && supabase.removeChannel(sub); } catch {}; try { chatSub && supabase.removeChannel(chatSub); } catch {} };
   }, [campaignId]);
 
-  if (!campaignId) return <div className="p-6">Missing campaign id</div>;
+  if (!campaignId) return <div className="p-6">Missing launch id</div>;
 
-  const title = campaign?.title || 'Campaign';
+  const title = campaign?.title || 'Launch';
   const parentHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
   const ownerAvatar = owner?.profile_picture_url || (owner?.userdid ? `https://api.dicebear.com/7.x/identicon/svg?seed=${owner.userdid}` : '/placeholder.svg');
   const ownerName = owner?.screename || owner?.username || (owner?.userdid ? `${String(owner.userdid).slice(0,4)}…${String(owner.userdid).slice(-4)}` : 'creator');
@@ -311,7 +311,7 @@ export default function CampaignPage() {
                     </div>
                     <div className="hidden md:block w-px h-10 bg-border ml-2" />
                     <div className="text-xs md:text-sm text-muted-foreground space-x-3">
-                      <span className="inline-block">Raised: {Number((campaign as any)?.total_received_sol ?? campaign?.raised_sol ?? 0).toFixed(2)} SOL{typeof campaign?.goal_sol === 'number' ? ` / ${Number(campaign?.goal_sol || 0).toFixed(1)} SOL` : ''}</span>
+                      <span className="inline-block">Collected: {Number((campaign as any)?.total_received_sol ?? campaign?.raised_sol ?? 0).toFixed(2)} SOL{typeof campaign?.goal_sol === 'number' ? ` / ${Number(campaign?.goal_sol || 0).toFixed(1)} SOL` : ''}</span>
                       <span className="inline-block">
                         Mint: {campaign?.mint_address ? (
                           <a href={`https://pump.fun/coin/${campaign.mint_address}`} target="_blank" rel="noreferrer" className="underline font-mono">{campaign.mint_address}</a>
@@ -329,7 +329,7 @@ export default function CampaignPage() {
                       e.preventDefault();
                       const fd = new FormData(e.currentTarget as HTMLFormElement);
                       const amt = Number(fd.get('amount') as string);
-                      alert(`Donate ${isFinite(amt) ? amt : 0} SOL to ${title}`);
+                      alert(`Send ${isFinite(amt) ? amt : 0} SOL to ${title}`);
                     }}
                   >
                     {[0.1, 0.2, 0.5, 1].map(v => (
@@ -337,7 +337,7 @@ export default function CampaignPage() {
                         key={v}
                         type="button"
                         onClick={() => {
-                          const input = document.getElementById('donate-amount') as HTMLInputElement | null;
+                          const input = document.getElementById('payment-amount') as HTMLInputElement | null;
                           if (input) input.value = String(v);
                         }}
                         className="px-2 py-1 text-xs rounded border border-border hover:bg-accent"
@@ -346,7 +346,7 @@ export default function CampaignPage() {
                       </button>
                     ))}
                     <input
-                      id="donate-amount"
+                      id="payment-amount"
                       name="amount"
                       inputMode="decimal"
                       placeholder="Amount (SOL)"
@@ -357,7 +357,7 @@ export default function CampaignPage() {
                       onClick={() => setDonationOpen(true)}
                       className="px-3 py-1.5 h-8 rounded-full bg-primary text-primary-foreground text-sm hover:opacity-90"
                     >
-                      Donate
+                      Send payment
                     </button>
                     <button
                       type="button"
@@ -422,7 +422,7 @@ export default function CampaignPage() {
             <div className="ios-card overflow-hidden h-[70vh] lg:h-[calc(100vh-8rem)] sticky top-20 flex flex-col">
               <div className="px-3 py-2 border-b border-border text-sm font-medium flex items-center justify-between">
                 <div>Live Chat</div>
-                <div className="text-xs md:text-sm text-muted-foreground">Total donated: {(Number(campaign?.raised_sol || 0) + totalDonated).toFixed(2)} SOL</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Total collected: {(Number(campaign?.raised_sol || 0) + totalDonated).toFixed(2)} SOL</div>
               </div>
               <div className="flex-1 overflow-auto p-3 space-y-2" id="chat-scroll">
                 {messages.length === 0 ? (
@@ -544,7 +544,7 @@ export default function CampaignPage() {
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <div className="text-xs md:text-sm text-muted-foreground space-x-3">
-                  <span>Raised: {Number(campaign?.raised_sol || 0).toFixed(2)} SOL{typeof campaign?.goal_sol === 'number' ? ` / ${Number(campaign?.goal_sol || 0).toFixed(1)} SOL` : ''}</span>
+                  <span>Collected: {Number(campaign?.raised_sol || 0).toFixed(2)} SOL{typeof campaign?.goal_sol === 'number' ? ` / ${Number(campaign?.goal_sol || 0).toFixed(1)} SOL` : ''}</span>
                   <span>
                     Mint: {campaign?.mint_address ? (
                       <a href={`https://pump.fun/coin/${campaign.mint_address}`} target="_blank" rel="noreferrer" className="underline font-mono">{campaign.mint_address}</a>
@@ -576,7 +576,7 @@ export default function CampaignPage() {
                     onClick={() => setDonationOpen(true)}
                     className="px-3 py-1.5 h-8 rounded-full bg-primary text-primary-foreground text-sm hover:opacity-90"
                   >
-                    Donate
+                    Send payment
                   </button>
                   <button
                     type="button"
@@ -587,15 +587,15 @@ export default function CampaignPage() {
                   </button>
                 </div>
               </div>
-              <div className="text-sm text-foreground/90">${Number(((campaign as any)?.total_received_sol ?? campaign?.raised_sol ?? 0) + totalDonated).toFixed(2)} Donated so far!</div>
+              <div className="text-sm text-foreground/90">${Number(((campaign as any)?.total_received_sol ?? campaign?.raised_sol ?? 0) + totalDonated).toFixed(2)} Processed so far!</div>
             </div>
           </div>
 
           <div className="ios-card">
-            <div className="px-4 py-3 border-b border-border text-sm font-medium">Recent Donations</div>
+            <div className="px-4 py-3 border-b border-border text-sm font-medium">Recent payments</div>
             <div className="p-4">
               {donations.length === 0 ? (
-                <div className="text-sm text-muted-foreground">No donations yet.</div>
+                <div className="text-sm text-muted-foreground">No payments yet.</div>
               ) : (
                 <div className="space-y-2">
                   {donations.slice().reverse().map(d => (
@@ -625,11 +625,11 @@ export default function CampaignPage() {
           {campaign?.image_url ? (
             <img src={campaign.image_url} alt={title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">Campaign</div>
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">Launch</div>
           )}
         </div>
         <div className="p-4 space-y-3">
-          <div className="text-sm font-medium">Send a donation</div>
+          <div className="text-sm font-medium">Send a payment</div>
           <div className="flex items-center gap-2 flex-wrap">
             {[0.1, 0.2, 0.5, 1].map(v => (
               <button
@@ -716,14 +716,14 @@ export default function CampaignPage() {
                   setDonationMsg('');
                   setDonationOpen(false);
                 } catch (e) {
-                  console.warn('Donation send failed', e);
-                  alert('Donation failed or was cancelled');
+                  console.warn('Payment send failed', e);
+                  alert('Payment failed or was cancelled');
                 } finally {
                   setSendingDonation(false);
                 }
               }}
             >
-              {sendingDonation ? 'Sending…' : 'Send Donation'}
+              {sendingDonation ? 'Sending…' : 'Send payment'}
             </button>
           </div>
           <div className="flex items-center justify-end">

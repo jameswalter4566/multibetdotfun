@@ -13,9 +13,9 @@ type SandboxPanelProps = {
 
 export const sandboxSamples: Record<string, string[]> = {
   openai: [
-    "Summarize the latest fundraising milestones.",
+    "Summarize the latest product release milestones.",
     "Generate a headline for a crypto protocol showcase.",
-    "Draft a thank-you note for top donors.",
+    "Draft a thank-you note for early beta users.",
   ],
   claude: [
     "Outline a launch plan for a Solana-based product.",
@@ -33,15 +33,15 @@ export const sandboxSamples: Record<string, string[]> = {
     "channelId=UC_x5XG1OV2P6uZZ5FSM9Ttw",
     "videoId=dQw4w9WgXcQ",
   ],
-  twilio: ["SMS: Product update broadcast", "SMS: Goal reached announcement", "SMS: Share campaign update"],
+  twilio: ["SMS: Product update broadcast", "SMS: Goal reached announcement", "SMS: Share feature update"],
 };
 
 export const sandboxDefaultPayloads: Record<string, any> = {
   openai: {
     model: "gpt-4.1-mini",
     messages: [
-      { role: "system", content: "You are a helpful assistant for fundraising campaigns." },
-      { role: "user", content: "Summarize the latest fundraising milestones." },
+      { role: "system", content: "You are a helpful assistant for product teams." },
+      { role: "user", content: "Summarize the latest product release milestones." },
     ],
   },
   claude: {

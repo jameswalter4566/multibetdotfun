@@ -108,9 +108,9 @@ export default function StreamPage() {
       </Link>
       <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">
         <a href="/#mission" className="text-foreground/90 hover:underline text-sm md:text-base">Mission</a>
-        <a href="/#workers" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Organizers</a>
-        <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Campaigns</a>
-        <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Campaign</a>
+        <a href="/#workers" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Creators</a>
+        <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Launches</a>
+        <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Launch</a>
         <UserBadge />
         <a href="https://x.com/marketx402" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
       </nav>

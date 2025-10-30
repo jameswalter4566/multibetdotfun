@@ -113,7 +113,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
       }
       onOpenChange(false);
     } catch (e) {
-      alert((e as any)?.message || 'Failed to create campaign');
+      alert((e as any)?.message || 'Failed to create launch');
     } finally {
       setSaving(false);
     }
@@ -123,7 +123,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[80vw] max-w-[80vw] h-[80vh] rounded-2xl border border-border/50 bg-background flex flex-col">
         <DialogHeader>
-          <DialogTitle>Launch a campaign</DialogTitle>
+        <DialogTitle>Launch a new project</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1 overflow-hidden">
           {/* Left column: broadcast preview + control strip */}
@@ -138,11 +138,11 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
           <div className="space-y-3 h-full overflow-auto pr-1">
             <div>
               <label className="text-sm">Title</label>
-              <Input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Campaign title" />
+              <Input value={title} onChange={(e)=>setTitle(e.target.value)} placeholder="Launch title" />
             </div>
             <div>
               <label className="text-sm">Description</label>
-              <Textarea value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="What is this campaign about?" />
+              <Textarea value={description} onChange={(e)=>setDescription(e.target.value)} placeholder="What is this launch about?" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
@@ -155,10 +155,10 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
               </div>
             </div>
             <div>
-              <label className="text-sm">Campaign category</label>
+              <label className="text-sm">Launch category</label>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {[
-                  { key: 'personal', label: 'Personal', desc: 'Individual creator or cause' },
+                  { key: 'personal', label: 'Personal', desc: 'Independent creator or studio' },
                   { key: 'company', label: 'Company', desc: 'Organization or team' },
                 ].map((opt) => (
                   <button
@@ -177,7 +177,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
               </div>
             </div>
             <div>
-              <label className="text-sm">Campaign image</label>
+              <label className="text-sm">Launch image</label>
               <div className="mt-1 border border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:bg-accent/10"
                 onDragOver={(e)=>{ e.preventDefault(); e.stopPropagation(); }}
                 onDrop={(e)=>{ e.preventDefault(); e.stopPropagation(); handleSelect(e.dataTransfer.files); }}
@@ -190,7 +190,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
             </div>
             <div>
               <div className="flex items-center justify-between">
-                <label className="text-sm">Donation goal</label>
+                <label className="text-sm">Target amount</label>
                 <div className="text-xs text-muted-foreground">{goal.toFixed(1)} SOL</div>
               </div>
               <div className="pt-2">
@@ -199,7 +199,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
             </div>
             {/* Collage upload strip */}
             <div>
-              <label className="text-sm">Campaign photo collage</label>
+              <label className="text-sm">Launch photo collage</label>
               <div
                 className="mt-2 rounded-xl border border-dashed border-border bg-background/50 p-6 cursor-pointer hover:bg-accent/10 flex flex-col items-center justify-center text-center min-h-[160px]"
                 onDragOver={(e)=>{ e.preventDefault(); e.stopPropagation(); }}

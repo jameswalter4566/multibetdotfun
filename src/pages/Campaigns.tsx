@@ -59,16 +59,16 @@ export default function CampaignsPage() {
       <main className="container mx-auto px-4 pt-24 pb-10 max-w-5xl">
         <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold">Your Campaigns</h1>
-            <Button onClick={() => setOpen(true)}>Launch a Campaign</Button>
+            <h1 className="text-xl font-semibold">Your Launches</h1>
+            <Button onClick={() => setOpen(true)}>Create a launch</Button>
           </div>
           <div className="mt-4">
             {!userId ? (
-              <div className="text-sm text-muted-foreground">Please <a className="underline" href="/signin">sign in</a> to create a campaign.</div>
+              <div className="text-sm text-muted-foreground">Please <a className="underline" href="/signin">sign in</a> to create a launch.</div>
             ) : loading ? (
               <div className="text-sm text-muted-foreground">Loading…</div>
             ) : campaigns.length === 0 ? (
-              <div className="text-sm text-muted-foreground">You have not created any campaigns yet.</div>
+              <div className="text-sm text-muted-foreground">You have not published any launches yet.</div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {campaigns.map(c => (
@@ -86,11 +86,11 @@ export default function CampaignsPage() {
                         {c.website_url && <a className="underline" href={c.website_url} target="_blank" rel="noreferrer">Website</a>}
                         {c.x_url && <a className="underline" href={c.x_url} target="_blank" rel="noreferrer">X</a>}
                       </div>
-                      {/* Campaign progress bar */}
+                      {/* Launch progress bar */}
                       <div className="mt-3">
                         <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
-                          <span>Campaign progress</span>
-                          <span>Campaign goal</span>
+                          <span>Launch progress</span>
+                          <span>Launch target</span>
                         </div>
                         {(() => {
                           const raised = Number((c as any).total_received_sol ?? c.raised_sol ?? 0);
@@ -106,7 +106,7 @@ export default function CampaignsPage() {
                           );
                         })()}
                         <div className="mt-1 text-[11px] text-muted-foreground">
-                          {Number(c.raised_sol || 0).toFixed(2)} SOL raised out of {Number(c.goal_sol || 0).toFixed(2)} SOL goal
+                          {Number(c.raised_sol || 0).toFixed(2)} SOL processed toward {Number(c.goal_sol || 0).toFixed(2)} SOL target
                         </div>
                         {c.mint_address && (
                           <div className="mt-1 text-[11px] text-muted-foreground">

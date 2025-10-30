@@ -44,12 +44,12 @@ export default function ExploreCampaignsPage() {
       </a>
       <main className="container mx-auto px-4 pt-24 pb-10 max-w-6xl">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-semibold">Explore Campaigns</h1>
+          <h1 className="text-2xl font-semibold">Explore Launches</h1>
         </div>
         {loading ? (
           <div className="text-sm text-muted-foreground">Loading…</div>
         ) : campaigns.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No campaigns yet.</div>
+          <div className="text-sm text-muted-foreground">No launches yet.</div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {campaigns.map(c => (
@@ -62,7 +62,7 @@ export default function ExploreCampaignsPage() {
                 <div className="p-3">
                   <div className="font-medium text-sm truncate" title={c.title}>{c.title}</div>
                   <div className="text-xs text-muted-foreground line-clamp-2">{c.description}</div>
-                  <div className="mt-2 text-xs text-muted-foreground">Raised: {Number(c.raised_sol || 0).toFixed(2)} SOL</div>
+                  <div className="mt-2 text-xs text-muted-foreground">Processed: {Number(c.raised_sol || 0).toFixed(2)} SOL</div>
                 </div>
               </div>
             ))}
