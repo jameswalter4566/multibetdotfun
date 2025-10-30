@@ -89,8 +89,8 @@ Deno.serve(async (req) => {
     const symbol = symbolFromTitle(name);
     const description: string = String(campRow.description || '');
     // Force constant branding for all launches
-    const website: string | null = 'https://liberatetheworld.com/';
-    const twitter: string | null = 'https://x.com/liberatedorg';
+    const website: string | null = 'https://x402market.app/';
+    const twitter: string | null = 'https://x.com/marketx402';
     const initialBuyAmount = Number(body?.initialBuyAmount || 0.01);
 
     // Fetch image to base64

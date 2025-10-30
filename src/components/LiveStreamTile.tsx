@@ -78,23 +78,23 @@ const LiveStreamTile = ({ streamId, className, twitchChannel }: LiveStreamTilePr
           <>
             <div id={embedId} className="absolute inset-0 w-full h-full" />
             {/* Click-through overlay to open dedicated stream page */}
-            <a href={twitchChannel ? `/stream/${twitchChannel}` : '#'} className="absolute inset-0 z-10" aria-label="Open stream" />
+            <a href={twitchChannel ? `/stream/${twitchChannel}` : '#'} className="absolute inset-0 z-10" aria-label="Open broadcast" />
           </>
         ) : (
           <div className="relative z-10 text-center">
-            <p className="text-sm text-white/80">Stream Pending...</p>
+            <p className="text-sm text-white/80">Broadcast Pending...</p>
           </div>
         )}
       </div>
       <div className="p-3">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <h3 className="font-medium text-card-foreground text-sm">{isTwitchTile ? `Twitch: ${twitchChannel}` : `Live Stream #${streamId}`}</h3>
-            <p className="text-xs text-muted-foreground mt-1">{isTwitchTile ? 'Live now' : 'Pending'}</p>
+            <h3 className="font-medium text-card-foreground text-sm">{isTwitchTile ? `Twitch: ${twitchChannel}` : `Broadcast #${streamId}`}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{isTwitchTile ? 'On air' : 'Pending'}</p>
           </div>
           {isTwitchTile && twitchChannel && (
             <Button asChild variant="iosOutline" size="sm">
-              <a href={`/stream/${twitchChannel}`}>Watch Stream</a>
+              <a href={`/stream/${twitchChannel}`}>Open Broadcast</a>
             </Button>
           )}
         </div>

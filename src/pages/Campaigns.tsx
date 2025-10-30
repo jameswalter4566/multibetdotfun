@@ -54,8 +54,7 @@ export default function CampaignsPage() {
   return (
     <div className="min-h-screen bg-background">
       <a href="/" className="fixed top-2 left-12 md:left-16 z-20 block">
-        <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-        <img src="/950b5320-c3a6-44f1-8b8e-bdd46eb85fdf.png" alt="Partner" className="h-12 w-auto md:h-14 lg:h-16 ml-3 align-middle" />
+        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
       </a>
       <main className="container mx-auto px-4 pt-24 pb-10 max-w-5xl">
         <div className="bg-card border border-border rounded-lg p-6">
@@ -80,7 +79,7 @@ export default function CampaignsPage() {
                     <div className="p-3">
                       <div className="flex items-center justify-between gap-2">
                         <div className="font-medium truncate" title={c.title}>{c.title}</div>
-                        <Button variant="iosOutline" size="sm" onClick={() => { window.location.href = `/campaign/${c.id}`; }}>Watch Stream</Button>
+                        <Button variant="iosOutline" size="sm" onClick={() => { window.location.href = `/campaign/${c.id}`; }}>Open Broadcast</Button>
                       </div>
                       <div className="text-xs text-muted-foreground line-clamp-2 mt-1">{c.description}</div>
                       <div className="mt-1 flex gap-3 text-[11px] text-muted-foreground">

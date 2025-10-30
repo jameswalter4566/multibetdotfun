@@ -260,8 +260,7 @@ export default function CampaignPage() {
     <div className="min-h-screen bg-background">
       {/* Top-left logo */}
       <Link to="/" className="fixed top-2 left-12 md:left-16 z-30 block">
-        <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-        <img src="/950b5320-c3a6-44f1-8b8e-bdd46eb85fdf.png" alt="Partner" className="h-12 w-auto md:h-14 lg:h-16 ml-3 align-middle" />
+        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
       </Link>
       {/* Top-right nav (match Index nav) */}
       <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">
@@ -270,19 +269,19 @@ export default function CampaignPage() {
         <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Campaigns</a>
         <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Campaign</a>
         <UserBadge />
-        <a href="https://x.com/liberatedorg" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
+        <a href="https://x.com/marketx402" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
       </nav>
 
       <div className="container mx-auto px-2 md:px-4 pt-20 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Left: live stream placeholder (mirrors Stream layout) */}
+          {/* Left: broadcast placeholder (mirrors Stream layout) */}
           <div className="lg:col-span-8 xl:col-span-9">
             <div className="ios-card overflow-hidden h-[70vh] lg:h-[calc(100vh-8rem)] flex flex-col">
               <div className="flex-1 bg-black relative">
                 {campaign?.image_url ? (
                   <img src={campaign.image_url} alt={title} className="w-full h-full object-cover opacity-40" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">Live stream</div>
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">Broadcast</div>
                 )}
                 <div ref={videoContainerRef} className="absolute inset-0" />
                 <div ref={screenContainerRef} className="absolute inset-0 pointer-events-none" />

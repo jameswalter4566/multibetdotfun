@@ -296,7 +296,7 @@ console.log(data.items.map((item: any) => item.snippet.title));`,
 payload = {
     "to": "+15551234567",
     "from": "+18885550123",
-    "body": "Milestone unlocked! Join the live stream now."
+    "body": "Milestone unlocked! Jump back into the dashboard now."
 }
 
 res = requests.post(

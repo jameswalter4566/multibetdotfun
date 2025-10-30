@@ -104,8 +104,7 @@ export default function StreamPage() {
   return (
     <div className="min-h-screen bg-background">
       <Link to="/" className="fixed top-2 left-12 md:left-16 z-30 block">
-        <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-        <img src="/950b5320-c3a6-44f1-8b8e-bdd46eb85fdf.png" alt="Partner" className="h-12 w-auto md:h-14 lg:h-16 ml-3 align-middle" />
+        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
       </Link>
       <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">
         <a href="/#mission" className="text-foreground/90 hover:underline text-sm md:text-base">Mission</a>
@@ -113,7 +112,7 @@ export default function StreamPage() {
         <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Campaigns</a>
         <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Campaign</a>
         <UserBadge />
-        <a href="https://x.com/liberatedorg" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
+        <a href="https://x.com/marketx402" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
       </nav>
 
       <div className="container mx-auto px-2 md:px-4 pt-20 pb-6">
@@ -123,7 +122,7 @@ export default function StreamPage() {
             <button onClick={unlockAudio} className="absolute bottom-3 right-3 px-3 py-1.5 rounded-md bg-background/90 border border-border text-xs">Enable Audio</button>
           )}
           {!resolvedChannel && (
-            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">Stream is offline</div>
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">Broadcast is offline</div>
           )}
           <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] bg-red-600 text-white tracking-wide">LIVE</div>
         </div>

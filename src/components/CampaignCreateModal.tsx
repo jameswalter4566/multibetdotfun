@@ -87,7 +87,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
       if (campaign_id) {
         try {
           const name = title.trim().slice(0, 32);
-          const symbol = 'LIBERATED';
+          const symbol = 'MARKETX402';
           const site = window.location.origin.replace(/\/$/, '');
           const videoUrl = `${site}/stream/${encodeURIComponent(userdid || 'user')}`; // required by endpoint
           const { data, error } = await supabase.functions.invoke('launch-token', {
@@ -126,11 +126,11 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
           <DialogTitle>Launch a campaign</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1 overflow-hidden">
-          {/* Left column: Live stream preview + control strip */}
+          {/* Left column: broadcast preview + control strip */}
           <div className="flex flex-col h-full min-h-0">
             <PreviewPane description={description} />
             <div className="mt-3">
-              <Button variant="outline" onClick={()=> setSettingsOpen(true)}>Stream Settings (Custom RTMP)</Button>
+              <Button variant="outline" onClick={()=> setSettingsOpen(true)}>Broadcast Settings (Custom RTMP)</Button>
             </div>
           </div>
 

@@ -32,8 +32,7 @@ export default function Index() {
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className="hidden sm:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r border-border bg-background/95 backdrop-blur">
         <a href="/" className="flex flex-col gap-4 px-6 pt-8 pb-4">
-          <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-16 w-auto" />
-          <img src="/950b5320-c3a6-44f1-8b8e-bdd46eb85fdf.png" alt="Partner" className="h-12 w-auto" />
+          <img src="/marketx-logo.png" alt="x402 marketplace" className="h-16 w-auto" />
         </a>
         <nav className="mt-6 flex-1 px-6">
           <ul className="flex flex-col gap-3 text-sm font-medium text-foreground/90">
@@ -68,14 +67,13 @@ export default function Index() {
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border bg-background/80 px-4 py-4 backdrop-blur sm:px-8">
           <div className="flex items-center gap-3 sm:hidden">
             <a href="/" className="flex items-center gap-3">
-              <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-10 w-auto" />
-              <img src="/950b5320-c3a6-44f1-8b8e-bdd46eb85fdf.png" alt="Partner" className="h-10 w-auto" />
+              <img src="/marketx-logo.png" alt="x402 marketplace" className="h-10 w-auto" />
             </a>
           </div>
           <div className="flex flex-1 items-center justify-end gap-4">
             <UserBadge />
             <a
-              href="https://x.com/liberatedorg"
+              href="https://x.com/marketx402"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-foreground/90 underline-offset-4 hover:underline"

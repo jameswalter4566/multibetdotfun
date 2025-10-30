@@ -40,8 +40,7 @@ export default function ExploreCampaignsPage() {
   return (
     <div className="min-h-screen bg-background">
       <a href="/" className="fixed top-2 left-12 md:left-16 z-20 block">
-        <img src="/f6cc0350-62e9-4a52-a7b4-e9955a2333a3.png" alt="Liberated" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-        <img src="/950b5320-c3a6-44f1-8b8e-bdd46eb85fdf.png" alt="Partner" className="h-12 w-auto md:h-14 lg:h-16 ml-3 align-middle" />
+        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
       </a>
       <main className="container mx-auto px-4 pt-24 pb-10 max-w-6xl">
         <div className="flex items-center justify-between mb-4">

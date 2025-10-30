@@ -14,7 +14,7 @@ type SandboxPanelProps = {
 export const sandboxSamples: Record<string, string[]> = {
   openai: [
     "Summarize the latest fundraising milestones.",
-    "Generate a headline for a crypto charity livestream.",
+    "Generate a headline for a crypto protocol showcase.",
     "Draft a thank-you note for top donors.",
   ],
   claude: [
@@ -33,7 +33,7 @@ export const sandboxSamples: Record<string, string[]> = {
     "channelId=UC_x5XG1OV2P6uZZ5FSM9Ttw",
     "videoId=dQw4w9WgXcQ",
   ],
-  twilio: ["SMS: Stream going live", "SMS: Goal reached announcement", "SMS: Share campaign update"],
+  twilio: ["SMS: Product update broadcast", "SMS: Goal reached announcement", "SMS: Share campaign update"],
 };
 
 export const sandboxDefaultPayloads: Record<string, any> = {
@@ -58,7 +58,7 @@ export const sandboxDefaultPayloads: Record<string, any> = {
   twilio: {
     to: "+15551234567",
     from: "+18885550123",
-    body: "Milestone unlocked! Join the live stream now.",
+    body: "Milestone unlocked! Claim your perk in the dashboard.",
   },
 };
 

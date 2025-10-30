@@ -18,7 +18,7 @@ export default function SiteFooter({ className }: SiteFooterProps) {
           {/* Right: social icons in circles */}
           <div className="md:justify-self-end flex items-center gap-3">
             <a
-              href="https://x.com/liberatedorg"
+              href="https://x.com/marketx402"
               target="_blank"
               rel="noopener noreferrer"
               className="h-9 w-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/15"
