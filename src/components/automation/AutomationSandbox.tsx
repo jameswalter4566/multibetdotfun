@@ -193,7 +193,7 @@ export const AutomationSandbox = () => {
   const { toast } = useToast();
 
   const assistantEndpoint = import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined;
-  const openAiKey = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
+  const openAiKey = import.meta.env.OPENAI_API_KEY as string | undefined;
 
   const updateAnchors = useCallback(() => {
     const container = canvasRef.current;
@@ -342,7 +342,7 @@ export const AutomationSandbox = () => {
         return text as string;
       }
 
-      return "Preview mode: configure VITE_AUTOMATION_ASSISTANT_ENDPOINT (server proxy) or VITE_OPENAI_API_KEY to enable live responses.";
+      return "Preview mode: configure VITE_AUTOMATION_ASSISTANT_ENDPOINT (server proxy) or OPENAI_API_KEY to enable live responses.";
     },
     [assistantEndpoint, automationName, openAiKey, walletAddress, isAutoPublish, isModerationEnabled]
   );
