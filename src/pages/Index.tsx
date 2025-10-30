@@ -60,6 +60,15 @@ export default function Index() {
             ))}
           </ul>
         </nav>
+        <div className="px-6 pb-4">
+          <button
+            type="button"
+            className="w-full rounded-xl bg-[#0ea5ff] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.4)] transition-colors hover:bg-[#08b0ff]"
+            onClick={() => navigate("/list-api?mode=automation")}
+          >
+            Create AI Automation
+          </button>
+        </div>
         <div className="px-6 pb-8 text-xs text-muted-foreground/80">Powered by x402 — instant access for builders.</div>
       </aside>
 
