@@ -72,8 +72,8 @@ const tileLogos: Record<string, string> = {
 const featureTiles = [
   {
     title: "Access Layer – Instant API Access",
-    image: "/logos/agent-automation.png",
-    alt: "Access automation",
+    image: "/logos/hero-console.png",
+    alt: "Platform payment console",
     points: [
       "One unified endpoint for every major API (OpenAI, Claude, Google, Stripe, etc.)",
       "No API keys or signup forms required",
@@ -93,8 +93,8 @@ const featureTiles = [
   },
   {
     title: "Marketplace Layer – List & Monetize Your API",
-    image: "/logos/payment-card.png",
-    alt: "Marketplace illustration",
+    image: "/logos/agent-automation.png",
+    alt: "Access automation",
     points: [
       "List your API in minutes",
       "Set per-call pricing and supported tokens",
@@ -104,8 +104,8 @@ const featureTiles = [
   },
   {
     title: "Payment Layer – Powered by x402 Protocol",
-    image: "/logos/hero-console.png",
-    alt: "Platform payment console",
+    image: "/logos/payment-card.png",
+    alt: "Marketplace illustration",
     points: [
       "Handles all transactions via x402 Payment Required standard",
       "Accepts SOL, USDC, $402MARKET, and other Solana tokens",
