@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Store, PlugZap, ShieldCheck, Building2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const marqueeLogosTop = [
@@ -116,6 +117,63 @@ const featureTiles = [
 
 export default function Landing() {
   const heroLogos = [...heroLogoSet, ...heroLogoSet].slice(0, 18);
+  const featureSectionRef = useRef<HTMLDivElement | null>(null);
+  const [featureProgress, setFeatureProgress] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setPrefersReducedMotion(mediaQuery.matches);
+    update();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", update);
+      return () => mediaQuery.removeEventListener("change", update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion || typeof window === "undefined") {
+      setFeatureProgress(1);
+      return;
+    }
+    const section = featureSectionRef.current;
+    if (!section) return;
+
+    const thresholds = Array.from({ length: 41 }, (_, i) => i / 40);
+    let animationFrame = 0;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        const ratio = Math.max(0, Math.min(1, entry.intersectionRatio));
+        cancelAnimationFrame(animationFrame);
+        animationFrame = window.requestAnimationFrame(() => {
+          setFeatureProgress(ratio);
+        });
+      },
+      {
+        threshold: thresholds,
+      }
+    );
+
+    observer.observe(section);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      observer.disconnect();
+    };
+  }, [prefersReducedMotion]);
+
+  const clampedProgress = prefersReducedMotion ? 1 : Math.min(Math.max(featureProgress, 0), 1);
+  const normalizedProgress = prefersReducedMotion
+    ? 1
+    : Math.min(Math.max((clampedProgress - 0.1) / 0.8, 0), 1);
+  const easedProgress = prefersReducedMotion ? 1 : 1 - Math.pow(1 - normalizedProgress, 3);
 
   const renderMarqueeBadge = (name: string, key: string) => {
     const logoSrc = brandLogos[name];
@@ -213,15 +271,27 @@ export default function Landing() {
 
       {/* Explainer Tiles */}
       <section className="py-10 md:py-16">
-        <div className="max-w-6xl mx-auto px-6">
+        <div ref={featureSectionRef} className="max-w-6xl mx-auto px-6">
           <div className="grid gap-8 md:grid-cols-2">
-            {featureTiles.map((tile) => (
-              <div
-                key={tile.title}
-                className="rounded-3xl border border-border bg-card/80 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.25)] backdrop-blur flex flex-col items-center text-center"
-              >
-                <img
-                  src={tile.image}
+            {featureTiles.map((tile, index) => {
+              const direction = index % 2 === 0 ? -1 : 1;
+              const offset = (1 - easedProgress) * (direction * 180);
+              const tileStyle: CSSProperties = prefersReducedMotion
+                ? {}
+                : {
+                    transform: `translateX(${offset}px)`,
+                    transition: "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
+                    willChange: "transform",
+                  };
+
+              return (
+                <div
+                  key={tile.title}
+                  className="rounded-3xl border border-border bg-card/80 p-6 shadow-[0_20px_60px_rgba(15,23,42,0.25)] backdrop-blur flex flex-col items-center text-center"
+                  style={tileStyle}
+                >
+                  <img
+                    src={tile.image}
                   alt={tile.alt}
                   className="w-[220px] max-w-full object-contain drop-shadow-[0_0_24px_rgba(14,165,255,0.2)] mb-4"
                 />
@@ -232,7 +302,8 @@ export default function Landing() {
                   ))}
                 </ul>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
