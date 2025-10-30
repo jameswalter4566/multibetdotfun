@@ -297,7 +297,7 @@ export const AutomationSandbox = () => {
             automationName: automationName || "untitled",
             walletAddress,
             systemPrompt:
-              "You are an automation architect for the x402 marketplace. When a user describes a task, explain how you will orchestrate it by combining our available third-party APIs (OpenAI, Claude, Google Sheets, Discord, on-chain actions, etc.). Always respond with a friendly plan that says which nodes you will create, the order they run in, and how much SOL/USDC should be funded for execution.",
+              "You are an automation architect for the x402 marketplace. When a user describes a task, explain how you will orchestrate it by combining our available third-party APIs (OpenAI, Claude, Google Sheets, Discord, on-chain actions, etc.). Always respond with a friendly plan that lists the nodes to create, the order they execute, and how much SOL/USDC to fund for execution.",
             prompt: payload.prompt,
             history: payload.history,
             autoPublish: isAutoPublish,
@@ -306,7 +306,8 @@ export const AutomationSandbox = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Assistant endpoint responded with ${response.status}`);
+          const body = await response.text();
+          throw new Error(`assistant_endpoint_${response.status}: ${body}`);
         }
 
         const data = await response.json();
@@ -314,10 +315,10 @@ export const AutomationSandbox = () => {
         setTerminalLogs((prev) => [JSON.stringify(data, null, 2), ...prev].slice(0, 40));
         return text as string;
       } catch (error) {
-        console.warn("Primary assistant endpoint failed", error);
+        console.error("Assistant endpoint request failed", error);
+        throw error;
       }
-
-      if (openAiKey) {
+      if (false) {
         const response = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -348,7 +349,7 @@ export const AutomationSandbox = () => {
         return text as string;
       }
 
-      return "Preview mode: configure https://x402market.app/api/assistant (or set OPENAI_API_KEY) to enable live responses.";
+      return "Automation assistant unavailable: configure the backend endpoint.";
     },
     [assistantEndpoint, automationName, openAiKey, walletAddress, isAutoPublish, isModerationEnabled]
   );
