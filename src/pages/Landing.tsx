@@ -234,7 +234,7 @@ export default function Landing() {
               Make your first call for free now. Built for developers, agents, and automations.
             </div>
 
-            <div className="hero-slide hero-slide-delay-3 mt-3 flex flex-col items-center gap-3">
+            <div className="hero-slide hero-slide-delay-3 mt-4 flex flex-wrap items-center justify-center gap-3">
               <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
                 <Link to="/home">Explore API marketplace</Link>
               </Button>
@@ -256,6 +256,25 @@ export default function Landing() {
                   />
                 </svg>
                 GitHub
+              </a>
+              <a
+                href="https://x.com/marketx402"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground/90 hover:bg-secondary/60"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className="h-4 w-4"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M3.5 0H9l4.5 6.5L18 0h6l-7.5 9.2L24 24h-5.5l-4.7-6.9L9 24H3.5l7.7-9.5L3.5 0Z"
+                  />
+                </svg>
+                X
               </a>
             </div>
           </div>
