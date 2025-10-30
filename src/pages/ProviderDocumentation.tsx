@@ -286,6 +286,14 @@ export default function ProviderDocumentation() {
               })}
             </ul>
           </nav>
+          <div className="px-6 pb-8">
+            <Link
+              to="/list-api"
+              className="inline-flex w-full items-center justify-center rounded-2xl bg-[#0ea5ff] px-4 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.35)] transition-colors hover:bg-[#08b0ff]"
+            >
+              Create AI Automation
+            </Link>
+          </div>
         </aside>
 
         <main className="flex-1">
