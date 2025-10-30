@@ -240,7 +240,7 @@ export default function Landing() {
               </Button>
               <div className="flex items-center justify-center gap-3">
                 <a
-                  href="https://github.com/jameswalter4566"
+                  href="https://github.com/marketx402"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground/90 hover:bg-secondary/60"

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -262,6 +262,7 @@ export const AutomationSandbox = () => {
         setNodes((current) =>
           current.map((node) => (node.id === pending.id ? { ...node, position: { x: pending.x, y: pending.y } } : node))
         );
+        requestAnimationFrame(updateAnchors);
         rafRef.current = null;
       });
     };
@@ -318,11 +319,11 @@ export const AutomationSandbox = () => {
         endX: toRect.left - containerRect.left,
         endY: toRect.top + toRect.height / 2 - containerRect.top,
       };
-    }).filter(Boolean) as Array<{ id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean }>;
+    }).filter((edge): edge is { id: string; startX: number; startY: number; endX: number; endY: number; animated?: boolean } => Boolean(edge));
     setConnectorAnchors(anchors);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     updateAnchors();
   }, [nodes, updateAnchors]);
 
@@ -434,7 +435,7 @@ export const AutomationSandbox = () => {
               onSelect={setActiveNodeId}
               provideRef={(id, el) => {
                 nodeRefs.current[id] = el;
-                updateAnchors();
+                requestAnimationFrame(updateAnchors);
               }}
             />
           ))}
