@@ -269,7 +269,7 @@ export default function CampaignPage() {
         <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Campaigns</a>
         <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Campaign</a>
         <UserBadge />
-        <a href="https://x.com/hubx402" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
+        <a href="https://x.com/hubdotapp" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
       </nav>
 
       <div className="container mx-auto px-2 md:px-4 pt-20 pb-6">

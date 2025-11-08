@@ -75,7 +75,7 @@ export default function Automation() {
           <div className="flex flex-1 items-center justify-end gap-4">
             <UserBadge />
             <a
-              href="https://x.com/hubx402"
+              href="https://x.com/hubdotapp"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-foreground/90 underline-offset-4 hover:underline"

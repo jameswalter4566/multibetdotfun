@@ -260,7 +260,7 @@ export default function Landing() {
                   GitHub
                 </a>
                 <a
-                  href="https://x.com/hubx402"
+                  href="https://x.com/hubdotapp"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow us on X"

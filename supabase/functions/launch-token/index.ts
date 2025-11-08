@@ -231,7 +231,7 @@ serve(async (req: Request) => {
       name: String(body.name).slice(0, 32),
       symbol: 'HUBX402',
       description: body.description || String(body.name),
-      twitter: 'https://x.com/hubx402',
+      twitter: 'https://x.com/hubdotapp',
       website: 'https://hubx402.app/',
       showName: true,
     })

@@ -17,7 +17,7 @@ const Header = ({ className }: HeaderProps) => {
           <a href="/#workers" className="ios-nav-link">Explore Organizers</a>
           <a href="/campaigns" className="ios-nav-link">Campaigns</a>
           <a href="/explore" className="ios-nav-link">Explore Campaigns</a>
-          <a href="https://x.com/hubx402" target="_blank" rel="noreferrer" className="ios-nav-link">X</a>
+          <a href="https://x.com/hubdotapp" target="_blank" rel="noreferrer" className="ios-nav-link">X</a>
           <UserBadge />
         </nav>
       </div>
