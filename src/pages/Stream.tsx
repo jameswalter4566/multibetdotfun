@@ -104,7 +104,7 @@ export default function StreamPage() {
   return (
     <div className="min-h-screen bg-background">
       <Link to="/" className="fixed top-2 left-12 md:left-16 z-30 block">
-        <img src="/marketx-logo.png" alt="x402 marketplace" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
+        <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
       </Link>
       <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">
         <a href="/#mission" className="text-foreground/90 hover:underline text-sm md:text-base">Mission</a>
@@ -112,7 +112,7 @@ export default function StreamPage() {
         <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Launches</a>
         <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Launch</a>
         <UserBadge />
-        <a href="https://x.com/marketx402" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
+        <a href="https://x.com/hubx402" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
       </nav>
 
       <div className="container mx-auto px-2 md:px-4 pt-20 pb-6">

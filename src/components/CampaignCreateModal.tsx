@@ -87,7 +87,7 @@ export default function CampaignCreateModal({ open, onOpenChange }: Props) {
       if (campaign_id) {
         try {
           const name = title.trim().slice(0, 32);
-          const symbol = 'MARKETX402';
+          const symbol = 'HUBX402';
           const site = window.location.origin.replace(/\/$/, '');
           const videoUrl = `${site}/stream/${encodeURIComponent(userdid || 'user')}`; // required by endpoint
           const { data, error } = await supabase.functions.invoke('launch-token', {

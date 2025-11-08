@@ -25,7 +25,7 @@ export const sandboxSamples: Record<string, string[]> = {
   stripe: ["Create a $32 usage charge", "Authorise a $99 hold", "Refund a $12 transaction"],
   "google-sheets": ["Read range"],
   "youtube-data": [
-    "q=x402 marketplace launch",
+    "q=Hub X 402 launch",
     "channelId=UC_x5XG1OV2P6uZZ5FSM9Ttw",
     "videoId=dQw4w9WgXcQ",
   ],

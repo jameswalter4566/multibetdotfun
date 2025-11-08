@@ -10,13 +10,13 @@ export type Streamer = {
 
 // Basic static config. Extend/replace with API data when available.
 export const STREAMERS: Streamer[] = [
-  { channel: 'jhette-marketx', displayName: 'Jhette', pfp: '/jhette.jpg', mint: undefined, marketCapUsd: undefined, currentFeesUsd: undefined },
-  { channel: 'chrissa-marketx', displayName: 'Chrissa', pfp: '/chrissaimage.jpg' },
-  { channel: 'ellie-marketx', displayName: 'Ellie', pfp: '/ELLIE.jpg' },
-  { channel: 'kevin-marketx', displayName: 'KEVIN', pfp: '/KEVIN.jpg' },
-  { channel: 'joy-marketx', displayName: 'Joy', pfp: '/joyy.jpg' },
-  { channel: 'anjj-marketx', displayName: 'Anjj', pfp: '/ANJJ.jpg' },
-  { channel: 'kassandra-marketx', displayName: 'Kassandra', pfp: '/kassandra.jpg' },
+  { channel: 'jhette-hubx', displayName: 'Jhette', pfp: '/jhette.jpg', mint: undefined, marketCapUsd: undefined, currentFeesUsd: undefined },
+  { channel: 'chrissa-hubx', displayName: 'Chrissa', pfp: '/chrissaimage.jpg' },
+  { channel: 'ellie-hubx', displayName: 'Ellie', pfp: '/ELLIE.jpg' },
+  { channel: 'kevin-hubx', displayName: 'KEVIN', pfp: '/KEVIN.jpg' },
+  { channel: 'joy-hubx', displayName: 'Joy', pfp: '/joyy.jpg' },
+  { channel: 'anjj-hubx', displayName: 'Anjj', pfp: '/ANJJ.jpg' },
+  { channel: 'kassandra-hubx', displayName: 'Kassandra', pfp: '/kassandra.jpg' },
 ];
 
 export function getStreamer(channel: string): Streamer | undefined {

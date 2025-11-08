@@ -58,8 +58,7 @@ function resolveSiteBase(req: Request): string | null {
 async function fetchFaviconAsFile(baseUrl: string): Promise<File | null> {
   const base = stripTrailingSlash(baseUrl)
   const candidates = [
-    '/marketx-logo.png',
-    '/marketx-favicon.png',
+    '/HUBX402DESIGN.png',
     '/favicon.ico',
     '/favicon.png',
     '/favicon-32x32.png',
@@ -90,12 +89,12 @@ function decodeBase64ToUint8Array(b64: string): Uint8Array {
 }
 
 async function imageInputToFile(body: LaunchBody, req: Request): Promise<File> {
-  // Always use the fixed image if reachable (marketx-logo.png in public root)
+  // Always use the fixed image if reachable (Hub X 402 design in public root)
   const base = resolveSiteBase(req)
-  if (!base) throw new Error('SITE_URL or Origin/Referer required to fetch public/marketx-logo.png')
+  if (!base) throw new Error('SITE_URL or Origin/Referer required to fetch public/HUBX402DESIGN.png')
   const fixed = await fetchFaviconAsFile(base)
   if (fixed) return fixed
-  throw new Error(`Could not fetch ${base}/marketx-logo.png`)
+  throw new Error(`Could not fetch ${base}/HUBX402DESIGN.png`)
 }
 
 async function uploadMetadataToPumpIPFS(file: File, fields: {
@@ -230,14 +229,14 @@ serve(async (req: Request) => {
     const file = await imageInputToFile(body, req)
     const ipfs = await uploadMetadataToPumpIPFS(file, {
       name: String(body.name).slice(0, 32),
-      symbol: 'MARKETX402',
+      symbol: 'HUBX402',
       description: body.description || String(body.name),
-      twitter: 'https://x.com/marketx402',
-      website: 'https://x402market.app/',
+      twitter: 'https://x.com/hubx402',
+      website: 'https://hubx402.app/',
       showName: true,
     })
     const metaName = ipfs.metadata?.name || body.name
-    const metaSymbol = 'MARKETX402'
+    const metaSymbol = 'HUBX402'
     const metadataUri = ipfs.metadataUri
 
     // Payer keys

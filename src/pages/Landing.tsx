@@ -17,7 +17,7 @@ const marqueeLogosTop = [
   "Pinecone",
   "Supabase",
   "Solana",
-  "x402",
+  "Hub X 402",
 ];
 
 const marqueeLogosBottom = [
@@ -58,6 +58,7 @@ const brandLogos: Record<string, string> = {
   PayPal: "/logos/paypal.png",
   "Google Sheets": "/logos/google-sheets.png",
   "YouTube Data": "/logos/youtube.png",
+  "Hub X 402": "/HUBX402DESIGN.png",
 };
 
 const tileLogos: Record<string, string> = {
@@ -77,7 +78,7 @@ const featureTiles = [
     points: [
       "One unified endpoint for every major API (OpenAI, Claude, Google, Stripe, etc.)",
       "No API keys or signup forms required",
-      "Pay per call using x402 protocol",
+      "Pay per call using Hub X 402 protocol",
       "Designed for developers, agents, and automations",
     ],
   },
@@ -103,11 +104,11 @@ const featureTiles = [
     ],
   },
   {
-    title: "Payment Layer – Powered by x402 Protocol",
+    title: "Payment Layer – Powered by Hub X 402 Protocol",
     image: "/logos/payment-card.png",
     alt: "Marketplace illustration",
     points: [
-      "Handles all transactions via x402 Payment Required standard",
+      "Handles all transactions via the Hub X 402 Payment Required standard",
       "Accepts SOL, USDC, $402MARKET, and other Solana tokens",
       "Instant confirmations, no chargebacks",
       "Replaces outdated payment processors",
@@ -227,7 +228,7 @@ export default function Landing() {
               instant access to every top third party api with a single call
             </h1>
             <h2 className="hero-text-shadow hero-slide hero-slide-delay-1 mt-4 text-2xl md:text-3xl font-bold text-white">
-              <span className="hero-highlight">no API key required. Powered by x402</span>
+              <span className="hero-highlight">no API key required. Powered by Hub X 402</span>
             </h2>
 
             <div className="hero-text-shadow hero-slide hero-slide-delay-2 mt-8 text-sm md:text-base text-foreground/90">
@@ -240,7 +241,7 @@ export default function Landing() {
               </Button>
               <div className="flex items-center justify-center gap-3">
                 <a
-                  href="https://github.com/marketx402"
+                  href="https://github.com/hubx402"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground/90 hover:bg-secondary/60"
@@ -259,7 +260,7 @@ export default function Landing() {
                   GitHub
                 </a>
                 <a
-                  href="https://x.com/marketx402"
+                  href="https://x.com/hubx402"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow us on X"
@@ -371,7 +372,7 @@ export default function Landing() {
                     <div className="text-lg font-semibold">{name}</div>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Instant access. No API key required. Powered by x402.
+                    Instant access. No API key required. Powered by Hub X 402.
                   </div>
                 </div>
               );

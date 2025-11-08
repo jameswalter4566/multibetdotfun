@@ -23,18 +23,18 @@ export const apiProviders: ApiProvider[] = [
     name: "OpenAI",
     slug: "openai",
     logo: "/logos/openai.png",
-    tagline: "Instant access. No API key required. Powered by x402.",
+    tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
-      "Use x402 Marketplace to call OpenAI's APIs without sharing or storing your own keys. Pay with x402 protocol, send your request to our gateway, and we forward it securely using our managed OpenAI account.",
-    endpoint: "https://x402market.app/openai/chat/completions",
+      "Use Hub X 402 to call OpenAI's APIs without sharing or storing your own keys. Pay with the Hub X 402 protocol, send your request to our gateway, and we forward it securely using our managed OpenAI account.",
+    endpoint: "https://hubx402.app/openai/chat/completions",
     method: "POST",
-    testUrl: "https://x402market.app/openai/models",
-    codeSampleTitle: "Node (fetch) – chat completions via x402 gateway",
+    testUrl: "https://hubx402.app/openai/models",
+    codeSampleTitle: "Node (fetch) – chat completions via Hub X 402 gateway",
     language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
 async function runChat() {
-  const response = await fetch("https://x402market.app/openai/chat/completions", {
+  const response = await fetch("https://hubx402.app/openai/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ async function runChat() {
     body: JSON.stringify({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are an assistant for x402 marketplace users." },
+        { role: "system", content: "You are an assistant for Hub X 402 users." },
         { role: "user", content: "Draft a welcome message for new API partners." }
       ],
       temperature: 0.7
@@ -64,25 +64,25 @@ runChat().catch(console.error);`,
       {
         name: "Chat Completions",
         method: "POST",
-        path: "https://x402market.app/openai/chat/completions",
+        path: "https://hubx402.app/openai/chat/completions",
         description: "Proxy for OpenAI's Chat Completions. Send messages array and chat parameters, receive assistant replies."
       },
       {
         name: "Completions",
         method: "POST",
-        path: "https://x402market.app/openai/completions",
+        path: "https://hubx402.app/openai/completions",
         description: "Text completion endpoint for legacy or non-chat models like `text-davinci-003`."
       },
       {
         name: "Image Generations",
         method: "POST",
-        path: "https://x402market.app/openai/images/generations",
+        path: "https://hubx402.app/openai/images/generations",
         description: "Generate images using DALL·E style prompts. Returns base64 data or URLs depending on payload options."
       },
       {
         name: "Models",
         method: "GET",
-        path: "https://x402market.app/openai/models",
+        path: "https://hubx402.app/openai/models",
         description: "List the OpenAI models currently available through the gateway."
       }
     ],
@@ -91,18 +91,18 @@ runChat().catch(console.error);`,
     name: "Claude",
     slug: "claude",
     logo: "/logos/claude.png",
-    tagline: "Instant access. No API key required. Powered by x402.",
+    tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
-      "Call Anthropic Claude through the x402 gateway for high-quality reasoning and agentic workflows. Your wallet funds the usage, we forward the request with our managed Anthropic key.",
-    endpoint: "https://x402market.app/claude/messages",
+      "Call Anthropic Claude through the Hub X 402 gateway for high-quality reasoning and agentic workflows. Your wallet funds the usage, we forward the request with our managed Anthropic key.",
+    endpoint: "https://hubx402.app/claude/messages",
     method: "POST",
-    testUrl: "https://x402market.app/claude/messages",
-    codeSampleTitle: "Node (fetch) – Claude messages via x402",
+    testUrl: "https://hubx402.app/claude/messages",
+    codeSampleTitle: "Node (fetch) – Claude messages via Hub X 402",
     language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
 async function callClaude() {
-  const response = await fetch("https://x402market.app/claude/messages", {
+  const response = await fetch("https://hubx402.app/claude/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -131,28 +131,27 @@ callClaude().catch(console.error);`,
       {
         name: "Messages",
         method: "POST",
-        path: "https://x402market.app/claude/messages",
-        description: "Send Anthropic Claude chat messages and receive assistant replies via x402."
+        path: "https://hubx402.app/claude/messages",
+        description: "Send Anthropic Claude chat messages and receive assistant replies via Hub X 402."
       }
     ],
-  },
   },
   {
     name: "Stripe",
     slug: "stripe",
     logo: "/logos/stripe.png",
-    tagline: "Instant access. No API key required. Powered by x402.",
+    tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
       "Create on-demand charges and PaymentIntents through a wallet-backed Stripe proxy. Perfect for gating API calls with fiat billing.",
-    endpoint: "https://x402market.app/stripe/charges",
+    endpoint: "https://hubx402.app/stripe/charges",
     method: "POST",
-    testUrl: "https://x402market.app/stripe/charges",
+    testUrl: "https://hubx402.app/stripe/charges",
     codeSampleTitle: "Node – create a one-time charge",
     language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
 async function createCharge() {
-  const res = await fetch("https://x402market.app/stripe/charges", {
+  const res = await fetch("https://hubx402.app/stripe/charges", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -176,20 +175,20 @@ createCharge().catch(console.error);`,
       {
         name: "Charges",
         method: "POST",
-        path: "https://x402market.app/stripe/charges",
+        path: "https://hubx402.app/stripe/charges",
         description: "Create an immediate charge using a tokenized payment method."
       },
       {
         name: "PaymentIntents",
         method: "POST",
-        path: "https://x402market.app/stripe/payment_intents",
+        path: "https://hubx402.app/stripe/payment_intents",
         description: "Create PaymentIntents for multi-step confirmation flows."
       },
       {
         name: "Customers",
         method: "POST",
-        path: "https://x402market.app/stripe/customers",
-        description: "Register or look up customers that will be billed through x402."
+        path: "https://hubx402.app/stripe/customers",
+        description: "Register or look up customers that will be billed through Hub X 402."
       }
     ],
   },
@@ -197,18 +196,18 @@ createCharge().catch(console.error);`,
     name: "Google Sheets",
     slug: "google-sheets",
     logo: "/logos/google-sheets.png",
-    tagline: "Instant access. No API key required. Powered by x402.",
+    tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
-      "Read and write Sheets data without juggling service accounts. Each request is signed by x402 and billed through your wallet session.",
-    endpoint: "https://x402market.app/google-sheets/values/get",
+      "Read and write Sheets data without juggling service accounts. Each request is signed by Hub X 402 and billed through your wallet session.",
+    endpoint: "https://hubx402.app/google-sheets/values/get",
     method: "POST",
-    testUrl: "https://x402market.app/google-sheets/values/get",
+    testUrl: "https://hubx402.app/google-sheets/values/get",
     codeSampleTitle: "Node (fetch) – read a range",
     language: "javascript",
     codeSample: `import fetch from "node-fetch";
 
 async function readSheet() {
-  const response = await fetch("https://x402market.app/google-sheets/values/get", {
+  const response = await fetch("https://hubx402.app/google-sheets/values/get", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -234,19 +233,19 @@ readSheet().catch(console.error);`,
       {
         name: "Get values",
         method: "POST",
-        path: "https://x402market.app/google-sheets/values/get",
+        path: "https://hubx402.app/google-sheets/values/get",
         description: "Fetch a range of cells from a spreadsheet. Provide `spreadsheetId` and `range` in the body."
       },
       {
         name: "Update values",
         method: "POST",
-        path: "https://x402market.app/google-sheets/values/update",
+        path: "https://hubx402.app/google-sheets/values/update",
         description: "Overwrite a target range. Send `values` and optional `valueInputOption`."
       },
       {
         name: "Append values",
         method: "POST",
-        path: "https://x402market.app/google-sheets/values/append",
+        path: "https://hubx402.app/google-sheets/values/append",
         description: "Append rows to the end of a sheet. Supply the value rows and optional insert mode."
       }
     ],
@@ -255,15 +254,15 @@ readSheet().catch(console.error);`,
     name: "YouTube Data",
     slug: "youtube-data",
     logo: "/logos/youtube.png",
-    tagline: "Instant access. No API key required. Powered by x402.",	
+    tagline: "Instant access. No API key required. Powered by Hub X 402.",	
     summary:
       "Fetch channel stats, video metadata, and search results instantly for campaign dashboards or analytics overlays.",
-    endpoint: "https://x402market.app/google/youtube/search",
+    endpoint: "https://hubx402.app/google/youtube/search",
     method: "GET",
-    testUrl: "https://x402market.app/google/youtube/search?q=solana",
+    testUrl: "https://hubx402.app/google/youtube/search?q=solana",
     codeSampleTitle: "JavaScript – search by keyword",
     language: "typescript",
-    codeSample: `const res = await fetch("https://x402market.app/google/youtube/search?q=solana+news", {
+    codeSample: `const res = await fetch("https://hubx402.app/google/youtube/search?q=solana+news", {
   headers: {
     "x402-session": "session-token-from-x402",
     "x402-sender-wallet": "YourSenderWalletAddress"
@@ -276,19 +275,19 @@ console.log(data.items.map((item: any) => item.snippet.title));`,
       {
         name: "Search",
         method: "GET",
-        path: "https://x402market.app/google/youtube/search",
+        path: "https://hubx402.app/google/youtube/search",
         description: "Search for videos, channels, or playlists by keyword."
       },
       {
         name: "Videos",
         method: "GET",
-        path: "https://x402market.app/google/youtube/videos",
+        path: "https://hubx402.app/google/youtube/videos",
         description: "Fetch metadata and statistics for specific videos."
       },
       {
         name: "Channels",
         method: "GET",
-        path: "https://x402market.app/google/youtube/channels",
+        path: "https://hubx402.app/google/youtube/channels",
         description: "Retrieve information about channels, including subscriber counts and descriptions."
       }
     ],
@@ -297,12 +296,12 @@ console.log(data.items.map((item: any) => item.snippet.title));`,
     name: "Twilio",
     slug: "twilio",
     logo: "/logos/twilio.png",
-    tagline: "Instant access. No API key required. Powered by x402.",
+    tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
-      "Send SMS updates or voice call triggers via the x402 Twilio proxy. Perfect for notifying supporters when a campaign milestone hits.",
-    endpoint: "https://x402market.app/twilio/messages",
+      "Send SMS updates or voice call triggers via the Hub X 402 Twilio proxy. Perfect for notifying supporters when a campaign milestone hits.",
+    endpoint: "https://hubx402.app/twilio/messages",
     method: "POST",
-    testUrl: "https://x402market.app/twilio/messages",
+    testUrl: "https://hubx402.app/twilio/messages",
     codeSampleTitle: "Python – send an SMS alert",
     language: "python",
     codeSample: `import requests
@@ -314,7 +313,7 @@ payload = {
 }
 
 res = requests.post(
-    "https://x402market.app/twilio/messages",
+    "https://hubx402.app/twilio/messages",
     headers={
         "Content-Type": "application/json",
         "x402-session": "session-token-from-x402",
@@ -328,19 +327,19 @@ print(res.json())`,
       {
         name: "Messages",
         method: "POST",
-        path: "https://x402market.app/twilio/messages",
+        path: "https://hubx402.app/twilio/messages",
         description: "Send SMS messages via the Twilio API proxy."
       },
       {
         name: "Calls",
         method: "POST",
-        path: "https://x402market.app/twilio/calls",
+        path: "https://hubx402.app/twilio/calls",
         description: "Initiate outbound calls using Twilio voice capabilities."
       },
       {
         name: "Lookup",
         method: "GET",
-        path: "https://x402market.app/twilio/lookup",
+        path: "https://hubx402.app/twilio/lookup",
         description: "Verify phone numbers or fetch carrier metadata."
       }
     ],

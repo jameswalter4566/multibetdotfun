@@ -33,7 +33,7 @@ export default function Index() {
     <div className="flex min-h-screen bg-background text-foreground">
       <aside className="hidden sm:flex fixed inset-y-0 left-0 z-30 w-64 flex-col border-r border-border bg-background/95 backdrop-blur">
         <a href="/" className="flex flex-col gap-4 px-6 pt-8 pb-4">
-          <img src="/marketx-logo.png" alt="x402 marketplace" className="h-auto w-auto max-w-[220px]" />
+          <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-auto w-auto max-w-[220px]" />
         </a>
         <nav className="mt-6 flex-1 px-6">
           <ul className="flex flex-col gap-3 text-sm font-medium text-foreground/90">
@@ -70,20 +70,20 @@ export default function Index() {
             ))}
           </ul>
         </nav>
-        <div className="px-6 pb-8 text-xs text-muted-foreground/80">Powered by x402 — instant access for builders.</div>
+        <div className="px-6 pb-8 text-xs text-muted-foreground/80">Powered by Hub X 402 — instant access for builders.</div>
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col sm:ml-64">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-border bg-background/80 px-4 py-4 backdrop-blur sm:px-8">
           <div className="flex items-center gap-3 sm:hidden">
             <a href="/" className="flex items-center gap-3">
-              <img src="/marketx-logo.png" alt="x402 marketplace" className="h-auto w-auto max-w-[160px]" />
+              <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-auto w-auto max-w-[160px]" />
             </a>
           </div>
           <div className="flex flex-1 items-center justify-end gap-4">
             <UserBadge />
             <a
-              href="https://x.com/marketx402"
+              href="https://x.com/hubx402"
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-foreground/90 underline-offset-4 hover:underline"
@@ -102,7 +102,7 @@ export default function Index() {
                     Explore API marketplace
                   </h1>
                   <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-                    Connect to leading APIs instantly, bill usage through x402, and launch integrations without hunting for keys.
+                    Connect to leading APIs instantly, bill usage through Hub X 402, and launch integrations without hunting for keys.
                   </p>
                 </div>
                 <Button
@@ -173,7 +173,7 @@ export default function Index() {
               <div className="rounded-3xl border border-border bg-secondary/40 p-6 shadow-glow space-y-4">
                 <div className="text-lg font-semibold text-foreground">Add your API</div>
                 <p className="text-sm text-muted-foreground">
-                  Publish your endpoint to the marketplace and let builders call it instantly with x402 billing.
+                  Publish your endpoint to the marketplace and let builders call it instantly with Hub X 402 billing.
                 </p>
                 <Button
                   className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_12px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"

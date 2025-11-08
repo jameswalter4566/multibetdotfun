@@ -18,7 +18,7 @@ export default function Signup() {
       <header className="max-w-4xl mx-auto px-6 pt-24 pb-12 text-center">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Create your marketplace account</h1>
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-          One wallet-backed session unlocks publishing, analytics, and x402 billing across the entire platform.
+          One wallet-backed session unlocks publishing, analytics, and Hub X 402 billing across the entire platform.
         </p>
       </header>
 

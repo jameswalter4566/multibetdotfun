@@ -14,8 +14,8 @@ export default function ListAPI() {
             List your API on our marketplace
           </h1>
           <p className="mt-4 text-base text-muted-foreground sm:text-lg">
-            Tap into x402 wallet billing, instant discovery, and live sandboxing. Reach builders the moment your endpoint goes
-            live.
+            Tap into Hub X 402 wallet billing, instant discovery, and live sandboxing. Reach builders the moment your endpoint
+            goes live.
           </p>
           <div className="mt-8 flex justify-center">
             <Button
@@ -40,7 +40,7 @@ export default function ListAPI() {
           <div className="rounded-3xl border border-border bg-secondary/40 p-6 shadow-glow">
             <div className="text-lg font-semibold text-foreground">Wallet-native billing</div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Charge per call with x402. No API keys or manual onboarding flows required for new developers.
+              Charge per call with Hub X 402. No API keys or manual onboarding flows required for new developers.
             </p>
           </div>
           <div className="rounded-3xl border border-border bg-secondary/40 p-6 shadow-glow">

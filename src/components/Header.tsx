@@ -10,14 +10,14 @@ const Header = ({ className }: HeaderProps) => {
     <header className={cn("w-full nav-glass py-3 px-6 border-b border-border/30", className)}>
       <div className="container mx-auto flex items-center justify-between">
         <a href="/" className="flex items-center gap-2">
-          <img src="/marketx-logo.png" alt="x402 marketplace" className="h-8 w-auto" />
+          <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-8 w-auto" />
         </a>
         <nav className="hidden md:flex items-center gap-2">
           <a href="/#mission" className="ios-nav-link">Mission</a>
           <a href="/#workers" className="ios-nav-link">Explore Organizers</a>
           <a href="/campaigns" className="ios-nav-link">Campaigns</a>
           <a href="/explore" className="ios-nav-link">Explore Campaigns</a>
-          <a href="https://x.com/marketx402" target="_blank" rel="noreferrer" className="ios-nav-link">X</a>
+          <a href="https://x.com/hubx402" target="_blank" rel="noreferrer" className="ios-nav-link">X</a>
           <UserBadge />
         </nav>
       </div>
