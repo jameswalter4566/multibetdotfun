@@ -291,7 +291,7 @@ export default function ProviderDocumentation() {
               to="/agent"
               className="inline-flex w-full items-center justify-center rounded-2xl bg-[#a855f7] px-4 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(168,85,247,0.35)] transition-colors hover:bg-[#9333ea]"
             >
-              Create AI Automation
+              Create AI Automation (Beta)
             </Link>
           </div>
         </aside>

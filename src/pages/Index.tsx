@@ -22,7 +22,7 @@ export default function Index() {
     () => [
       { label: "Explore API market place", href: "#marketplace" },
       { label: "Documentation", href: docHome },
-      { label: "Create AI Automation", href: "/agent", cta: true },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
       { label: "Agent Playground", href: "/agent" },
       { label: "Test sandbox", href: "#sandbox" },
       { label: "Add your API", href: "/list-api" },

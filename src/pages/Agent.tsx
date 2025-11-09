@@ -33,7 +33,7 @@ export default function Agent() {
     () => [
       { label: "Explore API market place", href: "#marketplace" },
       { label: "Documentation", href: docHome },
-      { label: "Create AI Automation", href: "/agent", cta: true },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
     ],
     [docHome]
   );
