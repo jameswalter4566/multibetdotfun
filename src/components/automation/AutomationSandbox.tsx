@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { PlayCircle, Repeat } from "lucide-react";
 import { AUTOMATION_SUPPORT_WALLET } from "@/constants/automation";
@@ -62,12 +61,12 @@ const DEFAULT_AUTOMATION_NAME = "untitled";
 const DEFAULT_AUTOMATION_FLAGS = { autoPublish: false, moderation: true };
 
 const TerminalLog = ({ logs }: { logs: string[] }) => (
-  <Card className="border border-border/60 bg-background/80 backdrop-blur">
-    <CardHeader>
-      <CardTitle className="text-sm font-semibold text-foreground">Automation terminal</CardTitle>
-      <CardDescription>Raw AI responses captured during simulation.</CardDescription>
-    </CardHeader>
-    <CardContent className="max-h-64 overflow-y-auto rounded-lg bg-black/80 p-4 font-mono text-xs text-[#c5fffd]">
+  <div className="rounded-[32px] border border-white/5 bg-[#030712]/90 p-5 shadow-[0_30px_80px_rgba(3,7,18,0.65)] backdrop-blur">
+    <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/60">
+      <span>Automation terminal</span>
+      <span>live feed</span>
+    </div>
+    <div className="mt-4 max-h-60 overflow-y-auto rounded-2xl bg-black/70 p-4 font-mono text-xs text-[#c5fffd]">
       {logs.length === 0 ? (
         <p className="text-white/50">Run an automation to stream logs here.</p>
       ) : (
@@ -79,8 +78,8 @@ const TerminalLog = ({ logs }: { logs: string[] }) => (
           ))}
         </ul>
       )}
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 );
 
 const Connector = ({
@@ -234,19 +233,18 @@ export const AutomationSandbox = () => {
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Automation playground</h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground">Automation playground</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Drag and wire nodes to choreograph end-to-end workflows. Generate ideas with the assistant and simulate them locally
-            before deploying to production.
+            Drag nodes, wire third-party APIs, and stream raw logs while the agent drafts your workflow.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="secondary" className="rounded-full border-border/70 bg-background px-5 py-2 text-sm" onClick={resetLayout}>
+          <Button variant="secondary" className="rounded-full border-border/70 bg-background px-6 py-2 text-sm" onClick={resetLayout}>
             <Repeat className="mr-2 h-4 w-4" />
             Reset layout
           </Button>
           <Button
-            className="rounded-full bg-[#0ea5ff] px-5 py-2 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.5)] hover:bg-[#08b0ff]"
+            className="rounded-full bg-[#0ea5ff] px-6 py-2 text-sm font-semibold text-white shadow-[0_0_30px_rgba(14,165,255,0.55)] hover:bg-[#08b0ff]"
             onClick={simulateAutomation}
           >
             <PlayCircle className="mr-2 h-4 w-4" />
@@ -255,39 +253,41 @@ export const AutomationSandbox = () => {
         </div>
       </div>
 
-      <div
-        ref={canvasRef}
-        className="relative min-h-[640px] overflow-hidden rounded-3xl border border-border/60 bg-[#050b1f] p-8 shadow-[0_0_80px_rgba(8,47,73,0.45)]"
-        style={{ backgroundImage: CANVAS_BACKGROUND, backgroundSize: "40px 40px" }}
-      >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#0ea5ff24] to-transparent" />
-        {nodes.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-center">
-            <div className="max-w-sm space-y-3 text-sm text-white/70">
-              <p className="text-base font-semibold text-white">Your canvas is empty</p>
-              <p>Prompt the AI assistant to generate nodes or drag them in from the marketplace.</p>
+      <div className="relative flex-1 min-h-0 rounded-[48px] bg-[#04091c] p-10 shadow-[0_70px_120px_rgba(4,9,28,0.8)]">
+        <div
+          ref={canvasRef}
+          className="relative h-full w-full overflow-hidden rounded-[32px]"
+          style={{ backgroundImage: CANVAS_BACKGROUND, backgroundSize: "40px 40px" }}
+        >
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#0ea5ff24] to-transparent" />
+          {nodes.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-center">
+              <div className="max-w-sm space-y-3 text-sm text-white/70">
+                <p className="text-base font-semibold text-white">Your canvas is empty</p>
+                <p>Prompt the AI assistant to generate nodes or drag them in from the marketplace.</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="relative h-full w-full">
-            {connectorAnchors.map((edge) => (
-              <Connector key={edge.id} {...edge} />
-            ))}
-            {nodes.map((node) => (
-              <NodeCard
-                key={node.id}
-                node={node}
-                provideRef={(id, el) => {
-                  nodeRefs.current[id] = el;
-                  requestAnimationFrame(updateAnchors);
-                }}
-              />
-            ))}
-          </div>
-        )}
+          ) : (
+            <div className="relative h-full w-full">
+              {connectorAnchors.map((edge) => (
+                <Connector key={edge.id} {...edge} />
+              ))}
+              {nodes.map((node) => (
+                <NodeCard
+                  key={node.id}
+                  node={node}
+                  provideRef={(id, el) => {
+                    nodeRefs.current[id] = el;
+                    requestAnimationFrame(updateAnchors);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div id="sandbox"><TerminalLog logs={terminalLogs} /></div>
+      <TerminalLog logs={terminalLogs} />
     </div>
   );
 };

@@ -5,16 +5,23 @@ export interface AssistantChatMessage {
   content: string;
 }
 
-const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, "");
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
-const SUPABASE_FUNCTION_ENDPOINT = supabaseUrl ? `${supabaseUrl}/functions/v1/assistant-chat` : undefined;
-const LEGACY_ASSISTANT_ENDPOINT = "https://hubx402.app/api/assistant";
-const DEFAULT_ASSISTANT_ENDPOINT = SUPABASE_FUNCTION_ENDPOINT ?? LEGACY_ASSISTANT_ENDPOINT;
+const FALLBACK_SUPABASE_URL = "https://noftpjabkurphbiiaqqq.supabase.co";
+const FALLBACK_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5vZnRwamFia3VycGhiaWlhcXFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyNjAxNjIsImV4cCI6MjA3MzgzNjE2Mn0.dOcyIPkBGRJk3Bnxu9-WsFsJouFIBwyhtHruwYqu6Xs";
+
+const envSupabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+const resolvedSupabaseUrl = (envSupabaseUrl || FALLBACK_SUPABASE_URL).replace(/\/$/, "");
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim() || FALLBACK_SUPABASE_ANON_KEY;
+const SUPABASE_FUNCTION_ENDPOINT = `${resolvedSupabaseUrl}/functions/v1/assistant-chat`;
+
+const envAssistantEndpoint = (import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined)?.trim();
+const sanitizedEnvEndpoint =
+  envAssistantEndpoint && !envAssistantEndpoint.includes("hubx402.app") ? envAssistantEndpoint : undefined;
+const DEFAULT_ASSISTANT_ENDPOINT = sanitizedEnvEndpoint ?? SUPABASE_FUNCTION_ENDPOINT;
 const DEFAULT_SYSTEM_PROMPT =
   "You are an automation architect for the Hub X 402. When a user describes a task, explain how you will orchestrate it by combining our available third-party APIs (OpenAI, Claude, Google Sheets, Discord, on-chain actions, etc.). Always respond with a friendly plan that lists the nodes to create, the order they execute, and how much SOL/USDC to fund for execution.";
 
-export const getAutomationAssistantEndpoint = () =>
-  (import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined)?.trim() ?? DEFAULT_ASSISTANT_ENDPOINT;
+export const getAutomationAssistantEndpoint = () => DEFAULT_ASSISTANT_ENDPOINT;
 
 export interface AutomationAssistantRequest {
   prompt: string;
