@@ -289,7 +289,7 @@ export default function ProviderDocumentation() {
           <div className="px-6 pb-8">
             <Link
               to="/agent"
-              className="inline-flex w-full items-center justify-center rounded-2xl bg-[#0ea5ff] px-4 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.35)] transition-colors hover:bg-[#08b0ff]"
+              className="inline-flex w-full items-center justify-center rounded-2xl bg-[#a855f7] px-4 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(168,85,247,0.35)] transition-colors hover:bg-[#9333ea]"
             >
               Create AI Automation
             </Link>
@@ -330,7 +330,7 @@ export default function ProviderDocumentation() {
                   <Link to="/marketplace">All APIs</Link>
                 </Button>
                 <Button
-                  className="rounded-xl bg-[#0ea5ff] px-5 py-5 text-sm font-semibold text-white shadow-[0_0_16px_rgba(14,165,255,0.5)] hover:bg-[#08b0ff]"
+                  className="rounded-xl bg-[#a855f7] px-5 py-5 text-sm font-semibold text-white shadow-[0_0_16px_rgba(168,85,247,0.5)] hover:bg-[#9333ea]"
                   onClick={() => window.open(provider.testUrl, "_blank", "noopener")}
                 >
                   Test it
@@ -431,7 +431,7 @@ export default function ProviderDocumentation() {
                             <span className="font-mono text-[12px] text-foreground">{ep.path}</span>
                             <Button
                               size="sm"
-                              className="ml-auto rounded-full bg-[#0ea5ff] text-white hover:bg-[#08b0ff]"
+                              className="ml-auto rounded-full bg-[#a855f7] text-white hover:bg-[#9333ea]"
                               onClick={() => handleEndpointTry(index)}
                             >
                               Try it
@@ -519,7 +519,7 @@ export default function ProviderDocumentation() {
                 <Button
                   onClick={() => executeSandboxRequest(sandboxStatus === "payment_required")}
                   disabled={sandboxStatus === "loading"}
-                  className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+                  className="w-full rounded-xl bg-[#a855f7] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(168,85,247,0.6)] hover:bg-[#9333ea]"
                 >
                   {sandboxStatus === "payment_required" ? "Retry with mock X-PAYMENT" : "Call gateway"}
                 </Button>

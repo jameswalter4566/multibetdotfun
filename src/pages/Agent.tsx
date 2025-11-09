@@ -162,7 +162,7 @@ export default function Agent() {
                       "max-w-[90%] rounded-2xl px-4 py-3 text-sm shadow-sm",
                       message.role === "assistant"
                         ? "mr-auto bg-background/80 text-foreground"
-                        : "ml-auto bg-[#0ea5ff] text-white"
+                        : "ml-auto bg-[#a855f7] text-white"
                     )}
                   >
                     {message.content}

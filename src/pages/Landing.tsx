@@ -207,7 +207,7 @@ export default function Landing() {
               {heroLogos.slice(0, 18).map((logo, i) => (
                 <div
                   key={i}
-                  className="group h-28 md:h-32 rounded-2xl border border-white/20 bg-white/10 transition-all duration-200 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:ring-2 hover:ring-cyan-400/70"
+                  className="group h-28 md:h-32 rounded-2xl border border-white/20 bg-white/10 transition-all duration-200 hover:bg-cyan-500/10 hover:border-cyan-400/60 hover:shadow-[0_0_18px_rgba(168,85,247,0.6)] hover:ring-2 hover:ring-cyan-400/70"
                 >
                   <div className="h-full w-full flex items-center justify-center p-4">
                     <img
@@ -236,7 +236,7 @@ export default function Landing() {
             </div>
 
             <div className="hero-slide hero-slide-delay-3 mt-4 flex flex-col items-center gap-3">
-              <Button asChild className="rounded-xl bg-[#0ea5ff] hover:bg-[#08b0ff] text-white shadow-[0_0_16px_rgba(14,165,255,0.8)] text-base md:text-lg px-6 py-5">
+              <Button asChild className="rounded-xl bg-[#a855f7] hover:bg-[#9333ea] text-white shadow-[0_0_16px_rgba(168,85,247,0.8)] text-base md:text-lg px-6 py-5">
                 <Link to="/home">Explore API marketplace</Link>
               </Button>
               <div className="flex items-center justify-center gap-3">
@@ -334,7 +334,7 @@ export default function Landing() {
                   <img
                     src={tile.image}
                   alt={tile.alt}
-                  className="w-[220px] max-w-full object-contain drop-shadow-[0_0_24px_rgba(14,165,255,0.2)] mb-4"
+                  className="w-[220px] max-w-full object-contain drop-shadow-[0_0_24px_rgba(168,85,247,0.2)] mb-4"
                 />
                 <h3 className="text-xl md:text-2xl font-bold">{tile.title}</h3>
                 <ul className="mt-4 text-sm md:text-base text-muted-foreground space-y-1 list-disc pl-6 text-left w-full">

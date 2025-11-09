@@ -54,7 +54,7 @@ export default function Marketplace() {
               <div className="mt-auto pt-6">
                 <Button
                   type="button"
-                  className="w-full rounded-xl bg-[#0ea5ff] px-4 py-5 text-sm font-semibold text-white shadow-[0_0_12px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+                  className="w-full rounded-xl bg-[#a855f7] px-4 py-5 text-sm font-semibold text-white shadow-[0_0_12px_rgba(168,85,247,0.6)] hover:bg-[#9333ea]"
                   onClick={(event) => {
                     event.stopPropagation();
                     openDocs(provider.slug);

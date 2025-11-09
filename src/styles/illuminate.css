@@ -6,10 +6,9 @@
   color: rgba(255,255,255,0.85);
 }
 .glow-text:hover .glow-word {
-  color: #0ea5ff;
+  color: #a855f7;
 }
 /* progressive illumination: left to right by default; delay per index */
 .glow-text:hover .glow-word {
   transition-delay: calc(var(--i) * 70ms);
 }
-

@@ -65,7 +65,7 @@ const DashboardTopNav = ({ links, homePath = "/home" }: DashboardTopNavProps) =>
               onClick={() => handleNavigation(link.href)}
               className={cn(
                 "rounded-full border border-transparent px-3 py-1.5 transition-all duration-150 hover:border-border/70 hover:bg-accent/40",
-                link.cta && "bg-[#0ea5ff] px-4 py-2 font-semibold text-white shadow-[0_0_15px_rgba(14,165,255,0.35)] hover:bg-[#0c9ae8]"
+                link.cta && "bg-[#a855f7] px-4 py-2 font-semibold text-white shadow-[0_0_15px_rgba(168,85,247,0.35)] hover:bg-[#7e22ce]"
               )}
             >
               {link.label}

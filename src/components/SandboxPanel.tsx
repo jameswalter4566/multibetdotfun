@@ -261,7 +261,7 @@ const SandboxPanel = ({ className, initialProvider, lockedProvider = false }: Sa
         <Button
           onClick={handleTryIt}
           disabled={status === "loading" || hasCalledGateway}
-          className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full rounded-xl bg-[#a855f7] py-4 text-sm font-semibold text-white shadow-[0_0_14px_rgba(168,85,247,0.6)] hover:bg-[#9333ea] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           Call gateway
         </Button>

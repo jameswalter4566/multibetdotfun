@@ -206,7 +206,7 @@ export default function ProfilePage() {
                           return (
                             <div className="h-2 rounded-full bg-muted/50 overflow-hidden ring-1 ring-border relative">
                               <div
-                                className="h-full rounded-full bg-[#0ea5ff] shadow-[0_0_8px_rgba(14,165,255,0.9),_0_0_16px_rgba(14,165,255,0.6)]"
+                                className="h-full rounded-full bg-[#a855f7] shadow-[0_0_8px_rgba(168,85,247,0.9),_0_0_16px_rgba(168,85,247,0.6)]"
                                 style={{ width: `${pct}%` }}
                               />
                             </div>

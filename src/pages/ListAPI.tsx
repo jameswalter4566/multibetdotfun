@@ -8,7 +8,7 @@ export default function ListAPI() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#0ea5ff]/20 via-transparent to-purple-500/10 blur-3xl" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#a855f7]/20 via-transparent to-purple-500/10 blur-3xl" />
         <div className="max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
             List your API on our marketplace
@@ -20,7 +20,7 @@ export default function ListAPI() {
           <div className="mt-8 flex justify-center">
             <Button
               size="lg"
-              className="rounded-full bg-[#0ea5ff] px-10 py-6 text-base font-semibold text-white shadow-[0_0_18px_rgba(14,165,255,0.6)] hover:bg-[#08b0ff]"
+              className="rounded-full bg-[#a855f7] px-10 py-6 text-base font-semibold text-white shadow-[0_0_18px_rgba(168,85,247,0.6)] hover:bg-[#9333ea]"
               onClick={() => navigate("/signup")}
             >
               Sign up

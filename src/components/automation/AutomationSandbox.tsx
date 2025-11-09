@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PlayCircle, Repeat } from "lucide-react";
 import { AUTOMATION_SUPPORT_WALLET } from "@/constants/automation";
 
-const CANVAS_BACKGROUND = "radial-gradient(circle at 20px 20px, rgba(14,165,255,0.12) 0, rgba(14,165,255,0.12) 1px, transparent 1px)";
+const CANVAS_BACKGROUND = "radial-gradient(circle at 20px 20px, rgba(168,85,247,0.12) 0, rgba(168,85,247,0.12) 1px, transparent 1px)";
 
 type CanvasNode = {
   id: string;
@@ -27,8 +27,8 @@ const DEFAULT_NODES: CanvasNode[] = [
     id: "assistant-node",
     title: "AI assistant",
     description: "Understands tasks and orchestrates flows",
-    color: "rgba(14,165,255,0.18)",
-    borderColor: "rgba(14,165,255,0.5)",
+    color: "rgba(168,85,247,0.18)",
+    borderColor: "rgba(168,85,247,0.5)",
     position: { x: 80, y: 150 },
     logo: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f916.svg",
   },
@@ -244,7 +244,7 @@ export const AutomationSandbox = () => {
             Reset layout
           </Button>
           <Button
-            className="rounded-full bg-[#0ea5ff] px-6 py-2 text-sm font-semibold text-white shadow-[0_0_30px_rgba(14,165,255,0.55)] hover:bg-[#08b0ff]"
+            className="rounded-full bg-[#a855f7] px-6 py-2 text-sm font-semibold text-white shadow-[0_0_30px_rgba(168,85,247,0.55)] hover:bg-[#9333ea]"
             onClick={simulateAutomation}
           >
             <PlayCircle className="mr-2 h-4 w-4" />
@@ -253,13 +253,13 @@ export const AutomationSandbox = () => {
         </div>
       </div>
 
-      <div className="relative flex-1 min-h-0 rounded-[48px] bg-[#04091c] p-10 shadow-[0_70px_120px_rgba(4,9,28,0.8)]">
+      <div className="relative flex-1 min-h-0 rounded-[48px] bg-[#1a0833] p-10 shadow-[0_70px_120px_rgba(26,8,51,0.8)]">
         <div
           ref={canvasRef}
           className="relative h-full w-full overflow-hidden rounded-[32px]"
           style={{ backgroundImage: CANVAS_BACKGROUND, backgroundSize: "40px 40px" }}
         >
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#0ea5ff24] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#a855f724] to-transparent" />
           {nodes.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center">
               <div className="max-w-sm space-y-3 text-sm text-white/70">

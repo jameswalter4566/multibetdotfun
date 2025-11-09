@@ -59,7 +59,7 @@ export default function Signup() {
               Minimum 8 characters. Use a mix of letters, numbers, and symbols for best security.
             </p>
           </div>
-          <Button type="submit" className="w-full rounded-xl bg-[#0ea5ff] py-4 text-sm font-semibold text-white hover:bg-[#08b0ff]">
+          <Button type="submit" className="w-full rounded-xl bg-[#a855f7] py-4 text-sm font-semibold text-white hover:bg-[#9333ea]">
             Sign up
           </Button>
           {submitted && (

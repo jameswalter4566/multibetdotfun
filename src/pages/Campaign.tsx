@@ -429,12 +429,12 @@ export default function CampaignPage() {
                   <div className="text-xs text-muted-foreground">No messages yet. Be the first to chat.</div>
                 ) : (
                   messages.map((m: any) => (
-                    <div key={m.id} className={m.sc ? "text-base font-extrabold text-[#0ea5ff] drop-shadow-[0_0_12px_rgba(14,165,255,0.9)]" : "text-sm"}>
+                    <div key={m.id} className={m.sc ? "text-base font-extrabold text-[#a855f7] drop-shadow-[0_0_12px_rgba(168,85,247,0.9)]" : "text-sm"}>
                       <span className="text-muted-foreground">[{new Date(m.ts).toLocaleTimeString()}]</span>{' '}
                       <span className="font-medium">{m.user}:</span>{' '}
-                      {m.sc && <span className="px-2 py-0.5 rounded bg-[#0ea5ff]/20 border border-[#0ea5ff]/40 mr-1">SUPERCHAT</span>}
+                      {m.sc && <span className="px-2 py-0.5 rounded bg-[#a855f7]/20 border border-[#a855f7]/40 mr-1">SUPERCHAT</span>}
                       {m.text}
-                      {m.sc && m.amt ? <span className="ml-1 text-[#0ea5ff]">({m.amt.toFixed(2)} SOL)</span> : null}
+                      {m.sc && m.amt ? <span className="ml-1 text-[#a855f7]">({m.amt.toFixed(2)} SOL)</span> : null}
                     </div>
                   ))
                 )}
