@@ -19,6 +19,7 @@ import ListAPI from "./pages/ListAPI";
 import Signup from "./pages/Signup";
 import AdminWorkbench from "./pages/AdminWorkbench";
 import Automation from "./pages/Automation";
+import Agent from "./pages/Agent";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
             <Route path="/automation" element={<Automation />} />
+            <Route path="/agent" element={<Agent />} />
             <Route path="/list-api" element={<ListAPI />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/mein/arbeit" element={<AdminWorkbench />} />
