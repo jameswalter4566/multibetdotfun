@@ -139,7 +139,7 @@ callClaude().catch(console.error);`,
   {
     name: "Stripe",
     slug: "stripe",
-    logo: "/logos/stripe.png",
+    logo: "/logos/498440.webp",
     tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
       "Create on-demand charges and PaymentIntents through a wallet-backed Stripe proxy. Perfect for gating API calls with fiat billing.",
