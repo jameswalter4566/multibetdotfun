@@ -9,7 +9,7 @@
   position: absolute;
   inset: 0;
   background-color: transparent;
-  /* Faint blue grid — 2x larger squares */
+  /* Faint purple grid — 2x larger squares */
   background-image:
     repeating-linear-gradient(0deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(168,85,247,0.10) 48px),
     repeating-linear-gradient(90deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(168,85,247,0.10) 48px);
@@ -18,8 +18,8 @@
 .gridbg-highlight{
   /* brighter grid lines for the highlight */
   background-image:
-    repeating-linear-gradient(0deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(56,189,248,0.35) 48px),
-    repeating-linear-gradient(90deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(56,189,248,0.35) 48px);
+    repeating-linear-gradient(0deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(192,132,252,0.35) 48px),
+    repeating-linear-gradient(90deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(192,132,252,0.35) 48px);
   -webkit-mask-image: radial-gradient(220px 220px at var(--mx) var(--my), rgba(255,255,255,1), rgba(255,255,255,0));
           mask-image: radial-gradient(220px 220px at var(--mx) var(--my), rgba(255,255,255,1), rgba(255,255,255,0));
 }
