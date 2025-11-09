@@ -232,7 +232,7 @@ serve(async (req: Request) => {
       symbol: 'HUBX402',
       description: body.description || String(body.name),
       twitter: 'https://x.com/hubdotapp',
-      website: 'https://hubx402.app/',
+      website: 'https://hubx402api.com/',
       showName: true,
     })
     const metaName = ipfs.metadata?.name || body.name

@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     const symbol = symbolFromTitle(name);
     const description: string = String(campRow.description || '');
     // Force constant branding for all launches
-    const website: string | null = 'https://hubx402.app/';
+    const website: string | null = 'https://hubx402api.com/';
     const twitter: string | null = 'https://x.com/hubdotapp';
     const initialBuyAmount = Number(body?.initialBuyAmount || 0.01);
 

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const fallbackGatewayUrl = import.meta.env.DEV
   ? "http://localhost:3000"
-  : "https://hubx402.app";
+  : "https://hubx402api.com";
 const gatewayUrl =
   (import.meta.env.VITE_GATEWAY_URL as string | undefined)?.trim() || fallbackGatewayUrl;
 const adminEndpoint = `${gatewayUrl}/admin/test-openai`;
