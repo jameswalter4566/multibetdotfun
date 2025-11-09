@@ -7,6 +7,9 @@ import { AutomationSandbox } from "@/components/automation/AutomationSandbox";
 import SiteFooter from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
 import { requestAutomationAssistant } from "@/lib/assistant";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { AUTOMATION_SUPPORT_WALLET } from "@/constants/automation";
 
 type ChatRole = "assistant" | "user";
 
@@ -38,6 +41,15 @@ export default function Agent() {
   const [messages, setMessages] = useState<AgentMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isResponding, setIsResponding] = useState(false);
+  const { toast } = useToast();
+  const supportWallet = AUTOMATION_SUPPORT_WALLET;
+
+  const handleCopySupportWallet = () => {
+    navigator.clipboard
+      .writeText(supportWallet)
+      .then(() => toast({ title: "Wallet copied", description: "Support wallet copied to clipboard." }))
+      .catch(() => toast({ title: "Copy failed", variant: "destructive" }));
+  };
 
   const handleSend = async (event?: React.FormEvent) => {
     event?.preventDefault();
@@ -86,8 +98,56 @@ export default function Agent() {
         <span id="marketplace" className="sr-only" aria-hidden="true" />
         <div className="mx-auto grid h-full min-h-0 w-full max-w-[1700px] gap-8 lg:grid-cols-[minmax(360px,520px)_minmax(0,2.4fr)]">
           <section className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/35 p-7 shadow-glow">
-            <div>
+            <div className="flex items-start justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Agent chat</p>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="rounded-full border-border/70 bg-background/80 px-4 py-1">
+                    How it works
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-xl space-y-4">
+                  <DialogHeader>
+                    <DialogTitle>AI Automation assistant</DialogTitle>
+                    <DialogDescription>
+                      Tell us what you want to automate and the assistant will stitch together the right third-party APIs while you stay in the cockpit.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 text-sm text-muted-foreground">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">Agent wallet</p>
+                      <p className="mt-2">
+                        Fund this wallet before running live automations. It pays for on-chain verification and per-call usage (SOL or USDC).
+                      </p>
+                      <div className="mt-3 flex items-center gap-2 rounded-lg border border-border/60 bg-background px-3 py-2 font-mono text-xs text-foreground">
+                        <span className="truncate">{supportWallet}</span>
+                        <Button variant="ghost" size="sm" onClick={handleCopySupportWallet}>
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                    <p>
+                      Hey there! I&apos;m your automation co-pilot. Describe the workflow you want to orchestrate and I&apos;ll assemble the right third-party APIs from our marketplace to make it happen.
+                    </p>
+                    <div className="space-y-2">
+                      <p className="font-medium text-foreground">How it works</p>
+                      <p>
+                        Simply type in a task or service you&apos;d like to automate and the assistant will pick the most relevant APIs, describe the nodes it plans to deploy, and request funding when on-chain actions are required.
+                      </p>
+                      <ul className="list-disc space-y-1 pl-5">
+                        <li><span className="font-medium text-foreground">Auto publish replies</span> stay off by default so nothing ships without your sign-off.</li>
+                        <li><span className="font-medium text-foreground">Require review</span> keeps flows paused until you approve them.</li>
+                        <li>Keep this tab open while the assistant works so drafts sync to the sandbox.</li>
+                      </ul>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Type your automation in the chat input and hit Send—responses stream here while nodes update in the sandbox.
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div>
               <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Describe your workflow</h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 The assistant translates your prompt into nodes and sends the plan to the sandbox on the right.
