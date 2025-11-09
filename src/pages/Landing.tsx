@@ -43,12 +43,12 @@ const heroLogoSet: { src: string; alt: string }[] = [
   { src: "/logos/helius.png", alt: "Helius" },
   { src: "/logos/paypal.png", alt: "PayPal" },
   { src: "/logos/google-sheets.png", alt: "Google Sheets" },
-  { src: "/logos/claude.png", alt: "Claude" },
+  { src: "/logos/Claude_AI_symbol.svg", alt: "Claude" },
 ];
 
 const brandLogos: Record<string, string> = {
   OpenAI: "/logos/openai_logo.png",
-  Claude: "/logos/claude.png",
+  Claude: "/logos/Claude_AI_symbol.svg",
   Google: "/logos/google.webp",
   Stripe: "/logos/stripe.png",
   YouTube: "/logos/youtube.png",

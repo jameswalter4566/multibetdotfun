@@ -90,7 +90,7 @@ runChat().catch(console.error);`,
   {
     name: "Claude",
     slug: "claude",
-    logo: "/logos/claude.png",
+    logo: "/logos/Claude_AI_symbol.svg",
     tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
       "Call Anthropic Claude through the Hub X 402 gateway for high-quality reasoning and agentic workflows. Your wallet funds the usage, we forward the request with our managed Anthropic key.",
