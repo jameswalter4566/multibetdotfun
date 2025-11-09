@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
 import { apiProviders } from "@/data/apiProviders";
 import { Input } from "@/components/ui/input";
@@ -8,8 +8,10 @@ import SiteFooter from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
 import { requestAutomationAssistant } from "@/lib/assistant";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { AUTOMATION_SUPPORT_WALLET } from "@/constants/automation";
+import { createAgentSession, fetchAgentSessions, type AgentSession } from "@/services/agents";
 
 type ChatRole = "assistant" | "user";
 
@@ -27,6 +29,23 @@ const initialMessages: AgentMessage[] = [
   },
 ];
 
+const generateClientId = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+    const rand = (Math.random() * 16) | 0;
+    const value = char === "x" ? rand : (rand & 0x3) | 0x8;
+    return value.toString(16);
+  });
+};
+
+const deriveAgentTitle = (prompt: string) => {
+  const sanitized = prompt.trim().replace(/\s+/g, " ");
+  if (!sanitized) return "Untitled agent";
+  return sanitized.length > 48 ? `${sanitized.slice(0, 45)}…` : sanitized;
+};
+
 export default function Agent() {
   const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
   const navLinks: DashboardNavLink[] = useMemo(
@@ -41,8 +60,16 @@ export default function Agent() {
   const [messages, setMessages] = useState<AgentMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isResponding, setIsResponding] = useState(false);
+  const [clientId, setClientId] = useState("");
+  const [agentSessions, setAgentSessions] = useState<AgentSession[]>([]);
+  const [activeAgentId, setActiveAgentId] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingName, setOnboardingName] = useState("");
+  const [onboardingPrompt, setOnboardingPrompt] = useState("");
+  const [isSavingAgent, setIsSavingAgent] = useState(false);
   const { toast } = useToast();
   const supportWallet = AUTOMATION_SUPPORT_WALLET;
+  const activeAgent = useMemo(() => agentSessions.find((session) => session.id === activeAgentId) ?? null, [agentSessions, activeAgentId]);
 
   const handleCopySupportWallet = () => {
     navigator.clipboard
@@ -51,44 +78,151 @@ export default function Agent() {
       .catch(() => toast({ title: "Copy failed", variant: "destructive" }));
   };
 
+  useEffect(() => {
+    if (clientId) return;
+    let stored = "";
+    try {
+      stored = localStorage.getItem("agent-client-id") || "";
+    } catch {
+      stored = "";
+    }
+    if (!stored) {
+      stored = generateClientId();
+      try {
+        localStorage.setItem("agent-client-id", stored);
+      } catch {
+        // ignore storage errors
+      }
+    }
+    setClientId(stored);
+  }, [clientId]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await fetchAgentSessions(clientId);
+        if (cancelled) return;
+        setAgentSessions(data);
+        if (data.length) {
+          let storedActive = "";
+          try {
+            storedActive = localStorage.getItem("agent-active-agent-id") || "";
+          } catch {
+            storedActive = "";
+          }
+          const initial = data.find((session) => session.id === storedActive) ?? data[0];
+          setActiveAgentId(initial.id);
+        } else {
+          setShowOnboarding(true);
+        }
+      } catch (error) {
+        console.error("Failed to load agents", error);
+        toast({ title: "Unable to load agents", description: "Refresh to try again.", variant: "destructive" });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId, toast]);
+
+  useEffect(() => {
+    if (!activeAgentId) return;
+    try {
+      localStorage.setItem("agent-active-agent-id", activeAgentId);
+    } catch {
+      // noop
+    }
+  }, [activeAgentId]);
+
+  const sendPrompt = useCallback(
+    async (rawPrompt: string, options?: { historyBase?: AgentMessage[] }) => {
+      const trimmed = rawPrompt.trim();
+      if (!trimmed) return;
+      const baseHistory = options?.historyBase ?? messages;
+      const userMessage: AgentMessage = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: trimmed,
+      };
+      const historyForAssistant = [...baseHistory, userMessage];
+      setMessages(historyForAssistant);
+      setIsResponding(true);
+      try {
+        const { text } = await requestAutomationAssistant({
+          prompt: trimmed,
+          history: historyForAssistant.map(({ role, content }) => ({ role, content })),
+        });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `assistant-${Date.now()}`,
+            role: "assistant",
+            content: text,
+          },
+        ]);
+      } catch (error) {
+        console.error("Agent chat failed", error);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `assistant-${Date.now()}`,
+            role: "assistant",
+            content: "I couldn't reach the automation assistant. Please try again in a moment.",
+          },
+        ]);
+      } finally {
+        setIsResponding(false);
+      }
+    },
+    [messages]
+  );
+
   const handleSend = async (event?: React.FormEvent) => {
     event?.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isResponding) return;
-
-    const userMessage: AgentMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: trimmed,
-    };
-    const historyForAssistant = [...messages, userMessage].map(({ role, content }) => ({ role, content }));
-    setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsResponding(true);
+    await sendPrompt(trimmed);
+  };
 
+  const createNewAgent = () => {
+    setOnboardingName("");
+    setOnboardingPrompt("");
+    setShowOnboarding(true);
+  };
+
+  const handleAgentCreation = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmedPrompt = onboardingPrompt.trim();
+    if (!clientId || !trimmedPrompt) return;
+    setIsSavingAgent(true);
     try {
-      const { text } = await requestAutomationAssistant({ prompt: trimmed, history: historyForAssistant });
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `assistant-${Date.now()}`,
-          role: "assistant",
-          content: text,
-        },
-      ]);
+      const session = await createAgentSession(clientId, {
+        title: onboardingName.trim() || deriveAgentTitle(trimmedPrompt),
+        initialPrompt: trimmedPrompt,
+      });
+      setAgentSessions((prev) => [session, ...prev]);
+      setActiveAgentId(session.id);
+      setShowOnboarding(false);
+      setOnboardingName("");
+      setOnboardingPrompt("");
+      setMessages([...initialMessages]);
+      await sendPrompt(trimmedPrompt, { historyBase: initialMessages });
     } catch (error) {
-      console.error("Agent chat failed", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `assistant-${Date.now()}`,
-          role: "assistant",
-          content: "I couldn't reach the automation assistant. Please try again in a moment.",
-        },
-      ]);
+      console.error("Create agent failed", error);
+      toast({ title: "Unable to create agent", description: "Please try again.", variant: "destructive" });
     } finally {
-      setIsResponding(false);
+      setIsSavingAgent(false);
     }
+  };
+
+  const handleAgentSelection = async (session: AgentSession) => {
+    if (session.id === activeAgentId || isResponding) return;
+    setActiveAgentId(session.id);
+    setMessages([...initialMessages]);
+    await sendPrompt(session.initial_prompt, { historyBase: initialMessages });
   };
 
   return (
@@ -152,7 +286,44 @@ export default function Agent() {
               <p className="mt-2 text-sm text-muted-foreground">
                 The assistant translates your prompt into nodes and sends the plan to the sandbox on the right.
               </p>
+              {activeAgent && (
+                <div className="mt-4 rounded-2xl border border-border/60 bg-background/60 p-4">
+                  <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Active agent</p>
+                  <p className="mt-2 text-sm font-semibold text-foreground">
+                    {activeAgent.title || deriveAgentTitle(activeAgent.initial_prompt)}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-3">{activeAgent.initial_prompt}</p>
+                </div>
+              )}
             </div>
+
+            {agentSessions.length > 0 && (
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Your agents</p>
+                  <Button type="button" variant="ghost" size="sm" className="rounded-full px-3 py-1 text-xs" onClick={createNewAgent}>
+                    + New agent
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {agentSessions.map((session) => (
+                    <button
+                      key={session.id}
+                      type="button"
+                      onClick={() => handleAgentSelection(session)}
+                      className={cn(
+                        "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                        session.id === activeAgentId
+                          ? "border-[#a855f7]/70 bg-[#a855f7]/20 text-white"
+                          : "border-border/60 text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {session.title || deriveAgentTitle(session.initial_prompt)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mt-6 flex-1 min-h-0 space-y-3 overflow-y-auto pr-1">
               {messages.map((message) => (
@@ -197,6 +368,49 @@ export default function Agent() {
         </div>
       </main>
       <SiteFooter className="shrink-0 border-t border-border/60" />
+      <Dialog
+        open={showOnboarding}
+        onOpenChange={(open) => {
+          if (isSavingAgent) return;
+          setShowOnboarding(open);
+        }}
+      >
+        <DialogContent className="max-w-lg space-y-4">
+          <DialogHeader>
+            <DialogTitle>Spin up your first automation agent</DialogTitle>
+            <DialogDescription>
+              Give the agent a quick nickname and describe the workflow you want. We&apos;ll save it in your workspace and immediately draft the flow.
+            </DialogDescription>
+          </DialogHeader>
+          <form className="space-y-4" onSubmit={handleAgentCreation}>
+            <Input
+              value={onboardingName}
+              onChange={(event) => setOnboardingName(event.target.value)}
+              placeholder="Name this agent (optional)"
+            />
+            <Textarea
+              value={onboardingPrompt}
+              onChange={(event) => setOnboardingPrompt(event.target.value)}
+              placeholder="Describe the automation you need..."
+              rows={4}
+            />
+            <div className="flex items-center justify-end gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  if (!isSavingAgent) setShowOnboarding(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSavingAgent || !onboardingPrompt.trim()}>
+                {isSavingAgent ? "Creating..." : "Create & start"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
