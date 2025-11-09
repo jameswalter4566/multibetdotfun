@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
 import Index from "./pages/Index";
-import Landing from "./pages/Landing";
 import Marketplace from "./pages/Marketplace";
 import Stream from "./pages/Stream";
 import Profile from "./pages/Profile";
@@ -30,9 +29,8 @@ const App = () => (
       <div className="app-content">
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<Index />} />
             <Route path="/home" element={<Index />} />
-            <Route path="/landing" element={<Landing />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/documentation/:slug" element={<ProviderDocumentation />} />
             <Route path="/agent" element={<Agent />} />
