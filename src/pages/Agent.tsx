@@ -22,11 +22,37 @@ type AgentMessage = {
   content: string;
 };
 
+const suggestionTemplate = [
+  "Here are 5 smart automations you can run with OpenAI + Google Sheets right now:",
+  "",
+  "1) Lead Enrichment & Scoring",
+  "- Sheet: Leads!A:F (A: Name, B: Email, C: Free Note, D: Industry, E: Intent, F: Score)",
+  "- Flow: New row → Apps Script calls OpenAI → JSON back into D–F (industry, intent, score, reason)",
+  "",
+  "2) Meeting Notes → Action Items & CRM Summary",
+  "- Sheet: Meetings!A:D (A: Raw Notes, B: Summary, C: Action Items, D: Next Steps)",
+  "- Flow: Paste notes → OpenAI returns structured summary + bullets",
+  "",
+  "3) Ad Copy Generator (5 angles per row)",
+  "- Sheet: Ads!A:G (A: Product, B: Audience, C: USP, D: Tone, E: Variant #, F: Angle, G: Copy)",
+  "- Flow: Fill A–D → Loop prompts OpenAI for 5 angles (pain, proof, urgency, curiosity, value)",
+  "",
+  "4) Customer Support Macros",
+  "- Sheet: Support!A:E (A: Ticket, B: Short Reply, C: Long Reply, D: Sentiment, E: Tags)",
+  "- Flow: New ticket → OpenAI returns sentiment, tags, 2 reply lengths",
+  "",
+  "5) Content Calendar Builder",
+  "- Sheet: Content!A:F (A: Theme, B: Keyword, C: Platform, D: Title, E: Outline, F: Hashtags)",
+  "- Flow: Fill A–C → OpenAI drafts title (≤70 chars), 3-point outline, 8–12 hashtags",
+  "",
+  "Tell me which one to stage (or describe your own) and I’ll wire the steps."
+].join("\n");
+
 const initialMessages: AgentMessage[] = [
   {
     id: "assistant-welcome",
     role: "assistant",
-    content: "Hey! I can wire up Solana + web2 APIs inside the sandbox. What do you want to build today?",
+    content: `Hey! I can wire up OpenAI + Google Sheets automations instantly inside the sandbox. What do you want to build today?\n\n${suggestionTemplate}`,
   },
 ];
 
