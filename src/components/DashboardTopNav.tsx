@@ -68,11 +68,15 @@ const DashboardTopNav = ({ links, homePath = "/home" }: DashboardTopNavProps) =>
   const handleNavigation = useCallback(
     (href: string) => {
       if (href.startsWith("#")) {
-        if (typeof document !== "undefined") {
-          const target = document.querySelector(href);
-          if (target) {
-            target.scrollIntoView({ behavior: "smooth", block: "start" });
-            return;
+        // Only scroll in-place on home routes; otherwise go to home with hash
+        const onHome = location.pathname === "/" || location.pathname === "/home";
+        if (onHome) {
+          if (typeof document !== "undefined") {
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+              return;
+            }
           }
         }
         if (typeof window !== "undefined") {
@@ -95,7 +99,7 @@ const DashboardTopNav = ({ links, homePath = "/home" }: DashboardTopNavProps) =>
 
       navigate(href);
     },
-    [homePath, navigate]
+    [homePath, navigate, location.pathname]
   );
 
   return (
