@@ -25,8 +25,15 @@ const DashboardTopNav = ({ links, homePath = "/home" }: DashboardTopNavProps) =>
   const location = useLocation();
 
   const dedupedLinks: DashboardNavLink[] = useMemo(() => {
+    // Remove sandbox link entirely
+    const filtered = links.filter((l) => {
+      const label = (l.label || '').toLowerCase();
+      const href = (l.href || '').toLowerCase();
+      return !(href === '#sandbox' || label.includes('sandbox'));
+    });
+
     const byHref = new Map<string, DashboardNavLink>();
-    for (const link of links) {
+    for (const link of filtered) {
       const existing = byHref.get(link.href);
       if (!existing) {
         byHref.set(link.href, link);
@@ -148,9 +155,12 @@ const DashboardTopNav = ({ links, homePath = "/home" }: DashboardTopNavProps) =>
             href="https://x.com/hubdotapp"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium text-foreground/90 underline-offset-4 hover:underline"
+            aria-label="Follow us on X"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/70 bg-background/80 hover:bg-accent/40"
           >
-            Follow us on X
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <path fill="currentColor" d="M3.5 0H9l4.5 6.5L18 0h6l-7.5 9.2L24 24h-5.5l-4.7-6.9L9 24H3.5l7.7-9.5L3.5 0Z" />
+            </svg>
           </a>
         </div>
       </div>
