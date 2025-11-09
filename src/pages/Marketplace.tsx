@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { apiProviders } from "@/data/apiProviders";
 import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { Input } from "@/components/ui/input";
 
 export default function Marketplace() {
   const navigate = useNavigate();
@@ -26,16 +27,80 @@ export default function Marketplace() {
     [navigate]
   );
 
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<string>("all");
+
+  const categoryOf = (slug: string): string => {
+    if (["openai", "claude"].includes(slug)) return "ai";
+    if (["stripe", "paypal"].includes(slug)) return "payments";
+    if (["google-sheets", "youtube"].includes(slug)) return "data";
+    if (["twilio"].includes(slug)) return "comms";
+    return "other";
+  };
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return apiProviders.filter((p) => {
+      const matchesQuery = !q ||
+        p.name.toLowerCase().includes(q) ||
+        p.summary.toLowerCase().includes(q) ||
+        p.tagline.toLowerCase().includes(q);
+      const cat = categoryOf(p.slug);
+      const matchesCat = category === "all" || cat === category;
+      return matchesQuery && matchesCat;
+    });
+  }, [search, category]);
+
+  const categories: Array<{ key: string; label: string }> = [
+    { key: "all", label: "All" },
+    { key: "ai", label: "AI" },
+    { key: "payments", label: "Payments" },
+    { key: "data", label: "Data" },
+    { key: "comms", label: "Comms" },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <DashboardTopNav links={navLinks} />
-      <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
-        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-center">API Marketplace</h1>
-        <p className="mt-3 text-center text-muted-foreground text-base md:text-lg">
-          Browse and call top third‑party APIs via a single unified endpoint.
-        </p>
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {apiProviders.map((provider) => (
+      <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
+        {/* Hero header */}
+        <div className="text-center">
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Explore API marketplace</h1>
+          <p className="mt-3 text-muted-foreground text-base md:text-lg">
+            Unified endpoints, wallet-native billing, instant docs. No provider keys required.
+          </p>
+        </div>
+
+        {/* Controls */}
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            {categories.map((c) => (
+              <button
+                key={c.key}
+                className={`rounded-full border px-3 py-1.5 text-sm ${
+                  category === c.key
+                    ? "bg-accent/60 border-border/70"
+                    : "border-border/40 hover:bg-accent/40"
+                }`}
+                onClick={() => setCategory(c.key)}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+          <div className="w-full sm:w-72">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search providers…"
+              className="rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((provider) => (
             <div
               key={provider.slug}
               role="link"
@@ -62,7 +127,12 @@ export default function Marketplace() {
                   />
                 </div>
                 <div className="mt-4 text-lg font-semibold text-foreground">{provider.name}</div>
-                <div className="mt-2 text-sm text-muted-foreground">{provider.tagline}</div>
+                <div className="mt-1">
+                  <span className="inline-block rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground">
+                    {categoryOf(provider.slug)}
+                  </span>
+                </div>
+                <div className="mt-2 text-sm text-muted-foreground line-clamp-2">{provider.tagline}</div>
               </div>
 
               <div className="mt-auto pt-6">
@@ -79,6 +149,11 @@ export default function Marketplace() {
               </div>
             </div>
           ))}
+          {filtered.length === 0 && (
+            <div className="col-span-full text-center text-sm text-muted-foreground py-10">
+              No providers match your filters.
+            </div>
+          )}
         </div>
       </div>
     </div>
