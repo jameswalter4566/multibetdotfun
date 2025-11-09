@@ -232,7 +232,6 @@ export default function Agent() {
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       <DashboardTopNav links={navLinks} />
       <main className="relative flex flex-1 min-h-0 overflow-hidden px-4 py-4 sm:px-8 lg:px-12">
-        <span id="marketplace" className="sr-only" aria-hidden="true" />
         <div className="mx-auto grid h-full min-h-0 w-full max-w-[1900px] gap-10 lg:grid-cols-[minmax(340px,480px)_minmax(0,3fr)]">
           <section className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/35 p-7 shadow-glow">
             <div className="flex items-start justify-between gap-4">
