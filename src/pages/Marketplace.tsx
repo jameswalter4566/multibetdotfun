@@ -147,15 +147,14 @@ export default function Marketplace() {
         </section>
 
         {/* Controls + full catalog */}
-        <section id="providers-grid" className="mt-12 grid gap-6 lg:grid-cols-[260px_1fr]">
-          {/* Sidebar filters */}
-          <aside className="h-max rounded-3xl border border-border bg-secondary/35 p-4 shadow-glow sticky top-24 self-start hidden lg:block">
-            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Filters</div>
-            <div className="mt-3 grid gap-2">
+        <section id="providers-grid" className="mt-12 space-y-4">
+          {/* Top filters row */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex w-full items-center gap-2 overflow-x-auto pb-1">
               {categories.map((c) => (
                 <button
                   key={c.key}
-                  className={`w-full rounded-full border px-3 py-1.5 text-sm text-left ${
+                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm ${
                     category === c.key
                       ? "bg-accent/60 border-border/70"
                       : "border-border/40 hover:bg-accent/40"
@@ -166,7 +165,7 @@ export default function Marketplace() {
                 </button>
               ))}
             </div>
-            <div className="mt-4">
+            <div className="w-full sm:w-72">
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -174,61 +173,67 @@ export default function Marketplace() {
                 className="rounded-full"
               />
             </div>
-          </aside>
+          </div>
 
           {/* Grid */}
-          <div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {nonFeatured.map((provider) => (
-                <div
-                  key={provider.slug}
-                  role="link"
-                  tabIndex={0}
-                  aria-label={`View documentation for ${provider.name}`}
-                  className="ios-card flex cursor-pointer flex-col p-6 transition-transform duration-200 hover:-translate-y-1"
-                  onClick={() => openDocs(provider.slug)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      openDocs(provider.slug);
-                    }
-                  }}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-border/60 bg-secondary/50">
-                      <img
-                        src={provider.logo || "/placeholder.svg"}
-                        alt={provider.name}
-                        className="h-12 w-12 object-contain"
-                        onError={(event) => {
-                          (event.currentTarget as HTMLImageElement).src = "/placeholder.svg";
-                        }}
-                      />
-                    </div>
-                    <div className="mt-4 text-lg font-semibold text-foreground">{provider.name}</div>
-                    <div className="mt-1">
-                      <span className="inline-block rounded-full border border-border/60 px-2 py-0.5 text-[11px] text-muted-foreground">
-                        {categoryOf(provider.slug)}
-                      </span>
-                    </div>
-                    <div className="mt-2 text-sm text-muted-foreground line-clamp-2">{provider.tagline}</div>
-                  </div>
-
-                  <div className="mt-auto pt-6">
-                    <Button
-                      type="button"
-                      className="w-full rounded-xl bg-[#a855f7] px-4 py-5 text-sm font-semibold text-white shadow-[0_0_12px_rgba(168,85,247,0.6)] hover:bg-[#9333ea]"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        openDocs(provider.slug);
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {nonFeatured.map((p) => (
+              <div
+                key={p.slug}
+                role="link"
+                tabIndex={0}
+                aria-label={`View documentation for ${p.name}`}
+                className="ios-card relative flex cursor-pointer flex-col overflow-hidden p-6 transition-transform duration-200 hover:-translate-y-1"
+                onClick={() => openDocs(p.slug)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openDocs(p.slug);
+                  }
+                }}
+              >
+                <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, #a855f7 0, transparent 60%), radial-gradient(circle at 80% 0%, #06b6d4 0, transparent 50%)' }} />
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-2xl border border-border/60 bg-secondary/50">
+                    <img
+                      src={p.logo || "/placeholder.svg"}
+                      alt={p.name}
+                      className="h-14 w-14 object-contain"
+                      onError={(event) => {
+                        (event.currentTarget as HTMLImageElement).src = "/placeholder.svg";
                       }}
-                    >
-                      Test Endpoint now
-                    </Button>
+                    />
                   </div>
+                  <div className="mt-4 text-lg font-semibold text-foreground">{p.name}</div>
+                  <div className="mt-2 text-sm text-muted-foreground line-clamp-2">{p.tagline}</div>
+                  {Array.isArray(p.endpoints) && p.endpoints.length > 0 && (
+                    <div className="mt-4 grid w-full grid-cols-1 gap-2 text-left">
+                      {p.endpoints.slice(0,2).map((e) => (
+                        <div key={e.path} className="flex items-center gap-2 text-xs">
+                          <span className="rounded-full border border-border/60 px-2 py-0.5 font-mono">
+                            {e.method}
+                          </span>
+                          <span className="truncate font-mono text-[11px] text-muted-foreground" title={e.path}>{e.path}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+
+                <div className="mt-auto pt-6">
+                  <Button
+                    type="button"
+                    className="w-full rounded-xl bg-[#a855f7] px-4 py-5 text-sm font-semibold text-white shadow-[0_0_12px_rgba(168,85,247,0.6)] hover:bg-[#9333ea]"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openDocs(p.slug);
+                    }}
+                  >
+                    Test Endpoint now
+                  </Button>
+                </div>
+              </div>
+            ))}
             {nonFeatured.length === 0 && (
               <div className="col-span-full text-center text-sm text-muted-foreground py-10">
                 No providers match your filters.
