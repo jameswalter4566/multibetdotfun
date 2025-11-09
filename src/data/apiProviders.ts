@@ -295,7 +295,7 @@ console.log(data.items.map((item: any) => item.snippet.title));`,
   {
     name: "Twilio",
     slug: "twilio",
-    logo: "/logos/twilio.png",
+    logo: "/logos/free-twilio-icon-svg-download-png-3030259.webp",
     tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
       "Send SMS updates or voice call triggers via the Hub X 402 Twilio proxy. Perfect for notifying supporters when a campaign milestone hits.",
