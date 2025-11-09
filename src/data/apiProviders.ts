@@ -22,7 +22,7 @@ export const apiProviders: ApiProvider[] = [
   {
     name: "OpenAI",
     slug: "openai",
-    logo: "/logos/openai.png",
+    logo: "/logos/openai_logo.png",
     tagline: "Instant access. No API key required. Powered by Hub X 402.",
     summary:
       "Use Hub X 402 to call OpenAI's APIs without sharing or storing your own keys. Pay with the Hub X 402 protocol, send your request to our gateway, and we forward it securely using our managed OpenAI account.",

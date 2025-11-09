@@ -34,7 +34,7 @@ const marqueeLogosBottom = [
 ];
 
 const heroLogoSet: { src: string; alt: string }[] = [
-  { src: "/logos/openai.png", alt: "OpenAI" },
+  { src: "/logos/openai_logo.png", alt: "OpenAI" },
   { src: "/logos/stripe.png", alt: "Stripe" },
   { src: "/logos/google.webp", alt: "Google" },
   { src: "/logos/twilio.png", alt: "Twilio" },
@@ -47,7 +47,7 @@ const heroLogoSet: { src: string; alt: string }[] = [
 ];
 
 const brandLogos: Record<string, string> = {
-  OpenAI: "/logos/openai.png",
+  OpenAI: "/logos/openai_logo.png",
   Claude: "/logos/claude.png",
   Google: "/logos/google.webp",
   Stripe: "/logos/stripe.png",
