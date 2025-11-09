@@ -227,7 +227,7 @@ export const AutomationSandbox = () => {
   };
 
   return (
-    <div id="marketplace" className="space-y-8">
+    <div id="marketplace" className="flex h-full flex-col gap-8">
       <style>{`
         @keyframes automation-dash { to { stroke-dashoffset: -180; } }
       `}</style>

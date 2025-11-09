@@ -5,12 +5,16 @@ export interface AssistantChatMessage {
   content: string;
 }
 
-const DEFAULT_ASSISTANT_ENDPOINT = "https://hubx402.app/api/assistant";
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, "");
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
+const SUPABASE_FUNCTION_ENDPOINT = supabaseUrl ? `${supabaseUrl}/functions/v1/assistant-chat` : undefined;
+const LEGACY_ASSISTANT_ENDPOINT = "https://hubx402.app/api/assistant";
+const DEFAULT_ASSISTANT_ENDPOINT = SUPABASE_FUNCTION_ENDPOINT ?? LEGACY_ASSISTANT_ENDPOINT;
 const DEFAULT_SYSTEM_PROMPT =
   "You are an automation architect for the Hub X 402. When a user describes a task, explain how you will orchestrate it by combining our available third-party APIs (OpenAI, Claude, Google Sheets, Discord, on-chain actions, etc.). Always respond with a friendly plan that lists the nodes to create, the order they execute, and how much SOL/USDC to fund for execution.";
 
 export const getAutomationAssistantEndpoint = () =>
-  (import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined) ?? DEFAULT_ASSISTANT_ENDPOINT;
+  (import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined)?.trim() ?? DEFAULT_ASSISTANT_ENDPOINT;
 
 export interface AutomationAssistantRequest {
   prompt: string;
@@ -58,9 +62,18 @@ export const requestAutomationAssistant = async <T = unknown>({
   moderation,
   systemPrompt,
 }: AutomationAssistantRequest): Promise<AutomationAssistantResponse<T>> => {
-  const response = await fetch(getAutomationAssistantEndpoint(), {
+  const endpoint = getAutomationAssistantEndpoint();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (SUPABASE_FUNCTION_ENDPOINT && endpoint === SUPABASE_FUNCTION_ENDPOINT && supabaseAnonKey) {
+    headers["apikey"] = supabaseAnonKey;
+    headers["Authorization"] = `Bearer ${supabaseAnonKey}`;
+  }
+
+  const response = await fetch(endpoint, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(
       buildRequestBody({
         automationName,

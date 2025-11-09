@@ -96,7 +96,7 @@ export default function Agent() {
       <DashboardTopNav links={navLinks} />
       <main className="relative flex flex-1 min-h-0 overflow-hidden px-4 py-4 sm:px-8 lg:px-12">
         <span id="marketplace" className="sr-only" aria-hidden="true" />
-        <div className="mx-auto grid h-full min-h-0 w-full max-w-[1700px] gap-8 lg:grid-cols-[minmax(360px,520px)_minmax(0,2.4fr)]">
+        <div className="mx-auto grid h-full min-h-0 w-full max-w-[1900px] gap-10 lg:grid-cols-[minmax(340px,480px)_minmax(0,3fr)]">
           <section className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/35 p-7 shadow-glow">
             <div className="flex items-start justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Agent chat</p>
@@ -191,15 +191,8 @@ export default function Agent() {
             </form>
           </section>
 
-          <section
-            id="sandbox"
-            className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/30 p-8 shadow-[0_25px_60px_rgba(8,47,73,0.45)]"
-          >
-            <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border/70 bg-background/85 p-5">
-              <div className="flex-1 min-h-0 overflow-auto rounded-2xl">
-                <AutomationSandbox />
-              </div>
-            </div>
+          <section id="sandbox" className="flex h-full min-h-0 flex-col">
+            <AutomationSandbox />
           </section>
         </div>
       </main>
