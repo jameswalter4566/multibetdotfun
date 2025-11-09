@@ -7,6 +7,7 @@ import { AutomationSandbox } from "@/components/automation/AutomationSandbox";
 import SiteFooter from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
 import { requestAutomationAssistant } from "@/lib/assistant";
+import { formatAutomationAssistantResponse } from "@/lib/agentFormatter";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -162,7 +163,7 @@ export default function Agent() {
           {
             id: `assistant-${Date.now()}`,
             role: "assistant",
-            content: text,
+            content: formatAutomationAssistantResponse({ prompt: trimmed, assistantPlan: text }),
           },
         ]);
       } catch (error) {
