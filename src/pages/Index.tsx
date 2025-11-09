@@ -22,7 +22,7 @@ export default function Index() {
 
   const navLinks: DashboardNavLink[] = useMemo(
     () => [
-      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Explore API market place", href: "/marketplace" },
       { label: "Documentation", href: docHome },
       { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
       { label: "Agent Playground", href: "/agent" },
@@ -67,7 +67,7 @@ export default function Index() {
 
         {/* Marketplace preview + Sandbox */}
         <div className="mt-8 max-w-7xl mx-auto space-y-10 xl:space-y-0 xl:grid xl:grid-cols-[minmax(0,2fr)_minmax(360px,1fr)] xl:gap-10">
-          <section id="marketplace">
+          <section>
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-extrabold tracking-tight">Featured providers</h2>
               <a href="/marketplace" className="text-sm underline text-muted-foreground hover:text-foreground">View all</a>

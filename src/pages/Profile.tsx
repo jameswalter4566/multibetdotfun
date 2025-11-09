@@ -35,7 +35,7 @@ export default function ProfilePage() {
   const docHome = useReactMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
   const navLinks: DashboardNavLink[] = useReactMemo(
     () => [
-      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Explore API market place", href: "/marketplace" },
       { label: "Documentation", href: docHome },
       { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
       { label: "Agent Playground", href: "/agent" },
