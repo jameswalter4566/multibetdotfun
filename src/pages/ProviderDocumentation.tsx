@@ -5,16 +5,30 @@ import SiteFooter from "@/components/SiteFooter";
 import { apiProviders, getProviderBySlug } from "@/data/apiProviders";
 import type { ApiProvider } from "@/data/apiProviders";
 import { sandboxDefaultPayloads, sandboxSamples } from "@/components/SandboxPanel";
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
 
 type SandboxStatus = "idle" | "loading" | "success" | "error" | "payment_required";
 
 export default function ProviderDocumentation() {
   const { slug } = useParams<{ slug: string }>();
   const provider = getProviderBySlug(slug);
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
 
   if (!provider) {
     return (
       <div className="min-h-screen bg-background text-foreground">
+        <DashboardTopNav links={navLinks} />
         <div className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center gap-6 px-6 text-center">
           <div className="text-3xl font-semibold">Provider not found</div>
           <p className="text-muted-foreground">
@@ -254,6 +268,7 @@ export default function ProviderDocumentation() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <DashboardTopNav links={navLinks} />
       <div className="flex min-h-screen flex-col lg:flex-row">
         <aside className="hidden lg:flex lg:w-72 lg:flex-col lg:border-r lg:border-border lg:bg-secondary/30">
           <Link

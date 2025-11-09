@@ -1,11 +1,12 @@
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { agoraLive } from '@/services/agoraLive';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { supabase } from '@/integrations/supabase/client';
 import { connectPhantom } from '@/lib/phantom';
 import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import UserBadge from '@/components/UserBadge';
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { apiProviders } from "@/data/apiProviders";
 import StreamSettingsModal from '@/components/StreamSettingsModal';
 
   type Campaign = {
@@ -33,6 +34,18 @@ type DBUser = {
 };
 
 export default function CampaignPage() {
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
   const { id } = useParams<{ id: string }>();
   const campaignId = useMemo(() => Number(id || 0) || 0, [id]);
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -258,19 +271,7 @@ export default function CampaignPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top-left logo */}
-      <Link to="/" className="fixed top-2 left-12 md:left-16 z-30 block">
-        <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-      </Link>
-      {/* Top-right nav (match Index nav) */}
-      <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">
-        <a href="/#mission" className="text-foreground/90 hover:underline text-sm md:text-base">Mission</a>
-        <a href="/#workers" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Organizers</a>
-        <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Campaigns</a>
-        <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Campaign</a>
-        <UserBadge />
-        <a href="https://x.com/hubdotapp" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
-      </nav>
+      <DashboardTopNav links={navLinks} />
 
       <div className="container mx-auto px-2 md:px-4 pt-20 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">

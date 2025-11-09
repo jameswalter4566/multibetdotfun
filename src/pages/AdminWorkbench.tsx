@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { apiProviders } from "@/data/apiProviders";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +17,18 @@ const testWallet = "7FHxcYUCcyFmh35froTpsHa9YwA5euALXFaH7ykVATYh";
 type RequestState = "idle" | "loading" | "success" | "error";
 
 const AdminWorkbench = () => {
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
   const [status, setStatus] = useState<RequestState>("idle");
   const [resultText, setResultText] = useState<string>("");
   const [errorText, setErrorText] = useState<string>("");
@@ -73,6 +88,7 @@ const AdminWorkbench = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <DashboardTopNav links={navLinks} />
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-8 px-6 py-12">
         <header className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/80">

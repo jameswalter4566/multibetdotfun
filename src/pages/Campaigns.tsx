@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import CampaignCreateModal from '@/components/CampaignCreateModal';
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { useMemo as useReactMemo } from 'react';
+import { apiProviders } from "@/data/apiProviders";
 import { Button } from '@/components/ui/button';
 
 type Campaign = {
@@ -19,6 +22,18 @@ type Campaign = {
 };
 
 export default function CampaignsPage() {
+  const docHome = useReactMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useReactMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
   const [open, setOpen] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,10 +68,8 @@ export default function CampaignsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <a href="/" className="fixed top-2 left-12 md:left-16 z-20 block">
-        <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-      </a>
-      <main className="container mx-auto px-4 pt-24 pb-10 max-w-5xl">
+      <DashboardTopNav links={navLinks} />
+      <main className="container mx-auto px-4 pt-20 pb-10 max-w-5xl">
         <div className="bg-card border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <h1 className="text-xl font-semibold">Your Launches</h1>

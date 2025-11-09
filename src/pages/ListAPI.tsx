@@ -1,12 +1,28 @@
 import { Button } from "@/components/ui/button";
 import SiteFooter from "@/components/SiteFooter";
+import { useMemo } from "react";
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { apiProviders } from "@/data/apiProviders";
 import { useNavigate } from "react-router-dom";
 
 export default function ListAPI() {
   const navigate = useNavigate();
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <DashboardTopNav links={navLinks} />
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#a855f7]/20 via-transparent to-purple-500/10 blur-3xl" />
         <div className="max-w-5xl mx-auto px-6 pt-24 pb-20 text-center">

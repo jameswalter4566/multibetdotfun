@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { useMemo as useReactMemo } from 'react';
+import { apiProviders } from "@/data/apiProviders";
 
 type Campaign = {
   id: number;
@@ -10,6 +13,18 @@ type Campaign = {
 };
 
 export default function ExploreCampaignsPage() {
+  const docHome = useReactMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useReactMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,10 +54,8 @@ export default function ExploreCampaignsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <a href="/" className="fixed top-2 left-12 md:left-16 z-20 block">
-        <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-      </a>
-      <main className="container mx-auto px-4 pt-24 pb-10 max-w-6xl">
+      <DashboardTopNav links={navLinks} />
+      <main className="container mx-auto px-4 pt-20 pb-10 max-w-6xl">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-semibold">Explore Launches</h1>
         </div>

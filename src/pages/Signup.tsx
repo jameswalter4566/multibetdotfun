@@ -1,9 +1,23 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SiteFooter from "@/components/SiteFooter";
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { apiProviders } from "@/data/apiProviders";
 
 export default function Signup() {
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -15,6 +29,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <DashboardTopNav links={navLinks} />
       <header className="max-w-4xl mx-auto px-6 pt-24 pb-12 text-center">
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Create your marketplace account</h1>
         <p className="mt-3 text-sm text-muted-foreground sm:text-base">

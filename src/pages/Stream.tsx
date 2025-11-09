@@ -1,11 +1,24 @@
 import { useMemo, useRef, useEffect, useCallback, useState } from 'react';
-import { useParams, Link, useSearchParams } from 'react-router-dom';
-import UserBadge from '@/components/UserBadge';
+import { useParams, useSearchParams } from 'react-router-dom';
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
+import { apiProviders } from "@/data/apiProviders";
 import { supabase } from '@/integrations/supabase/client';
 import { agoraLive } from '@/services/agoraLive';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 
 export default function StreamPage() {
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
   const { channel } = useParams<{ channel: string }>();
   const [sp] = useSearchParams();
   const isHost = sp.get('host') === '1';
@@ -103,17 +116,7 @@ export default function StreamPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Link to="/" className="fixed top-2 left-12 md:left-16 z-30 block">
-        <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-12 w-auto md:h-14 lg:h-16 align-middle" />
-      </Link>
-      <nav className="fixed top-2 right-16 md:right-24 z-30 h-12 md:h-14 lg:h-16 flex items-center gap-6 md:gap-8">
-        <a href="/#mission" className="text-foreground/90 hover:underline text-sm md:text-base">Mission</a>
-        <a href="/#workers" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Creators</a>
-        <a href="/explore" className="text-foreground/90 hover:underline text-sm md:text-base">Explore Launches</a>
-        <a href="/campaigns" className="text-foreground/90 hover:underline text-sm md:text-base">Start a Launch</a>
-        <UserBadge />
-        <a href="https://x.com/hubdotapp" target="_blank" rel="noopener noreferrer" className="text-foreground/90 hover:underline text-sm md:text-base">Follow us on X</a>
-      </nav>
+      <DashboardTopNav links={navLinks} />
 
       <div className="container mx-auto px-2 md:px-4 pt-20 pb-6">
         <div className="ios-card overflow-hidden h-[70vh] lg:h-[calc(100vh-8rem)] relative">

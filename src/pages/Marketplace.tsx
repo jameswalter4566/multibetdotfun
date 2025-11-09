@@ -1,10 +1,23 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { apiProviders } from "@/data/apiProviders";
+import DashboardTopNav, { type DashboardNavLink } from "@/components/DashboardTopNav";
 
 export default function Marketplace() {
   const navigate = useNavigate();
+  const docHome = useMemo(() => (apiProviders[0] ? `/documentation/${apiProviders[0].slug}` : "/marketplace"), []);
+  const navLinks: DashboardNavLink[] = useMemo(
+    () => [
+      { label: "Explore API market place", href: "#marketplace" },
+      { label: "Documentation", href: docHome },
+      { label: "Create AI Automation (Beta)", href: "/agent", cta: true },
+      { label: "Agent Playground", href: "/agent" },
+      { label: "Test sandbox", href: "#sandbox" },
+      { label: "Add your API", href: "/list-api" },
+    ],
+    [docHome]
+  );
 
   const openDocs = useCallback(
     (slug: string) => {
@@ -15,6 +28,7 @@ export default function Marketplace() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <DashboardTopNav links={navLinks} />
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-center">API Marketplace</h1>
         <p className="mt-3 text-center text-muted-foreground text-base md:text-lg">
