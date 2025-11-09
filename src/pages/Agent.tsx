@@ -31,9 +31,6 @@ export default function Agent() {
       { label: "Explore API market place", href: "#marketplace" },
       { label: "Documentation", href: docHome },
       { label: "Create AI Automation", href: "/agent", cta: true },
-      { label: "Agent Playground", href: "/agent" },
-      { label: "Test sandbox", href: "#sandbox" },
-      { label: "Add your API", href: "/list-api" },
     ],
     [docHome]
   );
@@ -85,10 +82,10 @@ export default function Agent() {
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       <DashboardTopNav links={navLinks} />
-      <main className="relative flex flex-1 min-h-0 overflow-hidden px-4 py-6 sm:px-8 lg:px-12">
+      <main className="relative flex flex-1 min-h-0 overflow-hidden px-4 py-4 sm:px-8 lg:px-12">
         <span id="marketplace" className="sr-only" aria-hidden="true" />
-        <div className="mx-auto grid h-full min-h-0 w-full max-w-7xl gap-6 lg:grid-cols-[minmax(320px,360px)_minmax(0,1.65fr)]">
-          <section className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/35 p-6 shadow-glow">
+        <div className="mx-auto grid h-full min-h-0 w-full max-w-[1700px] gap-8 lg:grid-cols-[minmax(360px,520px)_minmax(0,2.4fr)]">
+          <section className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/35 p-7 shadow-glow">
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Agent chat</p>
               <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Describe your workflow</h1>
@@ -136,10 +133,10 @@ export default function Agent() {
 
           <section
             id="sandbox"
-            className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/30 p-6 shadow-[0_25px_60px_rgba(8,47,73,0.45)]"
+            className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/30 p-8 shadow-[0_25px_60px_rgba(8,47,73,0.45)]"
           >
-            <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80 p-4">
-              <div className="flex-1 min-h-0 overflow-auto rounded-xl">
+            <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border/70 bg-background/85 p-5">
+              <div className="flex-1 min-h-0 overflow-auto rounded-2xl">
                 <AutomationSandbox />
               </div>
             </div>

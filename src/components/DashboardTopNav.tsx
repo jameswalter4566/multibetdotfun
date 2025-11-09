@@ -52,9 +52,9 @@ const DashboardTopNav = ({ links, homePath = "/home" }: DashboardTopNavProps) =>
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-3 px-4 py-4 sm:px-8">
-        <a href="/" className="flex items-center gap-2">
-          <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-9 w-auto" />
+      <div className="mx-auto flex w-full max-w-[1800px] flex-wrap items-center gap-3 px-3 py-2 sm:px-6">
+        <a href="/" className="flex items-center gap-2 -ml-1 sm:-ml-2">
+          <img src="/HUBX402DESIGN.png" alt="Hub X 402" className="h-12 w-auto" />
         </a>
 
         <nav className="flex flex-1 flex-wrap items-center gap-2 text-sm font-medium text-foreground/85">
