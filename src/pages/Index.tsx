@@ -124,7 +124,6 @@ export default function Index() {
               </div>
             </aside>
           </div>
-        </div>
       </main>
       <SiteFooter />
     </div>
