@@ -8,13 +8,12 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { PlayCircle, Repeat } from "lucide-react";
+import { requestAutomationAssistant, type AssistantChatMessage } from "@/lib/assistant";
 
 const CANVAS_BACKGROUND = "radial-gradient(circle at 20px 20px, rgba(14,165,255,0.12) 0, rgba(14,165,255,0.12) 1px, transparent 1px)";
 
-interface ChatMessage {
+interface ChatMessage extends AssistantChatMessage {
   id: string;
-  role: "assistant" | "user";
-  content: string;
   createdAt: number;
 }
 
@@ -192,11 +191,6 @@ export const AutomationSandbox = () => {
   const nodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { toast } = useToast();
 
-  const assistantEndpoint =
-    (import.meta.env.VITE_AUTOMATION_ASSISTANT_ENDPOINT as string | undefined) ??
-    "https://hubx402.app/api/assistant";
-  const openAiKey = import.meta.env.OPENAI_API_KEY as string | undefined;
-
   const updateAnchors = useCallback(() => {
     const container = canvasRef.current;
     if (!container || nodes.length === 0) {
@@ -287,73 +281,6 @@ export const AutomationSandbox = () => {
     ]);
   }, []);
 
-  const callAssistant = useCallback(
-    async (payload: { prompt: string; history: ChatMessage[] }) => {
-      try {
-        const response = await fetch(assistantEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            automationName: automationName || "untitled",
-            walletAddress,
-            systemPrompt:
-              "You are an automation architect for the Hub X 402. When a user describes a task, explain how you will orchestrate it by combining our available third-party APIs (OpenAI, Claude, Google Sheets, Discord, on-chain actions, etc.). Always respond with a friendly plan that lists the nodes to create, the order they execute, and how much SOL/USDC to fund for execution.",
-            prompt: payload.prompt,
-            history: payload.history,
-            autoPublish: isAutoPublish,
-            moderation: isModerationEnabled,
-          }),
-        });
-
-        if (!response.ok) {
-          const body = await response.text();
-          throw new Error(`assistant_endpoint_${response.status}: ${body}`);
-        }
-
-        const data = await response.json();
-        const text = data.reply ?? data.message ?? "Assistant processed your request.";
-        setTerminalLogs((prev) => [JSON.stringify(data, null, 2), ...prev].slice(0, 40));
-        return text as string;
-      } catch (error) {
-        console.error("Assistant endpoint request failed", error);
-        throw error;
-      }
-      if (false) {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${openAiKey}`,
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are an automation architect for the Hub X 402. When a user describes a task, explain how you will orchestrate it by combining our available third-party APIs (OpenAI, Claude, Google Sheets, Discord, on-chain actions, etc.). Always respond with a friendly plan that says which nodes you will create, the order they run in, and how much SOL/USDC should be funded for execution.",
-              },
-              ...payload.history.map((message) => ({ role: message.role, content: message.content })),
-              { role: "user", content: payload.prompt },
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`OpenAI request failed with ${response.status}`);
-        }
-
-        const data = await response.json();
-        const text = data.choices?.[0]?.message?.content ?? "Assistant created a draft automation.";
-        setTerminalLogs((prev) => [JSON.stringify(data, null, 2), ...prev].slice(0, 40));
-        return text as string;
-      }
-
-      return "Automation assistant unavailable: configure the backend endpoint.";
-    },
-    [assistantEndpoint, automationName, openAiKey, walletAddress, isAutoPublish, isModerationEnabled]
-  );
-
   const handlePromptSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmed = promptInput.trim();
@@ -376,10 +303,19 @@ export const AutomationSandbox = () => {
     setIsSending(true);
 
     try {
-      const reply = await callAssistant({ prompt: trimmed, history: [...chatMessages, userMessage] });
-      appendAssistantMessage(reply);
+      const { text, raw } = await requestAutomationAssistant({
+        prompt: trimmed,
+        history: [...chatMessages, userMessage].map(({ role, content }) => ({ role, content })),
+        automationName,
+        walletAddress,
+        autoPublish: isAutoPublish,
+        moderation: isModerationEnabled,
+      });
+      setTerminalLogs((prev) => [JSON.stringify(raw, null, 2), ...prev].slice(0, 40));
+      appendAssistantMessage(text);
     } catch (error) {
       console.error(error);
+      setTerminalLogs((prev) => [`Assistant error: ${(error as Error).message}`, ...prev].slice(0, 40));
       appendAssistantMessage("I hit an issue reaching the assistant endpoint. Double-check your configuration and try again.");
     } finally {
       setIsSending(false);

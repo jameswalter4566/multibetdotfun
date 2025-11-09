@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AutomationSandbox } from "@/components/automation/AutomationSandbox";
 import SiteFooter from "@/components/SiteFooter";
 import { cn } from "@/lib/utils";
+import { requestAutomationAssistant } from "@/lib/assistant";
 
 type ChatRole = "assistant" | "user";
 
@@ -41,40 +42,53 @@ export default function Agent() {
   const [input, setInput] = useState("");
   const [isResponding, setIsResponding] = useState(false);
 
-  const handleSend = (event?: React.FormEvent) => {
+  const handleSend = async (event?: React.FormEvent) => {
     event?.preventDefault();
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || isResponding) return;
 
     const userMessage: AgentMessage = {
       id: `user-${Date.now()}`,
       role: "user",
       content: trimmed,
     };
+    const historyForAssistant = [...messages, userMessage].map(({ role, content }) => ({ role, content }));
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsResponding(true);
 
-    setTimeout(() => {
+    try {
+      const { text } = await requestAutomationAssistant({ prompt: trimmed, history: historyForAssistant });
       setMessages((prev) => [
         ...prev,
         {
           id: `assistant-${Date.now()}`,
           role: "assistant",
-          content: `Got it. I'll stage an automation flow for: “${trimmed}”. Check the canvas to see which APIs I'm connecting.`,
+          content: text,
         },
       ]);
+    } catch (error) {
+      console.error("Agent chat failed", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: "I couldn't reach the automation assistant. Please try again in a moment.",
+        },
+      ]);
+    } finally {
       setIsResponding(false);
-    }, 600);
+    }
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       <DashboardTopNav links={navLinks} />
-      <main className="relative flex-1 px-4 py-10 sm:px-8 lg:px-12">
+      <main className="relative flex flex-1 min-h-0 overflow-hidden px-4 py-6 sm:px-8 lg:px-12">
         <span id="marketplace" className="sr-only" aria-hidden="true" />
-        <div className="mx-auto grid w-full max-w-7xl gap-6 lg:grid-cols-[minmax(320px,380px)_minmax(0,1fr)]">
-          <section className="flex max-h-[900px] flex-col rounded-3xl border border-border bg-secondary/35 p-6 shadow-glow">
+        <div className="mx-auto grid h-full min-h-0 w-full max-w-7xl gap-6 lg:grid-cols-[minmax(320px,360px)_minmax(0,1.65fr)]">
+          <section className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/35 p-6 shadow-glow">
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Agent chat</p>
               <h1 className="mt-2 text-2xl font-bold tracking-tight text-foreground">Describe your workflow</h1>
@@ -83,7 +97,7 @@ export default function Agent() {
               </p>
             </div>
 
-            <div className="mt-6 flex-1 space-y-3 overflow-y-auto pr-1">
+            <div className="mt-6 flex-1 min-h-0 space-y-3 overflow-y-auto pr-1">
               {messages.map((message) => (
                 <div key={message.id} className="flex">
                   <div
@@ -114,29 +128,25 @@ export default function Agent() {
                 placeholder="Ask the agent to build an automation..."
                 className="flex-1 bg-background/80"
               />
-              <Button type="submit" className="rounded-2xl px-6 py-2">
-                Send
+              <Button type="submit" className="rounded-2xl px-6 py-2" disabled={isResponding}>
+                {isResponding ? "Sending..." : "Send"}
               </Button>
             </form>
           </section>
 
           <section
             id="sandbox"
-            className="rounded-3xl border border-border bg-secondary/30 p-4 shadow-[0_25px_60px_rgba(8,47,73,0.45)]"
+            className="flex h-full min-h-0 flex-col rounded-3xl border border-border bg-secondary/30 p-6 shadow-[0_25px_60px_rgba(8,47,73,0.45)]"
           >
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Node canvas</p>
-                <h2 className="text-xl font-semibold text-foreground">Automation preview</h2>
+            <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-background/80 p-4">
+              <div className="flex-1 min-h-0 overflow-auto rounded-xl">
+                <AutomationSandbox />
               </div>
-            </div>
-            <div className="rounded-2xl border border-border/80 bg-background/80 p-3">
-              <AutomationSandbox />
             </div>
           </section>
         </div>
       </main>
-      <SiteFooter className="mt-10" />
+      <SiteFooter className="shrink-0 border-t border-border/60" />
     </div>
   );
 }
