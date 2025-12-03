@@ -44,6 +44,7 @@ const formatProbability = (val: number | null): number => {
 
 const PAGE_SIZE = 12;
 const DEFAULT_INPUT_MINT = "EPjFWdd5AufqSSqeM2q9D4p9iu3Xwp9Qw3tXnCh9xz2V"; // USDC mainnet
+const MAINNET_USDC = DEFAULT_INPUT_MINT;
 
 export default function Index() {
   const navigate = useNavigate();
@@ -240,6 +241,7 @@ export default function Index() {
           "id, ticker, title, event_title, status, volume, open_interest, price_yes, price_no, category, tags, expiration_time, yes_mint, no_mint, settlement_mint",
           { count: "exact" }
         )
+        .eq("settlement_mint", MAINNET_USDC)
         .order("volume", { ascending: false })
         .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
       if (!mounted) return;
