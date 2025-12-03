@@ -369,7 +369,7 @@ export default function Index() {
                 Browse markets
               </Button>
               <Button asChild variant="outline" className="rounded-full border-border/70 px-6 py-3 text-sm font-semibold">
-                <a href="https://github.com/jameswalter4566/multibetdotfun" target="_blank" rel="noreferrer">
+                <a href="https://github.com/multibetsol/multibet" target="_blank" rel="noreferrer">
                   View GitHub
                 </a>
               </Button>
@@ -680,6 +680,12 @@ export default function Index() {
                 );
               })}
             </div>
+            {aiParlay && (
+              <div className="mt-4 rounded-xl border border-border/70 bg-white/70 p-4 text-sm text-foreground">
+                <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground mb-1">Parlay probability</div>
+                <div className="whitespace-pre-wrap leading-snug">{aiParlay}</div>
+              </div>
+            )}
             <div className="mt-6 flex justify-end gap-3">
               <Button variant="outline" onClick={() => setQuoteModalOpen(false)}>
                 Cancel

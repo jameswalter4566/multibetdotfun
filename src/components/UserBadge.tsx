@@ -51,7 +51,7 @@ export default function UserBadge() {
           List your App
         </a>
         <a
-          href="https://github.com/hubx402"
+          href="https://github.com/multibetsol/multibet"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub"
