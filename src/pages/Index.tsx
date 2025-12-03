@@ -203,7 +203,7 @@ export default function Index() {
           choice: "YES",
           category: market.category || "Market",
           resolves: market.expiration_time || null,
-          outputMint: market.yes_mint || market.no_mint || DEFAULT_OUTPUT_MINT,
+          outputMint: market.yes_mint || market.no_mint || null,
         },
       ];
     });
