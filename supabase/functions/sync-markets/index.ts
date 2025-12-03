@@ -140,15 +140,14 @@ Deno.serve(async (req) => {
 
     console.log("[sync-markets] upserting rows", { count: rows.length });
     const { error } = await admin.from("markets").upsert(rows, { onConflict: "ticker" });
-+    if (error) console.error("[sync-markets] upsert error", { message: error.message });
+    if (error) console.error("[sync-markets] upsert error", { message: error.message });
     if (error) return json({ success: false, error: error.message }, 500);
 
     return json({ success: true, insertedOrUpdated: rows.length });
   } catch (e) {
     try {
--      console.error("[sync-markets] error", (e as Error)?.message);
-+      console.error("[sync-markets] error", (e as Error)?.message);
-     } catch {}
-     return json({ success: false, error: (e as Error)?.message || "internal error" }, 500);
-   }
- });
+      console.error("[sync-markets] error", (e as Error)?.message);
+    } catch {}
+    return json({ success: false, error: (e as Error)?.message || "internal error" }, 500);
+  }
+});
