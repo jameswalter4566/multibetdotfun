@@ -98,17 +98,16 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
     const markets = ev?.markets || [];
     for (const m of markets) {
       const accounts = (m as any)?.accounts || {};
-      const accountEntries = Object.values(accounts || {}) as any[];
-      const preferredAccount = accounts?.[PREFERRED_SETTLEMENT_MINT];
-      const selectedAccount =
-        (preferredAccount && (preferredAccount.yesMint || preferredAccount.noMint)
-          ? preferredAccount
-          : accountEntries.find((acct: any) => acct?.yesMint && acct?.noMint)) ||
-        accountEntries.find((acct: any) => acct?.yesMint || acct?.noMint) ||
-        null;
-
-      const yesMint = selectedAccount?.yesMint ?? m.yesMint ?? null;
-      const noMint = selectedAccount?.noMint ?? m.noMint ?? null;
+      let yesMint = m.yesMint || null;
+      let noMint = m.noMint || null;
+      if (!yesMint || !noMint) {
+        const accountEntries = Object.values(accounts || {}) as any[];
+        for (const acct of accountEntries) {
+          if (!yesMint && acct?.yesMint) yesMint = acct.yesMint;
+          if (!noMint && acct?.noMint) noMint = acct.noMint;
+          if (yesMint && noMint) break;
+        }
+      }
       rows.push({
         ticker: m.ticker ?? null,
         title: m.title ?? ev.title ?? null,
