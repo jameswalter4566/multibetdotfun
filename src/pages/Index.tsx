@@ -110,6 +110,20 @@ export default function Index() {
     return { provider, pk };
   }, []);
 
+  const fetchPubkeyFromDb = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("wallet_public_key")
+      .order("signed_in_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      console.error("[auth] fetch pubkey failed", error.message);
+      return null;
+    }
+    return data?.wallet_public_key || null;
+  }, []);
+
   const connectAndMaybeQuote = useCallback(async () => {
     try {
       await ensureWallet();
@@ -206,11 +220,18 @@ export default function Index() {
     setQuoteError(null);
     setQuoteResults([]);
     try {
+      let pk = walletPubkey;
+      if (!pk) {
+        pk = await fetchPubkeyFromDb();
+        if (pk) setWalletPubkey(pk);
+      }
+      if (!pk) throw new Error("userPublicKey missing");
+
       const legs = parlayLegs
         .filter((l) => l.outputMint)
         .map((leg) => ({ outputMint: leg.outputMint, amount: Number(stake || "0") }));
       const { data, error } = await supabase.functions.invoke("get-quote", {
-        body: { legs, inputMint: DEFAULT_INPUT_MINT },
+        body: { legs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: pk },
       });
       if (error || !data?.success) {
         setQuoteError(error?.message || data?.error || "Quote failed");
