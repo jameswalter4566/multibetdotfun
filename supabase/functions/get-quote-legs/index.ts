@@ -37,6 +37,7 @@ serve(async (req) => {
     if (!legs.length) return json({ success: false, error: "legs required" }, 400);
 
     const results = [] as any[];
+    const errors = [] as any[];
     for (const leg of legs) {
       const amountDec = Number(leg.amount || 0);
       if (!leg.outputMint || amountDec <= 0) continue;
@@ -46,26 +47,30 @@ serve(async (req) => {
       url.searchParams.set("outputMint", leg.outputMint);
       url.searchParams.set("amount", String(amountInt));
       url.searchParams.set("slippageBps", String(leg.slippageBps ?? slippageBps));
-      url.searchParams.set("onlyDirectRoutes", "true");
+      url.searchParams.set("onlyDirectRoutes", "false");
       const start = Date.now();
       const resp = await fetch(url.toString());
       const text = await resp.text();
       if (!resp.ok) {
-        console.error("[get-quote-legs] quote failed", { status: resp.status, body: text.slice(0, 300), leg });
+        const err = { status: resp.status, body: text.slice(0, 300), leg };
+        console.error("[get-quote-legs] quote failed", err);
+        errors.push(err);
         continue;
       }
       let parsed: any = null;
       try {
         parsed = JSON.parse(text);
       } catch (e) {
-        console.error("[get-quote-legs] parse failed", { error: (e as Error)?.message, bodyPreview: text.slice(0, 300) });
+        const err = { error: (e as Error)?.message, bodyPreview: text.slice(0, 300), leg };
+        console.error("[get-quote-legs] parse failed", err);
+        errors.push(err);
         continue;
       }
       results.push({ leg, quote: parsed, durationMs: Date.now() - start });
     }
 
-    if (!results.length) return json({ success: false, error: "no quotes returned" }, 502);
-    return json({ success: true, results });
+    if (!results.length) return json({ success: false, error: "no quotes returned", errors }, 502);
+    return json({ success: true, results, errors });
   } catch (e) {
     console.error("[get-quote-legs] fatal", { error: (e as Error)?.message });
     return json({ success: false, error: (e as Error)?.message || "internal error" }, 500);
