@@ -46,6 +46,7 @@ type ApiEvent = {
 };
 
 const API_BASE_DEFAULT = "https://prediction-markets-api.dflow.net/api/v1";
+const PREFERRED_SETTLEMENT_MINT = "EPjFWdd5AufqSSqeM2q9D4p9iu3Xwp9Qw3tXnCh9xz2V"; // USDC
 
 async function fetchEvents(status: string) {
   const kalshiKey = Deno.env.get("kalshi_key");
@@ -101,11 +102,18 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
       let yesMint = m.yesMint || null;
       let noMint = m.noMint || null;
       if (!yesMint || !noMint) {
-        const accountEntries = Object.values(accounts || {}) as any[];
-        for (const acct of accountEntries) {
-          if (!yesMint && acct?.yesMint) yesMint = acct.yesMint;
-          if (!noMint && acct?.noMint) noMint = acct.noMint;
-          if (yesMint && noMint) break;
+        const preferredAccount = accounts?.[PREFERRED_SETTLEMENT_MINT];
+        if (preferredAccount) {
+          if (!yesMint && preferredAccount?.yesMint) yesMint = preferredAccount.yesMint;
+          if (!noMint && preferredAccount?.noMint) noMint = preferredAccount.noMint;
+        }
+        if (!yesMint || !noMint) {
+          const accountEntries = Object.values(accounts || {}) as any[];
+          for (const acct of accountEntries) {
+            if (!yesMint && acct?.yesMint) yesMint = acct.yesMint;
+            if (!noMint && acct?.noMint) noMint = acct.noMint;
+            if (yesMint && noMint) break;
+          }
         }
       }
       rows.push({
