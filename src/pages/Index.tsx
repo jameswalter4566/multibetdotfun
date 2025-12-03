@@ -131,7 +131,7 @@ export default function Index() {
         }));
         const nonEmptyLegs = legs.filter((l) => l.outputMint);
         if (!nonEmptyLegs.length) throw new Error("No output mints available for quote");
-        const { data, error } = await supabase.functions.invoke("get-quote", {
+        const { data, error } = await supabase.functions.invoke("get-quote-legs", {
           body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
         });
         if (error || !data?.success) {
