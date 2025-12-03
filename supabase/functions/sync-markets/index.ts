@@ -25,9 +25,9 @@ type ApiMarket = {
   yesMint?: string;
   noMint?: string;
   marketLedger?: string;
-  openTime?: string;
-  closeTime?: string;
-  expirationTime?: string;
+  openTime?: number | string;
+  closeTime?: number | string;
+  expirationTime?: number | string;
   result?: string;
   redemptionStatus?: string;
   tags?: string[];
@@ -45,22 +45,50 @@ type ApiEvent = {
   seriesTickers?: string[];
 };
 
+const API_BASE_DEFAULT = "https://prediction-markets-api.dflow.net/api/v1";
+
 async function fetchEvents(status: string) {
   const kalshiKey = Deno.env.get("kalshi_key");
-  const API_BASE =
-    Deno.env.get("KALSHI_API_BASE") ||
-    "https://pond.dflow.net/prediction-market-metadata-api-reference";
+  const API_BASE = Deno.env.get("KALSHI_API_BASE") || API_BASE_DEFAULT;
 
   const url = `${API_BASE}/events?withNestedMarkets=true${status ? `&status=${status}` : ""}`;
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (kalshiKey) headers["Authorization"] = `Bearer ${kalshiKey}`;
 
-  const resp = await fetch(url, { headers });
-  if (!resp.ok) {
-    throw new Error(`Kalshi API failed: ${resp.status} ${await resp.text()}`);
+  let text: string | null = null;
+  let parsed: any = null;
+  const start = Date.now();
+  try {
+    const resp = await fetch(url, { headers });
+    text = await resp.text();
+    if (!resp.ok) {
+      console.error("[sync-markets] fetch failed", { url, status: resp.status, body: text?.slice(0, 400) });
+      throw new Error(`Kalshi API failed: ${resp.status}`);
+    }
+    try {
+      parsed = JSON.parse(text || "null");
+    } catch (e) {
+      console.error("[sync-markets] json parse error", { url, bodyPreview: text?.slice(0, 400), error: (e as Error)?.message });
+      throw e;
+    }
+    const durationMs = Date.now() - start;
+    console.log("[sync-markets] fetched events", { url, durationMs, hasEvents: Boolean((parsed as any)?.events), isArray: Array.isArray(parsed) });
+    return parsed as { events?: ApiEvent[] } | ApiEvent[];
+  } catch (e) {
+    console.error("[sync-markets] fetchEvents error", { url, bodyPreview: text?.slice(0, 400), error: (e as Error)?.message });
+    throw e;
   }
-  return (await resp.json()) as { events?: ApiEvent[] } | ApiEvent[];
 }
+
+const toISO = (value?: number | string) => {
+  if (value == null) return null;
+  const num = typeof value === "string" ? Number(value) : value;
+  if (Number.isFinite(num)) {
+    const ms = num < 2_000_000_000 ? num * 1000 : num;
+    return new Date(ms).toISOString();
+  }
+  try { return new Date(value as string).toISOString(); } catch { return null; }
+};
 
 function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
   const events = Array.isArray(payload) ? payload : payload?.events || [];
@@ -79,9 +107,9 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
         yes_mint: m.yesMint ?? null,
         no_mint: m.noMint ?? null,
         market_ledger: m.marketLedger ?? null,
-        open_time: m.openTime ? new Date(m.openTime).toISOString() : null,
-        close_time: m.closeTime ? new Date(m.closeTime).toISOString() : null,
-        expiration_time: m.expirationTime ? new Date(m.expirationTime).toISOString() : null,
+        open_time: toISO(m.openTime),
+        close_time: toISO(m.closeTime),
+        expiration_time: toISO(m.expirationTime),
         result: m.result ?? null,
         redemption_status: m.redemptionStatus ?? null,
         category: ev.tags?.[0] ?? null,
@@ -93,6 +121,7 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
       });
     }
   }
+  console.log("[sync-markets] flattened rows", { count: rows.length });
   return rows;
 }
 
@@ -109,14 +138,17 @@ Deno.serve(async (req) => {
     const rows = flattenMarkets(apiPayload).filter((r) => r.ticker);
     if (!rows.length) return json({ success: false, error: "No markets returned from API" }, 502);
 
+    console.log("[sync-markets] upserting rows", { count: rows.length });
     const { error } = await admin.from("markets").upsert(rows, { onConflict: "ticker" });
++    if (error) console.error("[sync-markets] upsert error", { message: error.message });
     if (error) return json({ success: false, error: error.message }, 500);
 
     return json({ success: true, insertedOrUpdated: rows.length });
   } catch (e) {
     try {
-      console.error("[sync-markets] error", (e as Error)?.message);
-    } catch {}
-    return json({ success: false, error: (e as Error)?.message || "internal error" }, 500);
-  }
-});
+-      console.error("[sync-markets] error", (e as Error)?.message);
++      console.error("[sync-markets] error", (e as Error)?.message);
+     } catch {}
+     return json({ success: false, error: (e as Error)?.message || "internal error" }, 500);
+   }
+ });
