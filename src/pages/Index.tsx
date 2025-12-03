@@ -97,13 +97,13 @@ export default function Index() {
           <div className="absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" aria-hidden />
           <div className="relative z-10 max-w-5xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-foreground shadow-sm">
-              On-chain, minimal, fast
+              Parlay-first, minimal, fast
             </div>
             <h1 className="mt-6 text-4xl md:text-6xl font-extrabold tracking-tight leading-tight text-foreground">
-              multibet — trade prediction markets with leverage on Solana
+              multibet — build parlays on Solana prediction markets
             </h1>
             <p className="mt-4 max-w-3xl text-base md:text-lg text-muted-foreground">
-              A clean, white-surface venue to express conviction on macro, crypto, and culture. Transparent pricing today, live Kalshi-backed order books tomorrow.
+              Stack multiple yes/no markets into a single slip. Clean white surface, fast quotes, and transparent odds. Live Kalshi-backed order books coming next.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-md" onClick={goToMarkets}>
@@ -122,12 +122,12 @@ export default function Index() {
             </div>
             <div className="mt-6 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3 text-muted-foreground">
               <div className="rounded-2xl border border-border/70 bg-white/80 px-4 py-3 shadow-sm">
-                <div className="text-xs uppercase tracking-[0.16em] text-foreground/70">Leverage</div>
-                <div className="text-lg font-semibold text-foreground">Up to 4x, programmable</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-foreground/70">Parlays</div>
+                <div className="text-lg font-semibold text-foreground">Group multiple legs into one</div>
               </div>
               <div className="rounded-2xl border border-border/70 bg-white/80 px-4 py-3 shadow-sm">
                 <div className="text-xs uppercase tracking-[0.16em] text-foreground/70">Settlement</div>
-                <div className="text-lg font-semibold text-foreground">Instant, on-chain receipts</div>
+                <div className="text-lg font-semibold text-foreground">Instant on-chain receipts</div>
               </div>
               <div className="rounded-2xl border border-border/70 bg-white/80 px-4 py-3 shadow-sm">
                 <div className="text-xs uppercase tracking-[0.16em] text-foreground/70">Feeds</div>
@@ -164,7 +164,7 @@ export default function Index() {
                     <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-foreground/80">
                       {market.category}
                     </span>
-                    <span className="text-xs text-muted-foreground">Leverage {market.leverage}</span>
+                    <span className="text-xs text-muted-foreground">Parlay ready</span>
                   </div>
                   <h3 className="mt-4 text-lg font-semibold leading-snug">{market.question}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">Resolves {market.resolves}</p>
@@ -190,15 +190,79 @@ export default function Index() {
 
                   <div className="mt-6 flex gap-3">
                     <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-md" variant="default">
-                      Trade yes
+                      Add to parlay
                     </Button>
                     <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold" variant="outline">
-                      Trade no
+                      View market
                     </Button>
                   </div>
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* Parlay slip mock */}
+        <section className="mt-12 grid gap-6 lg:grid-cols-[2fr_1fr]">
+          <div className="rounded-[24px] border border-border bg-white/95 p-6 shadow-glow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Slip</p>
+                <h3 className="text-xl font-semibold text-foreground">Parlay builder</h3>
+              </div>
+              <button className="text-sm text-muted-foreground underline underline-offset-4">Clear all</button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {[
+                { id: 1, title: "Will BTC close above $120k on Dec 31, 2025?", choice: "YES" },
+                { id: 2, title: "Will a US spot ETH ETF be approved by Q2 2025?", choice: "YES" },
+              ].map((leg) => (
+                <div key={leg.id} className="rounded-2xl border border-border/80 bg-secondary/70 px-4 py-3">
+                  <p className="text-sm font-semibold text-foreground">{leg.title}</p>
+                  <p className="mt-1 text-xs font-semibold uppercase text-sky-600">{leg.choice}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5">
+              <label className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Stake amount ($)</label>
+              <input
+                type="number"
+                inputMode="decimal"
+                className="mt-2 w-full rounded-2xl border border-border/80 bg-white px-4 py-3 text-sm outline-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/60"
+                placeholder="10"
+                defaultValue={10}
+              />
+            </div>
+
+            <div className="mt-5">
+              <Button className="w-full rounded-2xl bg-sky-500 py-4 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(14,165,233,0.35)] hover:bg-sky-600">
+                Get Quote (2 legs)
+              </Button>
+              <p className="mt-2 text-center text-xs text-muted-foreground">2 leg parlay</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-border bg-white/90 p-5 shadow-sm">
+              <h4 className="text-sm font-semibold text-foreground">How it works</h4>
+              <ol className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li>1) Connect your Phantom wallet</li>
+                <li>2) Select Yes or No on multiple markets</li>
+                <li>3) All legs must win for your parlay to pay out</li>
+              </ol>
+            </div>
+            <div className="rounded-2xl border border-border bg-white/90 p-5 shadow-sm">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>Selection</span>
+                <span className="text-foreground font-semibold">2 legs</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+                <span>Yes picks</span>
+                <span className="text-foreground font-semibold">2</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -209,8 +273,7 @@ export default function Index() {
               <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Pipeline</p>
               <h3 className="mt-2 text-2xl font-bold text-foreground">Live data + funding rails next</h3>
               <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-                Hook into your wallet, size positions with leverage, and stream Kalshi markets directly. Get updates as we turn these
-                designs into live order books.
+                Connect your wallet, stack legs into parlays, and stream Kalshi markets directly. Get updates as we turn these designs into live order books.
               </p>
             </div>
             <div className="flex gap-3">
