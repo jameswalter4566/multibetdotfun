@@ -24,6 +24,8 @@ interface QuoteLeg {
   slippageBps?: number;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return json({}, 200);
   try {
@@ -38,7 +40,8 @@ serve(async (req) => {
 
     const results = [] as any[];
     const errors = [] as any[];
-    for (const leg of legs) {
+    for (let i = 0; i < legs.length; i++) {
+      const leg = legs[i];
       const amountDec = Number(leg.amount || 0);
       if (!leg.outputMint || amountDec <= 0) continue;
       const amountInt = Math.round(amountDec * 1_000_000); // assume 6 decimals (USDC)
@@ -48,25 +51,36 @@ serve(async (req) => {
       url.searchParams.set("outputMint", leg.outputMint);
       url.searchParams.set("amount", String(amountInt));
       url.searchParams.set("slippageBps", String(leg.slippageBps ?? slippageBps));
-      const start = Date.now();
-      const resp = await fetch(url.toString());
-      const text = await resp.text();
-      if (!resp.ok) {
-        const err = { status: resp.status, body: text.slice(0, 300), leg };
-        console.error("[get-quote-legs] quote failed", err);
-        errors.push(err);
-        continue;
-      }
       let parsed: any = null;
-      try {
-        parsed = JSON.parse(text);
-      } catch (e) {
-        const err = { error: (e as Error)?.message, bodyPreview: text.slice(0, 300), leg };
-        console.error("[get-quote-legs] parse failed", err);
-        errors.push(err);
-        continue;
+      let lastErr: any = null;
+      const start = Date.now();
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const resp = await fetch(url.toString());
+        const text = await resp.text();
+        const logCtx = { status: resp.status, attempt, leg, bodyPreview: text.slice(0, 400) };
+        console.log("[get-quote-legs] response", logCtx);
+        if (resp.status === 429) {
+          lastErr = logCtx;
+          console.error("[get-quote-legs] rate limited, retrying", logCtx);
+          await sleep(400 * attempt);
+          continue;
+        }
+        if (!resp.ok) {
+          lastErr = logCtx;
+          console.error("[get-quote-legs] quote failed", logCtx);
+          break;
+        }
+        try {
+          parsed = JSON.parse(text);
+          results.push({ leg, quote: parsed, durationMs: Date.now() - start, attempt, rawPreview: text.slice(0, 200) });
+        } catch (e) {
+          lastErr = { error: (e as Error)?.message, bodyPreview: text.slice(0, 400), leg, attempt };
+          console.error("[get-quote-legs] parse failed", lastErr);
+        }
+        break;
       }
-      results.push({ leg, quote: parsed, durationMs: Date.now() - start });
+      if (!parsed && lastErr) errors.push(lastErr);
+      if (i < legs.length - 1) await sleep(500); // small gap between legs
     }
 
     if (!results.length) return json({ success: false, error: "no quotes returned", errors }, 502);
