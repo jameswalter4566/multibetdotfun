@@ -124,15 +124,38 @@ export default function Index() {
       setQuoteError(null);
       setQuoteResults([]);
       try {
-        const missingMint = parlayLegs.some((leg) => !leg.outputMint);
-        if (missingMint) throw new Error("One or more selected markets are missing mint addresses.");
-        const legs = parlayLegs.map((leg) => ({
-          outputMint: leg.outputMint as string,
+        let legs = parlayLegs.map((leg) => ({
+          id: leg.id,
+          outputMint: leg.outputMint as string | null,
           amount: Number(stake || "0"),
         }));
-        if (!legs.length) throw new Error("No legs to quote");
+
+        // If any legs are missing mints, fetch them from DB and patch
+        const missingIds = legs.filter((l) => !l.outputMint).map((l) => l.id);
+        if (missingIds.length) {
+          const { data, error } = await supabase
+            .from("markets")
+            .select("id, yes_mint, no_mint")
+            .in("id", missingIds);
+          if (error) throw new Error("Missing mint addresses for selected markets");
+          const mapById = new Map<string, { yes_mint: string | null; no_mint: string | null }>();
+          (data || []).forEach((row) => {
+            mapById.set(String(row.id), { yes_mint: row.yes_mint, no_mint: row.no_mint });
+          });
+          legs = legs.map((l) => {
+            if (l.outputMint) return l;
+            const info = mapById.get(l.id);
+            return { ...l, outputMint: info?.yes_mint || info?.no_mint || null };
+          });
+        }
+
+        const nonEmptyLegs = legs
+          .filter((l) => l.outputMint)
+          .map((l) => ({ outputMint: l.outputMint as string, amount: l.amount }));
+
+        if (!nonEmptyLegs.length) throw new Error("No output mints available for quote. Select markets with mints.");
         const { data, error } = await supabase.functions.invoke("get-quote-legs", {
-          body: { legs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
+          body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
         });
         if (error || !data?.success) {
           setQuoteError(error?.message || data?.error || "Quote failed");

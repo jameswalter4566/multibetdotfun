@@ -97,6 +97,17 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
   for (const ev of events) {
     const markets = ev?.markets || [];
     for (const m of markets) {
+      const accounts = (m as any)?.accounts || {};
+      let yesMint = m.yesMint || null;
+      let noMint = m.noMint || null;
+      if (!yesMint || !noMint) {
+        const accountEntries = Object.values(accounts || {}) as any[];
+        for (const acct of accountEntries) {
+          if (!yesMint && acct?.yesMint) yesMint = acct.yesMint;
+          if (!noMint && acct?.noMint) noMint = acct.noMint;
+          if (yesMint && noMint) break;
+        }
+      }
       rows.push({
         ticker: m.ticker ?? null,
         title: m.title ?? ev.title ?? null,
@@ -104,8 +115,8 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
         status: m.status ?? ev.status ?? null,
         volume: m.volume ?? null,
         open_interest: (m.openInterest ?? m.open_interest) ?? null,
-        yes_mint: m.yesMint ?? null,
-        no_mint: m.noMint ?? null,
+        yes_mint: yesMint,
+        no_mint: noMint,
         market_ledger: m.marketLedger ?? null,
         open_time: toISO(m.openTime),
         close_time: toISO(m.closeTime),
