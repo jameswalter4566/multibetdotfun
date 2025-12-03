@@ -42,7 +42,6 @@ const formatProbability = (val: number | null): number => {
 
 const PAGE_SIZE = 12;
 const DEFAULT_INPUT_MINT = "EPjFWdd5AufqSSqeM2q9D4p9iu3Xwp9Qw3tXnCh9xz2V"; // USDC mainnet
-const DEFAULT_OUTPUT_MINT = "So11111111111111111111111111111111111111112"; // SOL fallback
 
 export default function Index() {
   const navigate = useNavigate();
@@ -125,14 +124,15 @@ export default function Index() {
       setQuoteError(null);
       setQuoteResults([]);
       try {
+        const missingMint = parlayLegs.some((leg) => !leg.outputMint);
+        if (missingMint) throw new Error("One or more selected markets are missing mint addresses.");
         const legs = parlayLegs.map((leg) => ({
-          outputMint: leg.outputMint || DEFAULT_OUTPUT_MINT,
+          outputMint: leg.outputMint as string,
           amount: Number(stake || "0"),
         }));
-        const nonEmptyLegs = legs.filter((l) => l.outputMint);
-        if (!nonEmptyLegs.length) throw new Error("No output mints available for quote");
+        if (!legs.length) throw new Error("No legs to quote");
         const { data, error } = await supabase.functions.invoke("get-quote-legs", {
-          body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
+          body: { legs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
         });
         if (error || !data?.success) {
           setQuoteError(error?.message || data?.error || "Quote failed");
