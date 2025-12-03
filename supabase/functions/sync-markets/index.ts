@@ -101,20 +101,17 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
       const accounts = (m as any)?.accounts || {};
       let yesMint = m.yesMint || null;
       let noMint = m.noMint || null;
-      if (!yesMint || !noMint) {
-        const preferredAccount = accounts?.[PREFERRED_SETTLEMENT_MINT];
-        if (preferredAccount) {
-          if (!yesMint && preferredAccount?.yesMint) yesMint = preferredAccount.yesMint;
-          if (!noMint && preferredAccount?.noMint) noMint = preferredAccount.noMint;
-        }
-        if (!yesMint || !noMint) {
-          const accountEntries = Object.values(accounts || {}) as any[];
-          for (const acct of accountEntries) {
-            if (!yesMint && acct?.yesMint) yesMint = acct.yesMint;
-            if (!noMint && acct?.noMint) noMint = acct.noMint;
-            if (yesMint && noMint) break;
-          }
-        }
+      let settlementMint: string | null = null;
+      const entries = Object.entries(accounts || {});
+      const preferredEntry = entries.find(([key, acct]) => key === PREFERRED_SETTLEMENT_MINT && (acct as any)?.yesMint && (acct as any)?.noMint);
+      const firstFullEntry = entries.find(([, acct]) => (acct as any)?.yesMint && (acct as any)?.noMint);
+      const fallbackEntry = entries.find(([, acct]) => (acct as any)?.yesMint || (acct as any)?.noMint);
+      const chosen = preferredEntry || firstFullEntry || fallbackEntry;
+      if (chosen) {
+        settlementMint = chosen[0] || null;
+        const acct: any = chosen[1];
+        if (!yesMint && acct?.yesMint) yesMint = acct.yesMint;
+        if (!noMint && acct?.noMint) noMint = acct.noMint;
       }
       rows.push({
         ticker: m.ticker ?? null,
@@ -125,6 +122,7 @@ function flattenMarkets(payload: { events?: ApiEvent[] } | ApiEvent[]): any[] {
         open_interest: (m.openInterest ?? m.open_interest) ?? null,
         yes_mint: yesMint,
         no_mint: noMint,
+        settlement_mint: settlementMint,
         market_ledger: m.marketLedger ?? null,
         open_time: toISO(m.openTime),
         close_time: toISO(m.closeTime),

@@ -22,6 +22,7 @@ interface QuoteLeg {
   outputMint: string;
   amount: number;
   slippageBps?: number;
+  inputMint?: string;
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -45,9 +46,10 @@ serve(async (req) => {
       const amountDec = Number(leg.amount || 0);
       if (!leg.outputMint || amountDec <= 0) continue;
       const amountInt = Math.round(amountDec * 1_000_000); // assume 6 decimals (USDC)
+      const legInputMint = leg.inputMint || inputMint;
       const url = new URL(`${QUOTE_BASE}/order`);
       url.searchParams.set("userPublicKey", userPublicKey);
-      url.searchParams.set("inputMint", inputMint);
+      url.searchParams.set("inputMint", legInputMint);
       url.searchParams.set("outputMint", leg.outputMint);
       url.searchParams.set("amount", String(amountInt));
       url.searchParams.set("slippageBps", String(leg.slippageBps ?? slippageBps));
@@ -57,7 +59,7 @@ serve(async (req) => {
       for (let attempt = 1; attempt <= 3; attempt++) {
         const resp = await fetch(url.toString());
         const text = await resp.text();
-        const logCtx = { status: resp.status, attempt, leg, bodyPreview: text.slice(0, 400) };
+        const logCtx = { status: resp.status, attempt, leg, inputMint: legInputMint, bodyPreview: text.slice(0, 400) };
         console.log("[get-quote-legs] response", logCtx);
         if (resp.status === 429) {
           lastErr = logCtx;

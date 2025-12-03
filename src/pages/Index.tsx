@@ -22,6 +22,7 @@ type MarketRow = {
   expiration_time?: string | null;
   yes_mint?: string | null;
   no_mint?: string | null;
+  settlement_mint?: string | null;
 };
 
 type ParlayLeg = {
@@ -31,6 +32,7 @@ type ParlayLeg = {
   category: string;
   resolves?: string | null;
   outputMint?: string | null;
+  settlementMint?: string | null;
 };
 
 const formatProbability = (val: number | null): number => {
@@ -128,6 +130,7 @@ export default function Index() {
           id: leg.id,
           outputMint: leg.outputMint as string | null,
           amount: Number(stake || "0"),
+          inputMint: leg.settlementMint || null,
         }));
 
         // If any legs are missing mints, fetch them from DB and patch
@@ -135,23 +138,27 @@ export default function Index() {
         if (missingIds.length) {
           const { data, error } = await supabase
             .from("markets")
-            .select("id, yes_mint, no_mint")
+            .select("id, yes_mint, no_mint, settlement_mint")
             .in("id", missingIds);
           if (error) throw new Error("Missing mint addresses for selected markets");
-          const mapById = new Map<string, { yes_mint: string | null; no_mint: string | null }>();
+          const mapById = new Map<string, { yes_mint: string | null; no_mint: string | null; settlement_mint: string | null }>();
           (data || []).forEach((row) => {
-            mapById.set(String(row.id), { yes_mint: row.yes_mint, no_mint: row.no_mint });
+            mapById.set(String(row.id), { yes_mint: row.yes_mint, no_mint: row.no_mint, settlement_mint: row.settlement_mint });
           });
           legs = legs.map((l) => {
             if (l.outputMint) return l;
             const info = mapById.get(l.id);
-            return { ...l, outputMint: info?.yes_mint || info?.no_mint || null };
+            return { ...l, outputMint: info?.yes_mint || info?.no_mint || null, inputMint: info?.settlement_mint || l.inputMint };
           });
         }
 
         const nonEmptyLegs = legs
           .filter((l) => l.outputMint)
-          .map((l) => ({ outputMint: l.outputMint as string, amount: l.amount }));
+          .map((l) => ({
+            outputMint: l.outputMint as string,
+            amount: l.amount,
+            inputMint: l.inputMint || DEFAULT_INPUT_MINT,
+          }));
 
         if (!nonEmptyLegs.length) throw new Error("No output mints available for quote. Select markets with mints.");
         const { data, error } = await supabase.functions.invoke("get-quote-legs", {
@@ -204,6 +211,7 @@ export default function Index() {
           category: market.category || "Market",
           resolves: market.expiration_time || null,
           outputMint: market.yes_mint || market.no_mint || null,
+          settlementMint: market.settlement_mint || null,
         },
       ];
     });
@@ -229,7 +237,7 @@ export default function Index() {
       const { data, error, count } = await supabase
         .from("markets")
         .select(
-          "id, ticker, title, event_title, status, volume, open_interest, price_yes, price_no, category, tags, expiration_time, yes_mint, no_mint",
+          "id, ticker, title, event_title, status, volume, open_interest, price_yes, price_no, category, tags, expiration_time, yes_mint, no_mint, settlement_mint",
           { count: "exact" }
         )
         .order("volume", { ascending: false })
