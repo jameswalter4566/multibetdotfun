@@ -292,25 +292,32 @@ export default function Index() {
     if (!quoteResults.length) return;
     setPlacing(true);
     try {
-      const { provider, pk } = await ensureWallet();
-      const quotes = quoteResults.map((r) => r.quote);
-      const { data, error } = await supabase.functions.invoke("swap-parlay", {
-        body: { quotes, userPublicKey: pk },
-      });
-      if (error || !data?.success) throw new Error(error?.message || data?.error || "Swap failed");
-      const swaps: any[] = data.results || [];
-      for (const s of swaps) {
-        const raw = s?.swap?.swapTransaction;
-        if (!raw) continue;
-        const buf = Uint8Array.from(atob(raw), (c) => c.charCodeAt(0));
+      const { provider } = await ensureWallet();
+      for (const item of quoteResults) {
+        const intent = item.quote;
+        const openTxB64: string | undefined = intent?.openTransaction;
+        if (!openTxB64) throw new Error("Missing open transaction for a leg");
+        const buf = Uint8Array.from(atob(openTxB64), (c) => c.charCodeAt(0));
         let tx: VersionedTransaction | Transaction;
         try {
           tx = VersionedTransaction.deserialize(buf);
         } catch {
           tx = Transaction.from(buf);
         }
-        const signed = await provider.signAndSendTransaction(tx);
-        console.log("[parlay] sent tx", signed?.signature || signed);
+        // Phantom sign
+        const signed = await provider.signTransaction(tx);
+        const signedB64 = btoa(String.fromCharCode(...signed.serialize()));
+        const resp = await fetch("https://quote-api.dflow.net/submit-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            quoteResponse: intent,
+            signedOpenTransaction: signedB64,
+          }),
+        });
+        const text = await resp.text();
+        if (!resp.ok) throw new Error(`Submit intent failed: ${text.slice(0, 200)}`);
+        console.log("[parlay] intent submitted", text.slice(0, 200));
       }
       setQuoteModalOpen(false);
     } catch (e) {

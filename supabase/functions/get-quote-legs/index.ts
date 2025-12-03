@@ -47,7 +47,7 @@ serve(async (req) => {
       if (!leg.outputMint || amountDec <= 0) continue;
       const amountInt = Math.round(amountDec * 1_000_000); // assume 6 decimals (USDC)
       const legInputMint = leg.inputMint || inputMint;
-      const url = new URL(`${QUOTE_BASE}/order`);
+      const url = new URL(`${QUOTE_BASE}/intent`);
       url.searchParams.set("userPublicKey", userPublicKey);
       url.searchParams.set("inputMint", legInputMint);
       url.searchParams.set("outputMint", leg.outputMint);
