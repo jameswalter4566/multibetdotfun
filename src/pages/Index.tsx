@@ -106,6 +106,7 @@ export default function Index() {
     setParlayOpen(true);
     setParlayLegs((prev) => {
       if (prev.some((leg) => leg.id === market.id)) return prev;
+      if (prev.length >= 4) return prev;
       return [...prev, { id: market.id, question: market.question, choice: "YES", category: market.category }];
     });
     if (typeof document !== "undefined") {
@@ -196,6 +197,8 @@ export default function Index() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {demoMarkets.map((market) => {
                 const positive = market.change >= 0;
+                const reachedMax = parlayLegs.length >= 4;
+                const isAdded = parlayLegs.some((leg) => leg.id === market.id);
                 return (
                   <div
                     key={market.id}
@@ -234,8 +237,9 @@ export default function Index() {
                         className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-md"
                         variant="default"
                         onClick={() => addToParlay(market)}
+                        disabled={isAdded || reachedMax}
                       >
-                        Add to parlay
+                        {isAdded ? "Added" : reachedMax ? "Max 4 legs" : "Add to parlay"}
                       </Button>
                       <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold" variant="outline">
                         View market
@@ -256,6 +260,7 @@ export default function Index() {
                 <div>
                   <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Slip</p>
                   <h3 className="text-xl font-semibold text-foreground">Parlay builder</h3>
+                  <p className="text-xs text-muted-foreground">Max 4 legs</p>
                 </div>
                 <button
                   className="text-sm text-muted-foreground underline underline-offset-4 disabled:opacity-40"
