@@ -58,10 +58,7 @@ export default function Index() {
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
-  const [walletPubkey, setWalletPubkey] = useState<string | null>(() => {
-    if (typeof window !== "undefined") return localStorage.getItem("multibet_wallet_pubkey");
-    return null;
-  });
+  const [walletPubkey, setWalletPubkey] = useState<string | null>(null);
   const [connectModalOpen, setConnectModalOpen] = useState(false);
   const [pendingQuote, setPendingQuote] = useState(false);
 
@@ -87,9 +84,6 @@ export default function Index() {
     const pk = res?.publicKey?.toString?.();
     if (!pk) throw new Error("Wallet connection failed");
     setWalletPubkey(pk);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("multibet_wallet_pubkey", pk);
-    }
     // Upsert user row
     try {
       await supabase
@@ -127,9 +121,7 @@ export default function Index() {
 
   const connectAndMaybeQuote = useCallback(async () => {
     try {
-      await ensureWallet();
-      const pk = await fetchPubkeyFromDb();
-      if (!pk) throw new Error("userPublicKey missing after connect");
+      const { pk } = await ensureWallet();
       setWalletPubkey(pk);
       setConnectModalOpen(false);
       if (pendingQuote) {
@@ -139,7 +131,7 @@ export default function Index() {
     } catch (e) {
       setQuoteError((e as Error)?.message || "Wallet connect failed");
     }
-  }, [ensureWallet, pendingQuote, fetchPubkeyFromDb, runQuote]);
+  }, [ensureWallet, pendingQuote, runQuote]);
 
   const addToParlay = (market: MarketRow) => {
     setParlayOpen(true);
