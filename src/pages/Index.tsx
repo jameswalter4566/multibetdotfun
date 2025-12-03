@@ -56,6 +56,7 @@ export default function Index() {
   const [totalPages, setTotalPages] = useState(1);
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [quoteResults, setQuoteResults] = useState<any[]>([]);
+  const [aiParlay, setAiParlay] = useState<string | null>(null);
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
@@ -125,6 +126,7 @@ export default function Index() {
       setQuoteLoading(true);
       setQuoteError(null);
       setQuoteResults([]);
+      setAiParlay(null);
       try {
         const legs = parlayLegs.map((leg) => ({
           id: leg.id,
@@ -132,6 +134,7 @@ export default function Index() {
           amount: Number(stake || "0"),
           inputMint: leg.settlementMint || DEFAULT_INPUT_MINT,
           question: leg.question,
+          choice: leg.choice,
         }));
         const nonEmptyLegs = legs.filter((l) => l.outputMint);
         if (!nonEmptyLegs.length) throw new Error("No legs available for quote. Select markets with mints.");
@@ -150,6 +153,25 @@ export default function Index() {
           };
         });
         setQuoteResults(mockResults);
+
+        // Call AI parlay calculator (serverless) for a fun preview
+        try {
+          const { data, error } = await supabase.functions.invoke("parlay-ai", {
+            body: {
+              legs: nonEmptyLegs.map((l) => ({
+                question: l.question,
+                choice: l.choice,
+              })),
+              stake: Number(stake || "0"),
+            },
+          });
+          if (!error && data?.analysis) {
+            setAiParlay(data.analysis);
+          }
+        } catch (aiErr) {
+          console.error("[ai parlay] error", (aiErr as Error)?.message);
+        }
+
         setQuoteModalOpen(true);
       } catch (e) {
         setQuoteError((e as Error)?.message || "Quote failed");
@@ -178,7 +200,7 @@ export default function Index() {
     [ensureWallet, pendingQuote, runQuote]
   );
 
-  const addToParlay = (market: MarketRow) => {
+  const addToParlay = (market: MarketRow, choice: "YES" | "NO" = "YES") => {
     setParlayOpen(true);
     setParlayLegs((prev) => {
       if (prev.some((leg) => leg.id === market.id)) return prev;
@@ -188,7 +210,7 @@ export default function Index() {
         {
           id: market.id,
           question: market.title || market.event_title || "Untitled market",
-          choice: "YES",
+          choice,
           category: market.category || "Market",
           resolves: market.expiration_time || null,
           outputMint: market.yes_mint || market.no_mint || null,
@@ -421,10 +443,6 @@ export default function Index() {
                     <p className="mt-1 text-sm text-muted-foreground">Resolves {market.expiration_time ? new Date(market.expiration_time).toLocaleDateString() : "TBD"}</p>
 
                     <div className="mt-6 flex items-end justify-between">
-                      <div>
-                        <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Yes probability</div>
-                        <div className="text-4xl font-extrabold text-foreground">{probability}%</div>
-                      </div>
                       <div className="text-right">
                         <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Volume</div>
                         <div className="text-lg font-semibold text-foreground">{market.volume ?? "-"}</div>
@@ -442,10 +460,18 @@ export default function Index() {
                       <Button
                         className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-md"
                         variant="default"
-                        onClick={() => addToParlay(market)}
+                        onClick={() => addToParlay(market, "YES")}
                         disabled={isAdded || reachedMax}
                       >
-                        {isAdded ? "Added" : reachedMax ? "Max 4 legs" : "Add to parlay"}
+                        {isAdded ? "Added" : reachedMax ? "Max 4 legs" : "Add YES"}
+                      </Button>
+                      <Button
+                        className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-md"
+                        variant="secondary"
+                        onClick={() => addToParlay(market, "NO")}
+                        disabled={isAdded || reachedMax}
+                      >
+                        {isAdded ? "Added" : reachedMax ? "Max 4 legs" : "Add NO"}
                       </Button>
                       <Button
                         className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold"
