@@ -57,7 +57,12 @@ export default function Index() {
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
-  const [walletPubkey, setWalletPubkey] = useState<string | null>(null);
+  const [walletPubkey, setWalletPubkey] = useState<string | null>(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("multibet_wallet_pubkey");
+    return null;
+  });
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
+  const [pendingQuote, setPendingQuote] = useState(false);
 
   const goToMarkets = () => navigate("/marketplace");
 
@@ -81,6 +86,9 @@ export default function Index() {
     const pk = res?.publicKey?.toString?.();
     if (!pk) throw new Error("Wallet connection failed");
     setWalletPubkey(pk);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("multibet_wallet_pubkey", pk);
+    }
     // Upsert user row
     try {
       await supabase
@@ -180,15 +188,11 @@ export default function Index() {
 
   const toggleParlayPanel = () => setParlayOpen((v) => !v);
 
-  const handleGetQuote = useCallback(async () => {
-    if (!parlayLegs.length) return;
+  const runQuote = useCallback(async () => {
     setQuoteLoading(true);
     setQuoteError(null);
     setQuoteResults([]);
     try {
-      const { pk } = await ensureWallet();
-      setWalletPubkey(pk);
-
       const legs = parlayLegs
         .filter((l) => l.outputMint)
         .map((leg) => ({ outputMint: leg.outputMint, amount: Number(stake || "0") }));
@@ -205,8 +209,19 @@ export default function Index() {
       setQuoteError((e as Error)?.message || "Quote failed");
     } finally {
       setQuoteLoading(false);
+      setPendingQuote(false);
     }
   }, [parlayLegs, stake]);
+
+  const handleGetQuote = useCallback(async () => {
+    if (!parlayLegs.length) return;
+    if (!walletPubkey) {
+      setPendingQuote(true);
+      setConnectModalOpen(true);
+      return;
+    }
+    await runQuote();
+  }, [parlayLegs, walletPubkey, runQuote]);
 
   const handlePlaceParlay = useCallback(async () => {
     if (!quoteResults.length) return;
