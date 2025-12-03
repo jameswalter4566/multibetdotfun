@@ -69,6 +69,16 @@ export default function Index() {
     [parlayLegs]
   );
 
+  const ensureWallet = useCallback(async () => {
+    const provider = (window as any)?.solana;
+    if (!provider || !provider.isPhantom) throw new Error("Phantom wallet not found");
+    const res = await provider.connect();
+    const pk = res?.publicKey?.toString?.();
+    if (!pk) throw new Error("Wallet connection failed");
+    setWalletPubkey(pk);
+    return { provider, pk };
+  }, []);
+
   const addToParlay = (market: MarketRow) => {
     setParlayOpen(true);
     setParlayLegs((prev) => {
@@ -153,6 +163,9 @@ export default function Index() {
     setQuoteError(null);
     setQuoteResults([]);
     try {
+      const { pk } = await ensureWallet();
+      setWalletPubkey(pk);
+
       const legs = parlayLegs
         .filter((l) => l.outputMint)
         .map((leg) => ({ outputMint: leg.outputMint, amount: Number(stake || "0") }));
@@ -171,16 +184,6 @@ export default function Index() {
       setQuoteLoading(false);
     }
   }, [parlayLegs, stake]);
-
-  const ensureWallet = useCallback(async () => {
-    const provider = (window as any)?.solana;
-    if (!provider || !provider.isPhantom) throw new Error("Phantom wallet not found");
-    const res = await provider.connect();
-    const pk = res?.publicKey?.toString?.();
-    if (!pk) throw new Error("Wallet connection failed");
-    setWalletPubkey(pk);
-    return { provider, pk };
-  }, []);
 
   const handlePlaceParlay = useCallback(async () => {
     if (!quoteResults.length) return;
