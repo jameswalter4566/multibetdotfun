@@ -119,19 +119,53 @@ export default function Index() {
     return data?.wallet_public_key || null;
   }, []);
 
-  const connectAndMaybeQuote = useCallback(async () => {
-    try {
-      const { pk } = await ensureWallet();
-      setWalletPubkey(pk);
-      setConnectModalOpen(false);
-      if (pendingQuote) {
+  const runQuote = useCallback(
+    async (userPubkey: string) => {
+      setQuoteLoading(true);
+      setQuoteError(null);
+      setQuoteResults([]);
+      try {
+        const legs = parlayLegs.map((leg) => ({
+          outputMint: leg.outputMint || DEFAULT_OUTPUT_MINT,
+          amount: Number(stake || "0"),
+        }));
+        const nonEmptyLegs = legs.filter((l) => l.outputMint);
+        if (!nonEmptyLegs.length) throw new Error("No output mints available for quote");
+        const { data, error } = await supabase.functions.invoke("get-quote", {
+          body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
+        });
+        if (error || !data?.success) {
+          setQuoteError(error?.message || data?.error || "Quote failed");
+        } else {
+          setQuoteResults(data.results || []);
+          setQuoteModalOpen(true);
+        }
+      } catch (e) {
+        setQuoteError((e as Error)?.message || "Quote failed");
+      } finally {
+        setQuoteLoading(false);
         setPendingQuote(false);
-        await runQuote(pk);
       }
-    } catch (e) {
-      setQuoteError((e as Error)?.message || "Wallet connect failed");
-    }
-  }, [ensureWallet, pendingQuote, runQuote]);
+    },
+    [parlayLegs, stake]
+  );
+
+  const connectAndMaybeQuote = useCallback(
+    async () => {
+      try {
+        const { pk } = await ensureWallet();
+        setWalletPubkey(pk);
+        setConnectModalOpen(false);
+        if (pendingQuote) {
+          setPendingQuote(false);
+          await runQuote(pk);
+        }
+      } catch (e) {
+        setQuoteError((e as Error)?.message || "Wallet connect failed");
+      }
+    },
+    [ensureWallet, pendingQuote, runQuote]
+  );
 
   const addToParlay = (market: MarketRow) => {
     setParlayOpen(true);
@@ -210,32 +244,6 @@ export default function Index() {
   }, [page]);
 
   const toggleParlayPanel = () => setParlayOpen((v) => !v);
-
-  const runQuote = useCallback(async (userPubkey: string) => {
-    setQuoteLoading(true);
-    setQuoteError(null);
-    setQuoteResults([]);
-    try {
-      const legs = parlayLegs
-        .map((leg) => ({ outputMint: leg.outputMint || DEFAULT_OUTPUT_MINT, amount: Number(stake || "0") }));
-      const nonEmptyLegs = legs.filter((l) => l.outputMint);
-      if (!nonEmptyLegs.length) throw new Error("No output mints available for quote");
-      const { data, error } = await supabase.functions.invoke("get-quote", {
-        body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
-      });
-      if (error || !data?.success) {
-        setQuoteError(error?.message || data?.error || "Quote failed");
-      } else {
-        setQuoteResults(data.results || []);
-        setQuoteModalOpen(true);
-      }
-    } catch (e) {
-      setQuoteError((e as Error)?.message || "Quote failed");
-    } finally {
-      setQuoteLoading(false);
-      setPendingQuote(false);
-    }
-  }, [parlayLegs, stake]);
 
   const handleGetQuote = useCallback(async () => {
     if (!parlayLegs.length) return;
