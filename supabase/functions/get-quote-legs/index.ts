@@ -47,45 +47,64 @@ serve(async (req) => {
       if (!leg.outputMint || amountDec <= 0) continue;
       const amountInt = Math.round(amountDec * 1_000_000); // assume 6 decimals (USDC)
       const legInputMint = leg.inputMint || inputMint;
-      const url = new URL(`${QUOTE_BASE}/intent`);
-      url.searchParams.set("userPublicKey", userPublicKey);
-      url.searchParams.set("inputMint", legInputMint);
-      url.searchParams.set("outputMint", leg.outputMint);
-      url.searchParams.set("amount", String(amountInt));
-      url.searchParams.set("slippageBps", String(leg.slippageBps ?? slippageBps));
+      const buildUrl = (mint: string) => {
+        const url = new URL(`${QUOTE_BASE}/intent`);
+        url.searchParams.set("userPublicKey", userPublicKey);
+        url.searchParams.set("inputMint", mint);
+        url.searchParams.set("outputMint", leg.outputMint);
+        url.searchParams.set("amount", String(amountInt));
+        url.searchParams.set("slippageBps", String(leg.slippageBps ?? slippageBps));
+        return url;
+      };
       let parsed: any = null;
       let lastErr: any = null;
       const start = Date.now();
-      for (let attempt = 1; attempt <= 3; attempt++) {
+      const attemptIntent = async (mint: string, attempt: number) => {
+        const url = buildUrl(mint);
         const resp = await fetch(url.toString());
         const text = await resp.text();
-        const logCtx = { status: resp.status, attempt, leg, inputMint: legInputMint, bodyPreview: text.slice(0, 400) };
+        const logCtx = { status: resp.status, attempt, leg, inputMint: mint, bodyPreview: text.slice(0, 400) };
         console.log("[get-quote-legs] response", logCtx);
         if (resp.status === 429) {
           lastErr = logCtx;
           console.error("[get-quote-legs] rate limited, retrying", logCtx);
           await sleep(400 * attempt);
-          continue;
+          return null;
         }
         if (!resp.ok) {
           lastErr = logCtx;
           console.error("[get-quote-legs] quote failed", logCtx);
-          break;
+          return null;
         }
         try {
-          parsed = JSON.parse(text);
-          results.push({ leg, quote: parsed, durationMs: Date.now() - start, attempt, rawPreview: text.slice(0, 200) });
+          return JSON.parse(text);
         } catch (e) {
           lastErr = { error: (e as Error)?.message, bodyPreview: text.slice(0, 400), leg, attempt };
           console.error("[get-quote-legs] parse failed", lastErr);
+          return null;
         }
-        break;
+      };
+
+      // primary attempts with leg input mint
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        parsed = await attemptIntent(legInputMint, attempt);
+        if (parsed) break;
       }
-      if (!parsed && lastErr) errors.push(lastErr);
+
+      // fallback: if no success and legInputMint differs from default, try default once
+      if (!parsed && legInputMint !== DEFAULT_INPUT_MINT) {
+        parsed = await attemptIntent(DEFAULT_INPUT_MINT, 1);
+      }
+
+      if (parsed) {
+        results.push({ leg, quote: parsed, durationMs: Date.now() - start, rawPreview: JSON.stringify(parsed).slice(0, 200) });
+      } else if (lastErr) {
+        errors.push(lastErr);
+      }
       if (i < legs.length - 1) await sleep(500); // small gap between legs
     }
 
-    if (!results.length) return json({ success: false, error: "no quotes returned", errors }, 502);
+    if (!results.length) return json({ success: false, error: "no quotes returned", errors }, 400);
     return json({ success: true, results, errors });
   } catch (e) {
     console.error("[get-quote-legs] fatal", { error: (e as Error)?.message });

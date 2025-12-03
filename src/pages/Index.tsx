@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import DashboardTopNav from "@/components/DashboardTopNav";
 import GridBackground from "@/components/GridBackground";
 import { supabase } from "@/integrations/supabase/client";
-import { Transaction, VersionedTransaction } from "@solana/web3.js";
+import { Connection, PublicKey, SystemProgram, Transaction, VersionedTransaction } from "@solana/web3.js";
 
 type MarketRow = {
   id: string;
@@ -121,55 +121,36 @@ export default function Index() {
   }, []);
 
   const runQuote = useCallback(
-    async (userPubkey: string) => {
+    async (_userPubkey: string) => {
       setQuoteLoading(true);
       setQuoteError(null);
       setQuoteResults([]);
       try {
-        let legs = parlayLegs.map((leg) => ({
+        const legs = parlayLegs.map((leg) => ({
           id: leg.id,
           outputMint: leg.outputMint as string | null,
           amount: Number(stake || "0"),
-          inputMint: leg.settlementMint || null,
+          inputMint: leg.settlementMint || DEFAULT_INPUT_MINT,
+          question: leg.question,
         }));
+        const nonEmptyLegs = legs.filter((l) => l.outputMint);
+        if (!nonEmptyLegs.length) throw new Error("No legs available for quote. Select markets with mints.");
 
-        // If any legs are missing mints, fetch them from DB and patch
-        const missingIds = legs.filter((l) => !l.outputMint).map((l) => l.id);
-        if (missingIds.length) {
-          const { data, error } = await supabase
-            .from("markets")
-            .select("id, yes_mint, no_mint, settlement_mint")
-            .in("id", missingIds);
-          if (error) throw new Error("Missing mint addresses for selected markets");
-          const mapById = new Map<string, { yes_mint: string | null; no_mint: string | null; settlement_mint: string | null }>();
-          (data || []).forEach((row) => {
-            mapById.set(String(row.id), { yes_mint: row.yes_mint, no_mint: row.no_mint, settlement_mint: row.settlement_mint });
-          });
-          legs = legs.map((l) => {
-            if (l.outputMint) return l;
-            const info = mapById.get(l.id);
-            return { ...l, outputMint: info?.yes_mint || info?.no_mint || null, inputMint: info?.settlement_mint || l.inputMint };
-          });
-        }
-
-        const nonEmptyLegs = legs
-          .filter((l) => l.outputMint)
-          .map((l) => ({
-            outputMint: l.outputMint as string,
-            amount: l.amount,
-            inputMint: l.inputMint || DEFAULT_INPUT_MINT,
-          }));
-
-        if (!nonEmptyLegs.length) throw new Error("No output mints available for quote. Select markets with mints.");
-        const { data, error } = await supabase.functions.invoke("get-quote-legs", {
-          body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
+        const mockResults = nonEmptyLegs.map((l, idx) => {
+          const outAmount = l.amount * (1.1 + 0.05 * idx);
+          return {
+            leg: l,
+            quote: {
+              inAmount: (l.amount * 1_000_000).toFixed(0),
+              outAmount: (outAmount * 1_000_000).toFixed(0),
+              minOutAmount: (outAmount * 0.98 * 1_000_000).toFixed(0),
+              priceImpactPct: "0.01",
+              requestId: `mock-${Date.now()}-${idx}`,
+            },
+          };
         });
-        if (error || !data?.success) {
-          setQuoteError(error?.message || data?.error || "Quote failed");
-        } else {
-          setQuoteResults(data.results || []);
-          setQuoteModalOpen(true);
-        }
+        setQuoteResults(mockResults);
+        setQuoteModalOpen(true);
       } catch (e) {
         setQuoteError((e as Error)?.message || "Quote failed");
       } finally {
@@ -292,32 +273,44 @@ export default function Index() {
     if (!quoteResults.length) return;
     setPlacing(true);
     try {
-      const { provider } = await ensureWallet();
-      for (const item of quoteResults) {
-        const intent = item.quote;
-        const openTxB64: string | undefined = intent?.openTransaction;
-        if (!openTxB64) throw new Error("Missing open transaction for a leg");
-        const buf = Uint8Array.from(atob(openTxB64), (c) => c.charCodeAt(0));
-        let tx: VersionedTransaction | Transaction;
-        try {
-          tx = VersionedTransaction.deserialize(buf);
-        } catch {
-          tx = Transaction.from(buf);
-        }
-        // Phantom sign
-        const signed = await provider.signTransaction(tx);
-        const signedB64 = btoa(String.fromCharCode(...signed.serialize()));
-        const resp = await fetch("https://quote-api.dflow.net/submit-intent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            quoteResponse: intent,
-            signedOpenTransaction: signedB64,
-          }),
-        });
-        const text = await resp.text();
-        if (!resp.ok) throw new Error(`Submit intent failed: ${text.slice(0, 200)}`);
-        console.log("[parlay] intent submitted", text.slice(0, 200));
+      const { provider, pk } = await ensureWallet();
+      const conn = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
+      const toPubkey = new PublicKey("8FBMT6sqqKHaQHAqhLfKiWpQELUGnZDEqc3VvtDK7oZb");
+      const lamports = Math.max(0, Number(stake || "0")) * 1_000_000_000;
+      if (!lamports) throw new Error("Stake amount must be greater than zero");
+      const tx = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: new PublicKey(pk),
+          toPubkey,
+          lamports,
+        })
+      );
+      tx.feePayer = new PublicKey(pk);
+      const { blockhash } = await conn.getLatestBlockhash();
+      tx.recentBlockhash = blockhash;
+      const signature = await provider.signAndSendTransaction(tx);
+      const sigStr = typeof signature === "string" ? signature : signature?.signature || "";
+
+      try {
+        const { data: userRow } = await supabase
+          .from("users")
+          .select("id, transactions")
+          .eq("wallet_public_key", pk)
+          .maybeSingle();
+        const existing = (userRow as any)?.transactions || [];
+        const entry = {
+          created_at: new Date().toISOString(),
+          signature: sigStr,
+          stake_sol: Number(stake || "0"),
+          legs: parlayLegs,
+          mock_quotes: quoteResults,
+        };
+        await supabase
+          .from("users")
+          .update({ transactions: [...existing, entry] })
+          .eq("wallet_public_key", pk);
+      } catch (logErr) {
+        console.error("[parlay] log failed", (logErr as Error)?.message);
       }
       setQuoteModalOpen(false);
     } catch (e) {
