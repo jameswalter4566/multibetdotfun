@@ -362,7 +362,7 @@ export default function Index() {
               multibet — build parlays on Solana prediction markets
             </h1>
             <p className="mt-4 max-w-3xl text-base md:text-lg text-muted-foreground">
-              Stack multiple yes/no markets into a single slip. Clean white surface, fast quotes, and transparent odds. Live Kalshi-backed order books coming next.
+              Stack multiple yes/no markets into a single slip. Live Kalshi-backed order books coming next.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-md" onClick={goToMarkets}>
