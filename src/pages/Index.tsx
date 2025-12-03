@@ -127,15 +127,18 @@ export default function Index() {
   const connectAndMaybeQuote = useCallback(async () => {
     try {
       await ensureWallet();
+      const pk = await fetchPubkeyFromDb();
+      if (!pk) throw new Error("userPublicKey missing after connect");
+      setWalletPubkey(pk);
       setConnectModalOpen(false);
       if (pendingQuote) {
         setPendingQuote(false);
-        await runQuote();
+        await runQuote(pk);
       }
     } catch (e) {
       setQuoteError((e as Error)?.message || "Wallet connect failed");
     }
-  }, [ensureWallet, pendingQuote]);
+  }, [ensureWallet, pendingQuote, fetchPubkeyFromDb, runQuote]);
 
   const addToParlay = (market: MarketRow) => {
     setParlayOpen(true);
@@ -215,23 +218,16 @@ export default function Index() {
 
   const toggleParlayPanel = () => setParlayOpen((v) => !v);
 
-  const runQuote = useCallback(async () => {
+  const runQuote = useCallback(async (userPubkey: string) => {
     setQuoteLoading(true);
     setQuoteError(null);
     setQuoteResults([]);
     try {
-      let pk = walletPubkey;
-      if (!pk) {
-        pk = await fetchPubkeyFromDb();
-        if (pk) setWalletPubkey(pk);
-      }
-      if (!pk) throw new Error("userPublicKey missing");
-
       const legs = parlayLegs
         .filter((l) => l.outputMint)
         .map((leg) => ({ outputMint: leg.outputMint, amount: Number(stake || "0") }));
       const { data, error } = await supabase.functions.invoke("get-quote", {
-        body: { legs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: pk },
+        body: { legs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
       });
       if (error || !data?.success) {
         setQuoteError(error?.message || data?.error || "Quote failed");
@@ -249,15 +245,15 @@ export default function Index() {
 
   const handleGetQuote = useCallback(async () => {
     if (!parlayLegs.length) return;
-    const provider = (window as any)?.solana;
-    const needsConnect = !walletPubkey || !provider || !provider.isConnected;
-    if (needsConnect) {
+    const pk = await fetchPubkeyFromDb();
+    if (!pk) {
       setPendingQuote(true);
       setConnectModalOpen(true);
       return;
     }
-    await runQuote();
-  }, [parlayLegs, walletPubkey, runQuote]);
+    setWalletPubkey(pk);
+    await runQuote(pk);
+  }, [parlayLegs, fetchPubkeyFromDb, runQuote]);
 
   const handlePlaceParlay = useCallback(async () => {
     if (!quoteResults.length) return;
