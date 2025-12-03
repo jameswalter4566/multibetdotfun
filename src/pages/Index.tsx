@@ -366,7 +366,7 @@ export default function Index() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button asChild variant="outline" className="rounded-full border-border/70 px-6 py-3 text-sm font-semibold">
-                <a href="https://github.com/multibetsol/multibet" target="_blank" rel="noreferrer">
+                <a href="https://github.com/multibetsol/multibet/commits/main/" target="_blank" rel="noreferrer">
                   View GitHub
                 </a>
               </Button>

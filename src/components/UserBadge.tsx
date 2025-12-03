@@ -45,7 +45,7 @@ export default function UserBadge() {
     return (
       <div className="flex items-center gap-3">
         <a
-          href="https://github.com/multibetsol/multibet"
+          href="https://github.com/multibetsol/multibet/commits/main/"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub"

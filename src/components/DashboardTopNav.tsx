@@ -17,7 +17,7 @@ export type DashboardNavLink = {
 
 export const DEFAULT_NAV_LINKS: DashboardNavLink[] = [
   { label: "Markets", href: "/marketplace" },
-  { label: "GitHub", href: "https://github.com/multibetsol/multibet" },
+  { label: "GitHub", href: "https://github.com/multibetsol/multibet/commits/main/" },
   { label: "Follow us", href: "https://x.com/multibetdotfun" },
 ];
 
