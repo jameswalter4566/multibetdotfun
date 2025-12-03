@@ -76,6 +76,24 @@ export default function Index() {
     const pk = res?.publicKey?.toString?.();
     if (!pk) throw new Error("Wallet connection failed");
     setWalletPubkey(pk);
+    // Upsert user row
+    try {
+      await supabase
+        .from("users")
+        .upsert(
+          {
+            userdid: pk,
+            username: pk,
+            wallet_public_key: pk,
+            auth_method: "phantom",
+            signed_in_at: new Date().toISOString(),
+            last_login: new Date().toISOString(),
+          },
+          { onConflict: "userdid" }
+        );
+    } catch (e) {
+      console.error("[auth] upsert user failed", (e as Error)?.message);
+    }
     return { provider, pk };
   }, []);
 
