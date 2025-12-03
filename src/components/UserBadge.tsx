@@ -45,12 +45,6 @@ export default function UserBadge() {
     return (
       <div className="flex items-center gap-3">
         <a
-          href="/list-api"
-          className="inline-flex items-center rounded-full bg-[#a855f7] px-4 py-2 text-sm font-semibold text-white shadow-[0_0_14px_rgba(168,85,247,0.4)] hover:bg-[#9333ea]"
-        >
-          List your App
-        </a>
-        <a
           href="https://github.com/multibetsol/multibet"
           target="_blank"
           rel="noopener noreferrer"
