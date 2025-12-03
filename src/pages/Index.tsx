@@ -1,19 +1,24 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMemo, useState } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import DashboardTopNav from "@/components/DashboardTopNav";
 import GridBackground from "@/components/GridBackground";
+import { supabase } from "@/integrations/supabase/client";
 
-type DemoMarket = {
+type MarketRow = {
   id: string;
-  question: string;
-  category: string;
-  probability: number;
-  change: number;
-  volume: string;
-  resolves: string;
-  leverage: string;
+  ticker: string | null;
+  title: string | null;
+  event_title?: string | null;
+  status: string | null;
+  volume: number | null;
+  open_interest?: number | null;
+  price_yes: number | null;
+  price_no?: number | null;
+  category: string | null;
+  tags?: string[] | null;
+  expiration_time?: string | null;
 };
 
 type ParlayLeg = {
@@ -21,76 +26,23 @@ type ParlayLeg = {
   question: string;
   choice: "YES" | "NO";
   category: string;
+  resolves?: string | null;
 };
 
-const demoMarkets: DemoMarket[] = [
-  {
-    id: "btc-120k-2025",
-    question: "Will BTC close above $120k on Dec 31, 2025?",
-    category: "Crypto",
-    probability: 62,
-    change: 1.8,
-    volume: "$12.4M",
-    resolves: "Dec 31, 2025",
-    leverage: "x3",
-  },
-  {
-    id: "sol-400-jun",
-    question: "Will SOL trade above $400 before June 2025?",
-    category: "Crypto",
-    probability: 54,
-    change: -0.6,
-    volume: "$8.1M",
-    resolves: "Jun 30, 2025",
-    leverage: "x2",
-  },
-  {
-    id: "eth-etf",
-    question: "Will a US spot ETH ETF be approved by Q2 2025?",
-    category: "Macro",
-    probability: 68,
-    change: 2.4,
-    volume: "$9.6M",
-    resolves: "Jun 30, 2025",
-    leverage: "x4",
-  },
-  {
-    id: "fed-cut-march",
-    question: "Will the Fed cut rates at the March 2026 meeting?",
-    category: "Rates",
-    probability: 41,
-    change: 0.9,
-    volume: "$5.4M",
-    resolves: "Mar 19, 2026",
-    leverage: "x3",
-  },
-  {
-    id: "oil-70",
-    question: "Will WTI crude settle above $70 in Q1 2026?",
-    category: "Commodities",
-    probability: 58,
-    change: -1.2,
-    volume: "$3.9M",
-    resolves: "Mar 31, 2026",
-    leverage: "x2",
-  },
-  {
-    id: "ai-chip-share",
-    question: "Will NVIDIA keep >70% AI accelerator share by FY2026?",
-    category: "Equities",
-    probability: 64,
-    change: 1.1,
-    volume: "$6.7M",
-    resolves: "Jan 31, 2026",
-    leverage: "x3",
-  },
-];
+const formatProbability = (val: number | null): number => {
+  if (val == null || Number.isNaN(val)) return 50;
+  if (val <= 1) return Math.round(val * 100);
+  if (val <= 100) return Math.round(val);
+  return Math.round(val / 100);
+};
 
 export default function Index() {
   const navigate = useNavigate();
   const [parlayOpen, setParlayOpen] = useState(false);
   const [parlayLegs, setParlayLegs] = useState<ParlayLeg[]>([]);
   const [stake, setStake] = useState("10");
+  const [markets, setMarkets] = useState<MarketRow[]>([]);
+  const [loadingMarkets, setLoadingMarkets] = useState(true);
 
   const goToMarkets = () => navigate("/marketplace");
 
@@ -102,12 +54,21 @@ export default function Index() {
     [parlayLegs]
   );
 
-  const addToParlay = (market: DemoMarket) => {
+  const addToParlay = (market: MarketRow) => {
     setParlayOpen(true);
     setParlayLegs((prev) => {
       if (prev.some((leg) => leg.id === market.id)) return prev;
       if (prev.length >= 4) return prev;
-      return [...prev, { id: market.id, question: market.question, choice: "YES", category: market.category }];
+      return [
+        ...prev,
+        {
+          id: market.id,
+          question: market.title || market.event_title || "Untitled market",
+          choice: "YES",
+          category: market.category || "Market",
+          resolves: market.expiration_time || null,
+        },
+      ];
     });
     if (typeof document !== "undefined") {
       const panel = document.getElementById("parlay-panel");
@@ -123,6 +84,44 @@ export default function Index() {
     setParlayLegs([]);
     setStake("10");
   };
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchMarkets = async () => {
+      setLoadingMarkets(true);
+      const { data, error } = await supabase
+        .from("markets")
+        .select("id, ticker, title, event_title, status, volume, open_interest, price_yes, price_no, category, tags, expiration_time")
+        .order("volume", { ascending: false })
+        .limit(18);
+      if (!mounted) return;
+      if (error) {
+        console.error("[markets] fetch error", error.message);
+        setMarkets([]);
+      } else {
+        setMarkets(data || []);
+      }
+      setLoadingMarkets(false);
+    };
+
+    fetchMarkets();
+
+    const channel = supabase
+      .channel("markets-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "markets" },
+        () => fetchMarkets()
+      )
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      try {
+        supabase.removeChannel(channel);
+      } catch {}
+    };
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -178,25 +177,36 @@ export default function Index() {
           </div>
         </section>
 
-        {/* Markets */}
+        {/* Markets + Parlay */}
         <section id="markets" className="mt-12">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Markets</p>
-              <h2 className="text-2xl font-extrabold tracking-tight text-foreground">Curated questions to trade now</h2>
+              <h2 className="text-2xl font-extrabold tracking-tight text-foreground">Live feed from Kalshi</h2>
             </div>
             <Button variant="outline" className="rounded-full border-border/70 px-4 py-2 text-sm" onClick={goToMarkets}>
               View all
             </Button>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            These cards are design-only placeholders. Live order books will be powered by Kalshi data.
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">Powered by the Markets table populated from the Kalshi metadata API.</p>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,400px)]">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {demoMarkets.map((market) => {
-                const positive = market.change >= 0;
+              {loadingMarkets && (
+                <div className="col-span-full rounded-2xl border border-border bg-white/80 p-6 text-sm text-muted-foreground shadow-sm">
+                  Loading markets…
+                </div>
+              )}
+
+              {!loadingMarkets && markets.length === 0 && (
+                <div className="col-span-full rounded-2xl border border-border bg-white/80 p-6 text-sm text-muted-foreground shadow-sm">
+                  No markets yet. Run the sync function from Supabase to pull the latest Kalshi data.
+                </div>
+              )}
+
+              {markets.map((market) => {
+                const positiveChange = (market.price_yes ?? 0) >= (market.price_no ?? 0);
+                const probability = formatProbability(market.price_yes);
                 const reachedMax = parlayLegs.length >= 4;
                 const isAdded = parlayLegs.some((leg) => leg.id === market.id);
                 return (
@@ -206,30 +216,29 @@ export default function Index() {
                   >
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-foreground/80">
-                        {market.category}
+                        {market.category || "Market"}
                       </span>
                       <span className="text-xs text-muted-foreground">Parlay ready</span>
                     </div>
-                    <h3 className="mt-4 text-lg font-semibold leading-snug">{market.question}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">Resolves {market.resolves}</p>
+                    <h3 className="mt-4 text-lg font-semibold leading-snug">{market.title || market.event_title || "Untitled market"}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">Resolves {market.expiration_time ? new Date(market.expiration_time).toLocaleDateString() : "TBD"}</p>
 
                     <div className="mt-6 flex items-end justify-between">
                       <div>
                         <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Yes probability</div>
-                        <div className="text-4xl font-extrabold text-foreground">{market.probability}%</div>
+                        <div className="text-4xl font-extrabold text-foreground">{probability}%</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">24h change</div>
-                        <div className={`text-lg font-semibold ${positive ? "text-green-600" : "text-red-600"}`}>
-                          {positive ? "+" : ""}
-                          {market.change}%
-                        </div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Volume</div>
+                        <div className="text-lg font-semibold text-foreground">{market.volume ?? "-"}</div>
                       </div>
                     </div>
 
                     <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                      <span>Volume {market.volume}</span>
-                      <span className="text-foreground/80">Settles on-chain</span>
+                      <span>Status: {market.status || "unknown"}</span>
+                      <span className={positiveChange ? "text-green-600" : "text-red-600"}>
+                        Yes: {market.price_yes ?? "-"} / No: {market.price_no ?? "-"}
+                      </span>
                     </div>
 
                     <div className="mt-6 flex gap-3">
@@ -293,6 +302,7 @@ export default function Index() {
                           ×
                         </button>
                       </div>
+                      <p className="mt-1 text-xs text-muted-foreground">Resolves {leg.resolves ? new Date(leg.resolves).toLocaleDateString() : "TBD"}</p>
                     </div>
                   ))
                 )}
