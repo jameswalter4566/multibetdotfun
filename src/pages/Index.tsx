@@ -110,6 +110,19 @@ export default function Index() {
     return { provider, pk };
   }, []);
 
+  const connectAndMaybeQuote = useCallback(async () => {
+    try {
+      await ensureWallet();
+      setConnectModalOpen(false);
+      if (pendingQuote) {
+        setPendingQuote(false);
+        await runQuote();
+      }
+    } catch (e) {
+      setQuoteError((e as Error)?.message || "Wallet connect failed");
+    }
+  }, [ensureWallet, pendingQuote]);
+
   const addToParlay = (market: MarketRow) => {
     setParlayOpen(true);
     setParlayLegs((prev) => {
@@ -215,7 +228,9 @@ export default function Index() {
 
   const handleGetQuote = useCallback(async () => {
     if (!parlayLegs.length) return;
-    if (!walletPubkey) {
+    const provider = (window as any)?.solana;
+    const needsConnect = !walletPubkey || !provider || !provider.isConnected;
+    if (needsConnect) {
       setPendingQuote(true);
       setConnectModalOpen(true);
       return;
@@ -592,6 +607,26 @@ export default function Index() {
               <Button disabled={placing} onClick={handlePlaceParlay}>
                 {placing ? "Placing..." : "Place parlay"}
               </Button>
+            </div>
+            {quoteError && <p className="mt-3 text-xs text-red-600 text-center">{quoteError}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* Connect Wallet Modal */}
+      {connectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-white p-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-foreground">Connect wallet to place parlay</h3>
+              <button className="text-sm text-muted-foreground underline" onClick={() => setConnectModalOpen(false)}>Close</button>
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              We’ll connect Phantom, store your public key, and keep you signed in for future quotes.
+            </p>
+            <div className="mt-5 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setConnectModalOpen(false)}>Cancel</Button>
+              <Button onClick={connectAndMaybeQuote}>Connect Phantom</Button>
             </div>
             {quoteError && <p className="mt-3 text-xs text-red-600 text-center">{quoteError}</p>}
           </div>
