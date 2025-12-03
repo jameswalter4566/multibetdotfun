@@ -362,12 +362,9 @@ export default function Index() {
               multibet — build parlays on Solana prediction markets
             </h1>
             <p className="mt-4 max-w-3xl text-base md:text-lg text-muted-foreground">
-              Stack multiple yes/no markets into a single slip. Live Kalshi-backed order books coming next.
+              Stack multiple yes/no markets into a single slip.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button className="rounded-full px-6 py-3 text-sm font-semibold shadow-md" onClick={goToMarkets}>
-                Browse markets
-              </Button>
               <Button asChild variant="outline" className="rounded-full border-border/70 px-6 py-3 text-sm font-semibold">
                 <a href="https://github.com/multibetsol/multibet" target="_blank" rel="noreferrer">
                   View GitHub
@@ -630,26 +627,6 @@ export default function Index() {
           </div>
         </section>
 
-        {/* Secondary CTA */}
-        <section className="mt-14 rounded-[24px] border border-border bg-secondary/80 p-8 shadow-create">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Pipeline</p>
-              <h3 className="mt-2 text-2xl font-bold text-foreground">Live data + funding rails next</h3>
-              <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-                Connect your wallet, stack legs into parlays, and stream Kalshi markets directly. Get updates as we turn these designs into live order books.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button className="rounded-full px-5 py-3 text-sm font-semibold" onClick={() => navigate("/signup")}>
-                Join the waitlist
-              </Button>
-              <Button asChild variant="outline" className="rounded-full px-5 py-3 text-sm font-semibold">
-                <a href="https://x.com/multibetdotfun" target="_blank" rel="noreferrer">Follow on X</a>
-              </Button>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Quote Modal */}
