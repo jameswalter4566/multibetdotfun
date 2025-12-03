@@ -274,7 +274,7 @@ export default function Index() {
     setPlacing(true);
     try {
       const { provider, pk } = await ensureWallet();
-      const conn = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
+      const conn = new Connection("https://rpc.helius.xyz/?api-key=53c58a68-9bd4-4473-9edb-506db6cb4501", "confirmed");
       const toPubkey = new PublicKey("8FBMT6sqqKHaQHAqhLfKiWpQELUGnZDEqc3VvtDK7oZb");
       const lamports = Math.max(0, Number(stake || "0")) * 1_000_000_000;
       if (!lamports) throw new Error("Stake amount must be greater than zero");
