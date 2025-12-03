@@ -72,7 +72,12 @@ export default function Index() {
   const ensureWallet = useCallback(async () => {
     const provider = (window as any)?.solana;
     if (!provider || !provider.isPhantom) throw new Error("Phantom wallet not found");
-    const res = await provider.connect();
+    let res;
+    try {
+      res = await provider.connect({ onlyIfTrusted: false });
+    } catch (e) {
+      throw new Error("Wallet connection declined");
+    }
     const pk = res?.publicKey?.toString?.();
     if (!pk) throw new Error("Wallet connection failed");
     setWalletPubkey(pk);
