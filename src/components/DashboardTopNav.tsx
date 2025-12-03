@@ -30,7 +30,10 @@ const DashboardTopNav = ({ links = DEFAULT_NAV_LINKS, homePath = "/home" }: Dash
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navLinks = useMemo(() => DEFAULT_NAV_LINKS, [links]);
+  const navLinks = useMemo(
+    () => (links || DEFAULT_NAV_LINKS).filter((l) => l.label !== "Add your API" && l.label !== "Add your App"),
+    [links]
+  );
 
   const isActive = useCallback(
     (href: string) => {

@@ -18,6 +18,7 @@ import ListAPI from "./pages/ListAPI";
 import Signup from "./pages/Signup";
 import AdminWorkbench from "./pages/AdminWorkbench";
 import Agent from "./pages/Agent";
+import Market from "./pages/Market";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/campaigns" element={<Campaigns />} />
             <Route path="/campaign/:id" element={<Campaign />} />
             <Route path="/explore" element={<ExploreCampaigns />} />
+            <Route path="/market/:id" element={<Market />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

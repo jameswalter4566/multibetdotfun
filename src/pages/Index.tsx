@@ -447,7 +447,11 @@ export default function Index() {
                       >
                         {isAdded ? "Added" : reachedMax ? "Max 4 legs" : "Add to parlay"}
                       </Button>
-                      <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold" variant="outline">
+                      <Button
+                        className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold"
+                        variant="outline"
+                        onClick={() => navigate(`/market/${market.id}`)}
+                      >
                         View market
                       </Button>
                     </div>
