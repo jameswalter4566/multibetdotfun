@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SiteFooter from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import DashboardTopNav from "@/components/DashboardTopNav";
 import GridBackground from "@/components/GridBackground";
 import { supabase } from "@/integrations/supabase/client";
+import { Transaction, VersionedTransaction } from "@solana/web3.js";
 
 type MarketRow = {
   id: string;
@@ -19,6 +20,8 @@ type MarketRow = {
   category: string | null;
   tags?: string[] | null;
   expiration_time?: string | null;
+  yes_mint?: string | null;
+  no_mint?: string | null;
 };
 
 type ParlayLeg = {
@@ -27,6 +30,7 @@ type ParlayLeg = {
   choice: "YES" | "NO";
   category: string;
   resolves?: string | null;
+  outputMint?: string | null;
 };
 
 const formatProbability = (val: number | null): number => {
@@ -36,13 +40,24 @@ const formatProbability = (val: number | null): number => {
   return Math.round(val / 100);
 };
 
+const PAGE_SIZE = 12;
+const DEFAULT_INPUT_MINT = "EPjFWdd5AufqSSqeM2q9D4p9iu3Xwp9Qw3tXnCh9xz2V"; // USDC mainnet
+
 export default function Index() {
   const navigate = useNavigate();
-  const [parlayOpen, setParlayOpen] = useState(false);
+  const [parlayOpen, setParlayOpen] = useState(true);
   const [parlayLegs, setParlayLegs] = useState<ParlayLeg[]>([]);
   const [stake, setStake] = useState("10");
   const [markets, setMarkets] = useState<MarketRow[]>([]);
   const [loadingMarkets, setLoadingMarkets] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [quoteModalOpen, setQuoteModalOpen] = useState(false);
+  const [quoteResults, setQuoteResults] = useState<any[]>([]);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+  const [placing, setPlacing] = useState(false);
+  const [walletPubkey, setWalletPubkey] = useState<string | null>(null);
 
   const goToMarkets = () => navigate("/marketplace");
 
@@ -67,6 +82,7 @@ export default function Index() {
           choice: "YES",
           category: market.category || "Market",
           resolves: market.expiration_time || null,
+          outputMint: market.yes_mint || null,
         },
       ];
     });
@@ -89,17 +105,23 @@ export default function Index() {
     let mounted = true;
     const fetchMarkets = async () => {
       setLoadingMarkets(true);
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from("markets")
-        .select("id, ticker, title, event_title, status, volume, open_interest, price_yes, price_no, category, tags, expiration_time")
+        .select(
+          "id, ticker, title, event_title, status, volume, open_interest, price_yes, price_no, category, tags, expiration_time, yes_mint, no_mint",
+          { count: "exact" }
+        )
         .order("volume", { ascending: false })
-        .limit(18);
+        .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
       if (!mounted) return;
       if (error) {
         console.error("[markets] fetch error", error.message);
         setMarkets([]);
+        setTotalPages(1);
       } else {
         setMarkets(data || []);
+        const totalCount = count ?? (data?.length || 0);
+        setTotalPages(Math.max(1, Math.ceil(totalCount / PAGE_SIZE)));
       }
       setLoadingMarkets(false);
     };
@@ -121,7 +143,76 @@ export default function Index() {
         supabase.removeChannel(channel);
       } catch {}
     };
+  }, [page]);
+
+  const toggleParlayPanel = () => setParlayOpen((v) => !v);
+
+  const handleGetQuote = useCallback(async () => {
+    if (!parlayLegs.length) return;
+    setQuoteLoading(true);
+    setQuoteError(null);
+    setQuoteResults([]);
+    try {
+      const legs = parlayLegs
+        .filter((l) => l.outputMint)
+        .map((leg) => ({ outputMint: leg.outputMint, amount: Number(stake || "0") }));
+      const { data, error } = await supabase.functions.invoke("get-quote", {
+        body: { legs, inputMint: DEFAULT_INPUT_MINT },
+      });
+      if (error || !data?.success) {
+        setQuoteError(error?.message || data?.error || "Quote failed");
+      } else {
+        setQuoteResults(data.results || []);
+        setQuoteModalOpen(true);
+      }
+    } catch (e) {
+      setQuoteError((e as Error)?.message || "Quote failed");
+    } finally {
+      setQuoteLoading(false);
+    }
+  }, [parlayLegs, stake]);
+
+  const ensureWallet = useCallback(async () => {
+    const provider = (window as any)?.solana;
+    if (!provider || !provider.isPhantom) throw new Error("Phantom wallet not found");
+    const res = await provider.connect();
+    const pk = res?.publicKey?.toString?.();
+    if (!pk) throw new Error("Wallet connection failed");
+    setWalletPubkey(pk);
+    return { provider, pk };
   }, []);
+
+  const handlePlaceParlay = useCallback(async () => {
+    if (!quoteResults.length) return;
+    setPlacing(true);
+    try {
+      const { provider, pk } = await ensureWallet();
+      const quotes = quoteResults.map((r) => r.quote);
+      const { data, error } = await supabase.functions.invoke("swap-parlay", {
+        body: { quotes, userPublicKey: pk },
+      });
+      if (error || !data?.success) throw new Error(error?.message || data?.error || "Swap failed");
+      const swaps: any[] = data.results || [];
+      for (const s of swaps) {
+        const raw = s?.swap?.swapTransaction;
+        if (!raw) continue;
+        const buf = Uint8Array.from(atob(raw), (c) => c.charCodeAt(0));
+        let tx: VersionedTransaction | Transaction;
+        try {
+          tx = VersionedTransaction.deserialize(buf);
+        } catch {
+          tx = Transaction.from(buf);
+        }
+        const signed = await provider.signAndSendTransaction(tx);
+        console.log("[parlay] sent tx", signed?.signature || signed);
+      }
+      setQuoteModalOpen(false);
+    } catch (e) {
+      setQuoteError((e as Error)?.message || "Place parlay failed");
+    } finally {
+      setPlacing(false);
+    }
+  }, [quoteResults, ensureWallet]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -190,7 +281,7 @@ export default function Index() {
           </div>
           <p className="mt-2 text-sm text-muted-foreground">Powered by the Markets table populated from the Kalshi metadata API.</p>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,400px)]">
+          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,420px)]">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {loadingMarkets && (
                 <div className="col-span-full rounded-2xl border border-border bg-white/80 p-6 text-sm text-muted-foreground shadow-sm">
@@ -261,8 +352,8 @@ export default function Index() {
 
             <div
               id="parlay-panel"
-              className={`rounded-[24px] border border-border bg-white/95 p-6 shadow-glow transition-all duration-200 ${
-                parlayOpen ? "opacity-100 translate-y-0" : "opacity-95 lg:opacity-100"
+              className={`relative rounded-[24px] border border-border bg-white/95 p-6 shadow-glow transition-transform duration-200 ${
+                parlayOpen ? "translate-x-0" : "lg:translate-x-[calc(100%+16px)]"
               } lg:sticky lg:top-24`}
             >
               <div className="flex items-center justify-between">
@@ -271,15 +362,29 @@ export default function Index() {
                   <h3 className="text-xl font-semibold text-foreground">Parlay builder</h3>
                   <p className="text-xs text-muted-foreground">Max 4 legs</p>
                 </div>
-                <button
-                  className="text-sm text-muted-foreground underline underline-offset-4 disabled:opacity-40"
-                  onClick={clearParlay}
-                  disabled={!parlayLegs.length}
-                >
-                  Clear all
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="text-xs text-muted-foreground underline underline-offset-4"
+                    onClick={toggleParlayPanel}
+                  >
+                    {parlayOpen ? "Collapse" : "Open"}
+                  </button>
+                  <button
+                    className="text-sm text-muted-foreground underline underline-offset-4 disabled:opacity-40"
+                    onClick={clearParlay}
+                    disabled={!parlayLegs.length}
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
 
+              {!parlayOpen && (
+                <p className="mt-3 text-xs text-muted-foreground">Tap “Open” to manage your parlay.</p>
+              )}
+
+              {parlayOpen && (
+              <>
               <div className="mt-4 space-y-3">
                 {parlayLegs.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-border/70 bg-secondary/50 px-4 py-6 text-sm text-muted-foreground">
@@ -323,13 +428,19 @@ export default function Index() {
               <div className="mt-5">
                 <Button
                   className="w-full rounded-2xl bg-sky-500 py-4 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(14,165,233,0.35)] hover:bg-sky-600 disabled:opacity-60"
-                  disabled={!parlayLegs.length}
+                  disabled={!parlayLegs.length || quoteLoading}
+                  onClick={handleGetQuote}
                 >
-                  {parlayLegs.length ? `Get Quote (${parlayLegs.length} ${parlayLegs.length === 1 ? "leg" : "legs"})` : "Add a leg to quote"}
+                  {quoteLoading
+                    ? "Getting quotes..."
+                    : parlayLegs.length
+                    ? `Get Quote (${parlayLegs.length} ${parlayLegs.length === 1 ? "leg" : "legs"})`
+                    : "Add a leg to quote"}
                 </Button>
                 <p className="mt-2 text-center text-xs text-muted-foreground">
                   {parlayLegs.length ? `${parlayLegs.length} leg parlay` : "No legs selected"}
                 </p>
+                {quoteError && <p className="mt-2 text-xs text-red-600 text-center">{quoteError}</p>}
               </div>
 
               <div className="mt-6 space-y-2 rounded-2xl border border-border bg-white/90 p-4 text-sm text-muted-foreground">
@@ -353,7 +464,33 @@ export default function Index() {
                   <span className="text-foreground font-semibold">{selectionCounts.yesPicks}</span>
                 </div>
               </div>
+              </>
+              )}
             </div>
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+              Prev
+            </Button>
+            {[...Array(totalPages)].map((_, idx) => {
+              const p = idx + 1;
+              if (p > 6 && p < totalPages - 2) return null;
+              return (
+                <Button
+                  key={p}
+                  variant={p === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </Button>
+              );
+            })}
+            <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+              Next
+            </Button>
           </div>
         </section>
 
@@ -378,6 +515,48 @@ export default function Index() {
           </div>
         </section>
       </main>
+
+      {/* Quote Modal */}
+      {quoteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-3xl rounded-2xl border border-border bg-white p-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-foreground">Review quotes</h3>
+              <button className="text-sm text-muted-foreground underline" onClick={() => setQuoteModalOpen(false)}>
+                Close
+              </button>
+            </div>
+            <div className="mt-4 space-y-4 max-h-[60vh] overflow-y-auto">
+              {quoteResults.map((item, idx) => {
+                const leg = parlayLegs.find((l) => l.outputMint === item.leg?.outputMint) || parlayLegs[idx];
+                const quote = item.quote || {};
+                return (
+                  <div key={idx} className="rounded-xl border border-border bg-secondary/60 p-4">
+                    <div className="text-sm font-semibold text-foreground">{leg?.question || "Market"}</div>
+                    <div className="text-xs text-muted-foreground">Output mint: {item.leg?.outputMint}</div>
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                      <span>In: {quote.inAmount}</span>
+                      <span>Out: {quote.outAmount}</span>
+                      <span>Min out: {quote.minOutAmount}</span>
+                      <span>Impact: {quote.priceImpactPct}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setQuoteModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button disabled={placing} onClick={handlePlaceParlay}>
+                {placing ? "Placing..." : "Place parlay"}
+              </Button>
+            </div>
+            {quoteError && <p className="mt-3 text-xs text-red-600 text-center">{quoteError}</p>}
+          </div>
+        </div>
+      )}
+
       <SiteFooter />
     </div>
   );
