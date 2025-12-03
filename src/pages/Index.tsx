@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import DashboardTopNav from "@/components/DashboardTopNav";
@@ -13,6 +14,13 @@ type DemoMarket = {
   volume: string;
   resolves: string;
   leverage: string;
+};
+
+type ParlayLeg = {
+  id: string;
+  question: string;
+  choice: "YES" | "NO";
+  category: string;
 };
 
 const demoMarkets: DemoMarket[] = [
@@ -80,8 +88,40 @@ const demoMarkets: DemoMarket[] = [
 
 export default function Index() {
   const navigate = useNavigate();
+  const [parlayOpen, setParlayOpen] = useState(false);
+  const [parlayLegs, setParlayLegs] = useState<ParlayLeg[]>([]);
+  const [stake, setStake] = useState("10");
 
   const goToMarkets = () => navigate("/marketplace");
+
+  const selectionCounts = useMemo(
+    () => ({
+      legs: parlayLegs.length,
+      yesPicks: parlayLegs.filter((leg) => leg.choice === "YES").length,
+    }),
+    [parlayLegs]
+  );
+
+  const addToParlay = (market: DemoMarket) => {
+    setParlayOpen(true);
+    setParlayLegs((prev) => {
+      if (prev.some((leg) => leg.id === market.id)) return prev;
+      return [...prev, { id: market.id, question: market.question, choice: "YES", category: market.category }];
+    });
+    if (typeof document !== "undefined") {
+      const panel = document.getElementById("parlay-panel");
+      if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const removeLeg = (id: string) => {
+    setParlayLegs((prev) => prev.filter((leg) => leg.id !== id));
+  };
+
+  const clearParlay = () => {
+    setParlayLegs([]);
+    setStake("10");
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -152,115 +192,151 @@ export default function Index() {
             These cards are design-only placeholders. Live order books will be powered by Kalshi data.
           </p>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {demoMarkets.map((market) => {
-              const positive = market.change >= 0;
-              return (
-                <div
-                  key={market.id}
-                  className="relative overflow-hidden rounded-2xl border border-border bg-white/90 p-6 shadow-glow transition-transform duration-200 hover:-translate-y-1"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-foreground/80">
-                      {market.category}
-                    </span>
-                    <span className="text-xs text-muted-foreground">Parlay ready</span>
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold leading-snug">{market.question}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Resolves {market.resolves}</p>
-
-                  <div className="mt-6 flex items-end justify-between">
-                    <div>
-                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Yes probability</div>
-                      <div className="text-4xl font-extrabold text-foreground">{market.probability}%</div>
+          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,400px)]">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {demoMarkets.map((market) => {
+                const positive = market.change >= 0;
+                return (
+                  <div
+                    key={market.id}
+                    className="relative overflow-hidden rounded-2xl border border-border bg-white/90 p-6 shadow-glow transition-transform duration-200 hover:-translate-y-1"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-foreground/80">
+                        {market.category}
+                      </span>
+                      <span className="text-xs text-muted-foreground">Parlay ready</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">24h change</div>
-                      <div className={`text-lg font-semibold ${positive ? "text-green-600" : "text-red-600"}`}>
-                        {positive ? "+" : ""}
-                        {market.change}%
+                    <h3 className="mt-4 text-lg font-semibold leading-snug">{market.question}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">Resolves {market.resolves}</p>
+
+                    <div className="mt-6 flex items-end justify-between">
+                      <div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Yes probability</div>
+                        <div className="text-4xl font-extrabold text-foreground">{market.probability}%</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">24h change</div>
+                        <div className={`text-lg font-semibold ${positive ? "text-green-600" : "text-red-600"}`}>
+                          {positive ? "+" : ""}
+                          {market.change}%
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                    <span>Volume {market.volume}</span>
-                    <span className="text-foreground/80">Settles on-chain</span>
-                  </div>
+                    <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+                      <span>Volume {market.volume}</span>
+                      <span className="text-foreground/80">Settles on-chain</span>
+                    </div>
 
-                  <div className="mt-6 flex gap-3">
-                    <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-md" variant="default">
-                      Add to parlay
-                    </Button>
-                    <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold" variant="outline">
-                      View market
-                    </Button>
+                    <div className="mt-6 flex gap-3">
+                      <Button
+                        className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold shadow-md"
+                        variant="default"
+                        onClick={() => addToParlay(market)}
+                      >
+                        Add to parlay
+                      </Button>
+                      <Button className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold" variant="outline">
+                        View market
+                      </Button>
+                    </div>
                   </div>
+                );
+              })}
+            </div>
+
+            <div
+              id="parlay-panel"
+              className={`rounded-[24px] border border-border bg-white/95 p-6 shadow-glow transition-all duration-200 ${
+                parlayOpen ? "opacity-100 translate-y-0" : "opacity-95 lg:opacity-100"
+              } lg:sticky lg:top-24`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Slip</p>
+                  <h3 className="text-xl font-semibold text-foreground">Parlay builder</h3>
                 </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Parlay slip mock */}
-        <section className="mt-12 grid gap-6 lg:grid-cols-[2fr_1fr]">
-          <div className="rounded-[24px] border border-border bg-white/95 p-6 shadow-glow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Slip</p>
-                <h3 className="text-xl font-semibold text-foreground">Parlay builder</h3>
+                <button
+                  className="text-sm text-muted-foreground underline underline-offset-4 disabled:opacity-40"
+                  onClick={clearParlay}
+                  disabled={!parlayLegs.length}
+                >
+                  Clear all
+                </button>
               </div>
-              <button className="text-sm text-muted-foreground underline underline-offset-4">Clear all</button>
-            </div>
 
-            <div className="mt-4 space-y-3">
-              {[
-                { id: 1, title: "Will BTC close above $120k on Dec 31, 2025?", choice: "YES" },
-                { id: 2, title: "Will a US spot ETH ETF be approved by Q2 2025?", choice: "YES" },
-              ].map((leg) => (
-                <div key={leg.id} className="rounded-2xl border border-border/80 bg-secondary/70 px-4 py-3">
-                  <p className="text-sm font-semibold text-foreground">{leg.title}</p>
-                  <p className="mt-1 text-xs font-semibold uppercase text-sky-600">{leg.choice}</p>
+              <div className="mt-4 space-y-3">
+                {parlayLegs.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border/70 bg-secondary/50 px-4 py-6 text-sm text-muted-foreground">
+                    Add markets from the left to start a parlay.
+                  </div>
+                ) : (
+                  parlayLegs.map((leg) => (
+                    <div key={leg.id} className="rounded-2xl border border-border/80 bg-secondary/70 px-4 py-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{leg.category}</p>
+                          <p className="mt-1 text-sm font-semibold text-foreground">{leg.question}</p>
+                          <p className="mt-1 text-xs font-semibold uppercase text-sky-600">{leg.choice}</p>
+                        </div>
+                        <button
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                          onClick={() => removeLeg(leg.id)}
+                          aria-label="Remove leg"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="mt-5">
+                <label className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Stake amount ($)</label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  className="mt-2 w-full rounded-2xl border border-border/80 bg-white px-4 py-3 text-sm outline-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/60"
+                  placeholder="10"
+                  value={stake}
+                  onChange={(e) => setStake(e.target.value)}
+                />
+              </div>
+
+              <div className="mt-5">
+                <Button
+                  className="w-full rounded-2xl bg-sky-500 py-4 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(14,165,233,0.35)] hover:bg-sky-600 disabled:opacity-60"
+                  disabled={!parlayLegs.length}
+                >
+                  {parlayLegs.length ? `Get Quote (${parlayLegs.length} ${parlayLegs.length === 1 ? "leg" : "legs"})` : "Add a leg to quote"}
+                </Button>
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  {parlayLegs.length ? `${parlayLegs.length} leg parlay` : "No legs selected"}
+                </p>
+              </div>
+
+              <div className="mt-6 space-y-2 rounded-2xl border border-border bg-white/90 p-4 text-sm text-muted-foreground">
+                <h4 className="text-sm font-semibold text-foreground">How it works</h4>
+                <ol className="space-y-1">
+                  <li>1) Connect your Phantom wallet</li>
+                  <li>2) Select Yes or No on multiple markets</li>
+                  <li>3) All legs must win for your parlay to pay out</li>
+                </ol>
+              </div>
+
+              <div className="mt-3 rounded-2xl border border-border bg-white/90 p-4 text-sm text-muted-foreground">
+                <div className="flex items-center justify-between">
+                  <span>Selection</span>
+                  <span className="text-foreground font-semibold">
+                    {selectionCounts.legs} {selectionCounts.legs === 1 ? "leg" : "legs"}
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-5">
-              <label className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Stake amount ($)</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                className="mt-2 w-full rounded-2xl border border-border/80 bg-white px-4 py-3 text-sm outline-none shadow-sm focus-visible:ring-2 focus-visible:ring-primary/60"
-                placeholder="10"
-                defaultValue={10}
-              />
-            </div>
-
-            <div className="mt-5">
-              <Button className="w-full rounded-2xl bg-sky-500 py-4 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(14,165,233,0.35)] hover:bg-sky-600">
-                Get Quote (2 legs)
-              </Button>
-              <p className="mt-2 text-center text-xs text-muted-foreground">2 leg parlay</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-border bg-white/90 p-5 shadow-sm">
-              <h4 className="text-sm font-semibold text-foreground">How it works</h4>
-              <ol className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>1) Connect your Phantom wallet</li>
-                <li>2) Select Yes or No on multiple markets</li>
-                <li>3) All legs must win for your parlay to pay out</li>
-              </ol>
-            </div>
-            <div className="rounded-2xl border border-border bg-white/90 p-5 shadow-sm">
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span>Selection</span>
-                <span className="text-foreground font-semibold">2 legs</span>
-              </div>
-              <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
-                <span>Yes picks</span>
-                <span className="text-foreground font-semibold">2</span>
+                <div className="mt-2 flex items-center justify-between">
+                  <span>Yes picks</span>
+                  <span className="text-foreground font-semibold">{selectionCounts.yesPicks}</span>
+                </div>
               </div>
             </div>
           </div>
