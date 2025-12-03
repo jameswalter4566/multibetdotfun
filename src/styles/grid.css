@@ -9,17 +9,17 @@
   position: absolute;
   inset: 0;
   background-color: transparent;
-  /* Faint purple grid — 2x larger squares */
+  /* Soft neutral grid */
   background-image:
-    repeating-linear-gradient(0deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(168,85,247,0.10) 48px),
-    repeating-linear-gradient(90deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(168,85,247,0.10) 48px);
+    repeating-linear-gradient(0deg, rgba(45,63,93,0.0) 0px, rgba(45,63,93,0.0) 47px, rgba(45,63,93,0.06) 48px),
+    repeating-linear-gradient(90deg, rgba(45,63,93,0.0) 0px, rgba(45,63,93,0.0) 47px, rgba(45,63,93,0.06) 48px);
   background-size: auto;
 }
 .gridbg-highlight{
   /* brighter grid lines for the highlight */
   background-image:
-    repeating-linear-gradient(0deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(192,132,252,0.35) 48px),
-    repeating-linear-gradient(90deg, rgba(168,85,247,0.0) 0px, rgba(168,85,247,0.0) 47px, rgba(192,132,252,0.35) 48px);
+    repeating-linear-gradient(0deg, rgba(45,63,93,0.0) 0px, rgba(45,63,93,0.0) 47px, rgba(56,124,221,0.2) 48px),
+    repeating-linear-gradient(90deg, rgba(45,63,93,0.0) 0px, rgba(45,63,93,0.0) 47px, rgba(56,124,221,0.2) 48px);
   -webkit-mask-image: radial-gradient(220px 220px at var(--mx) var(--my), rgba(255,255,255,1), rgba(255,255,255,0));
           mask-image: radial-gradient(220px 220px at var(--mx) var(--my), rgba(255,255,255,1), rgba(255,255,255,0));
 }
