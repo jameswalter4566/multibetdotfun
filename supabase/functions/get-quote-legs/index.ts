@@ -42,12 +42,12 @@ serve(async (req) => {
       const amountDec = Number(leg.amount || 0);
       if (!leg.outputMint || amountDec <= 0) continue;
       const amountInt = Math.round(amountDec * 1_000_000); // assume 6 decimals (USDC)
-      const url = new URL(`${QUOTE_BASE}/quote`);
+      const url = new URL(`${QUOTE_BASE}/order`);
+      url.searchParams.set("userPublicKey", userPublicKey);
       url.searchParams.set("inputMint", inputMint);
       url.searchParams.set("outputMint", leg.outputMint);
       url.searchParams.set("amount", String(amountInt));
       url.searchParams.set("slippageBps", String(leg.slippageBps ?? slippageBps));
-      url.searchParams.set("onlyDirectRoutes", "false");
       const start = Date.now();
       const resp = await fetch(url.toString());
       const text = await resp.text();
