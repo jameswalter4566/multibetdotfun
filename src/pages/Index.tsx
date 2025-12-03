@@ -42,6 +42,7 @@ const formatProbability = (val: number | null): number => {
 
 const PAGE_SIZE = 12;
 const DEFAULT_INPUT_MINT = "EPjFWdd5AufqSSqeM2q9D4p9iu3Xwp9Qw3tXnCh9xz2V"; // USDC mainnet
+const DEFAULT_OUTPUT_MINT = "So11111111111111111111111111111111111111112"; // SOL fallback
 
 export default function Index() {
   const navigate = useNavigate();
@@ -153,7 +154,7 @@ export default function Index() {
           choice: "YES",
           category: market.category || "Market",
           resolves: market.expiration_time || null,
-          outputMint: market.yes_mint || null,
+          outputMint: market.yes_mint || market.no_mint || DEFAULT_OUTPUT_MINT,
         },
       ];
     });
@@ -224,10 +225,11 @@ export default function Index() {
     setQuoteResults([]);
     try {
       const legs = parlayLegs
-        .filter((l) => l.outputMint)
-        .map((leg) => ({ outputMint: leg.outputMint, amount: Number(stake || "0") }));
+        .map((leg) => ({ outputMint: leg.outputMint || DEFAULT_OUTPUT_MINT, amount: Number(stake || "0") }));
+      const nonEmptyLegs = legs.filter((l) => l.outputMint);
+      if (!nonEmptyLegs.length) throw new Error("No output mints available for quote");
       const { data, error } = await supabase.functions.invoke("get-quote", {
-        body: { legs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
+        body: { legs: nonEmptyLegs, inputMint: DEFAULT_INPUT_MINT, userPublicKey: userPubkey },
       });
       if (error || !data?.success) {
         setQuoteError(error?.message || data?.error || "Quote failed");
