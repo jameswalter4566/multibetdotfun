@@ -152,7 +152,9 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const apiPayload = await fetchEvents(status);
-    const rows = flattenMarkets(apiPayload).filter((r) => r.ticker);
+    const rows = flattenMarkets(apiPayload).filter(
+      (r) => r.ticker && r.yes_mint && r.no_mint && r.settlement_mint
+    );
     if (!rows.length) return json({ success: false, error: "No markets returned from API" }, 502);
 
     console.log("[sync-markets] upserting rows", { count: rows.length });
